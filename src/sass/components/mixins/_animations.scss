@@ -1,0 +1,16 @@
+
+@mixin shine-animation($speed: 200ms, $angle: 45deg) {
+    background: linear-gradient($angle, transparent 23% , map-get($map: $colors, $key: "darkgray") 25%,transparent 27% );
+    background-size: 300% 400%;
+    background-position-y:100%;
+    animation: $speed shine linear infinite;
+} 
+
+@keyframes shine {
+    from {
+        background-position-x: 0;
+    }
+    to {
+        background-position-x: -300%;
+    }
+}

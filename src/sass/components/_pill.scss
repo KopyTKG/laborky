@@ -1,0 +1,85 @@
+.pills {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pill {
+  width: 40rem;
+  background-color: map-get($map: $colors, $key: "darkwhite") !important;
+  padding: 1rem 2rem;
+  border: 2px solid map-get($map: $colors, $key: "darkblack");
+  border-radius: 0.5rem;
+  margin: 0 auto;
+
+  & .pill-main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    & .title {
+      color: map-get($map: $colors, $key: "lightblack");
+      font-size: map-get($map: $font-sizes, $key: "md");
+      font-weight: map-get($map: $font-weights, $key: "bold");
+    }
+
+    & .button {
+      border: none;
+      outline: 2px solid map-get($map: $colors, $key: "darkblack");
+      font-size: map-get($map: $font-sizes, $key: "sm");
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      transition: 0.25s ease-in-out;
+      cursor: pointer;
+    }
+  }
+
+  & .pill-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: map-get($map: $font-sizes, $key: "sm");
+
+    & .datetime {
+      color: map-get($map: $colors, $key: "darkblack");
+      font-size: map-get($map: $font-sizes, $key: "sm");
+      font-weight: map-get($map: $font-weights, $key: "bold");
+    }
+
+    & .capacity {
+      color: map-get($map: $colors, $key: "lightblack");
+      font-weight: map-get($map: $font-weights, $key: "bold");
+      font-size: map-get($map: $font-sizes, $key: "sm");
+    }
+  }
+}
+
+.active {
+  background-color: map-get($map: $colorsPRF, $key: "primary");
+  color: map-get($map: $colors, $key: "darkwhite");
+
+  &:hover {
+    background-color: map-get($map: $colorsPRF, $key: "highlight");
+    color: map-get($map: $colors, $key: "lightwhite");
+  }
+}
+
+.inactive {
+  background-color: map-get($map: $colorsPRF, $key: "disabled");
+  color: map-get($map: $colors, $key: "darkwhite");
+}
+
+.active-red {
+  background-color: map-get($map: $colors, $key: "darkred");
+  color: map-get($map: $colors, $key: "darkwhite");
+
+  &:hover {
+    background-color: lighten(map-get($map: $colors, $key: "darkred"), 5%);
+    color: map-get($map: $colors, $key: "lightwhite");
+  }
+}
+
+.inactive-red {
+  background-color: darken(map-get($map: $colors, $key: "darkred"), 30%);
+  color: map-get($map: $colors, $key: "darkwhite");
+}

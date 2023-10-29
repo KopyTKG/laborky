@@ -1,0 +1,6 @@
+.fallback {
+    @include shine-animation(
+            $speed: map-get($map: $shine, $key: "speed"),
+            $angle: map-get($map: $shine, $key: "angle")
+        );
+}

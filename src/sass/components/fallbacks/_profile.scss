@@ -1,0 +1,20 @@
+
+.f-profile {
+    width: $ProfileSize;
+    height: $ProfileSize;
+    @include shine-animation(
+        $speed: map-get($map: $shine, $key: "speed"),
+        $angle: map-get($map: $shine, $key: "angle")
+    );
+    @include FallbackBorder();
+}
+
+.f-name {
+    width: $NameWidth;
+    height: $NameHeight;
+    @include shine-animation(
+        $speed: map-get($map: $shine, $key: "speed"),
+        $angle: map-get($map: $shine, $key: "angle")
+    );
+    @include FallbackBorder($radius: 0.5rem );
+}

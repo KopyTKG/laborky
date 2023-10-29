@@ -1,0 +1,23 @@
+
+.profile {
+    width: 60rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    & .user {
+        width: 100%;
+        color: map-get($map: $colors, $key: 'lightwhite' );
+        font-size: map-get($map: $font-sizes, $key: 'xl' );
+        font-weight: map-get($map: $font-weights, $key: 'bold' );
+        padding: 1rem 2rem;
+    }
+
+    & .cats {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+}

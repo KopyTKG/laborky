@@ -1,0 +1,5 @@
+
+@mixin FallbackBorder($thikness: 0.125rem , $radius: 5rem ) {
+    border: $thikness solid map-get($map: $colors, $key: "darkwhite");
+    border-radius: $radius;
+}
