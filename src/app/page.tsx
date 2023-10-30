@@ -1,10 +1,10 @@
 'use client'
 import { redirect } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { setStag } from "./actions";
+import { useContext, useEffect,useState } from "react";
+import {useAuth} from "@/modules/auth.provider";
 
 export default function Home() {
-  
+  const {stag, setStag} = useAuth();
   useEffect(() => {
     const redirectUrl = 'https://ws.ujep.cz/ws/login?originalURL=http://localhost:3000';
     const searchParams = new URLSearchParams(window.location.search);
@@ -14,13 +14,13 @@ export default function Home() {
       stagUserRole: searchParams.get('stagUserRole'),
       stagUserInfo: searchParams.get('stagUserInfo')
     }
+    setStag(params);
     if (params.stagUserRole != null) {
-      setStag(params)
-      .then((param) => {
-        if(param.stagUserRole == 'ST') {
-          window.location.href = '/student'
-        }
-      })      
+      switch (params.stagUserRole) {
+        case 'ST':
+          redirect('/student');         
+          break;
+      }
     } else if (!window.location.href.includes(redirectUrl)) {
       // Redirect the user to the specified URL
       window.location.href = redirectUrl;
@@ -28,10 +28,10 @@ export default function Home() {
   }, []);
 
   return (
-    <main>
-      <div className="container-row">
-          <h1> Laborky</h1>
-      </div>
-    </main>
+      <main>
+        <div className="container-row">
+            <h1> Laborky</h1>
+        </div>
+      </main>
   );
 }
