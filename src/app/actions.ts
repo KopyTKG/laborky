@@ -10,10 +10,28 @@ export async function setStag(params: any) {
   return params;
 }
 
+export async function Set(key: string, value: string) {
+  cookies().set(key, value);
+  return value;
+}
+
 export async function getParam(param: string) {
   try {
     if (cookies().has(param)) {
       return cookies().get(param);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    throw e;
+  }
+}
+
+
+export async function deleteParam(param: string) {
+  try {
+    if (cookies().has(param)) {
+      return cookies().delete(param);
     } else {
       return null;
     }

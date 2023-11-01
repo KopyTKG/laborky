@@ -1,7 +1,9 @@
-import {Button} from '@nextui-org/button';
 import { Terminy } from "@/data/terminy"
 import Pill from "@/modules/pill.module"
 export default function StudentPage() {
+    
+
+
     return (
         <main>
             <div className="container">
