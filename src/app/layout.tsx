@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font'
 import '../sass/index.scss';
-import {NextUIProvider} from "@nextui-org/react";
 
+import './globals.css';
+//import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: 'Laborky UJEP',
@@ -17,9 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={GeistSans.className}>
-        <NextUIProvider>
           {children}
-        </NextUIProvider>
       </body>
     </html>
   )

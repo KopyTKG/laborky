@@ -2,8 +2,6 @@ import { Categorie } from "@/data/categorie";
 import Category from "@/modules/category.module";
 
 export default function ProfilePage() {
-    let one = 0;
-
     return (
         <main>
             <div className="profile">

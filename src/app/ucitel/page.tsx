@@ -2,9 +2,9 @@
 export default function UcitelPage() {
     return (
         <main>
-            <div className="container">
-               <h1> Student</h1>
-            </div>
+            <h1 className="text-4xl font-bold underline">
+        Hello world!
+      </h1>
         </main>
     )
 }
