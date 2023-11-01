@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font'
 import '../sass/index.scss';
-import {AuthWrapper} from '@/modules/auth.provider';
+import {NextUIProvider} from "@nextui-org/react";
 
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Laborky UJEP',
@@ -17,10 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AuthWrapper>
+      <body className={GeistSans.className}>
+        <NextUIProvider>
           {children}
-        </AuthWrapper>
+        </NextUIProvider>
       </body>
     </html>
   )

@@ -1,24 +1,23 @@
-'use server' 
-import { cookies } from 'next/headers'
- 
+"use server";
+import { cookies } from "next/headers";
+
 export async function setStag(params: any) {
-    const oneDay = 60 * 60;
-    cookies().set('stagUserTicket', params.stagUserTicket, {maxAge: oneDay})
-    cookies().set('stagUserName',  params.stagUserName, {maxAge: oneDay})
-    cookies().set('stagUserRole',  params.stagUserRole, {maxAge: oneDay})
-    cookies().set('stagUserInfo',  params.stagUserInfo, {maxAge: oneDay})
-    return params;
+  const oneDay = Date.now() + 60 * 60 * 1000 * 1.15 ;
+  cookies().set("stagUserTicket", params.stagUserTicket, { expires: oneDay });
+  cookies().set("stagUserName", params.stagUserName, { expires: oneDay });
+  cookies().set("stagUserRole", params.stagUserRole, { expires: oneDay });
+  cookies().set("stagUserInfo", params.stagUserInfo, { expires: oneDay });
+  return params;
 }
 
-
 export async function getParam(param: string) {
-    try {
-        if(cookies().has(param)) {
-            return cookies().get(param)
-        } else {
-            return null
-        }
-    } catch (e) {
-        throw e;
+  try {
+    if (cookies().has(param)) {
+      return cookies().get(param);
+    } else {
+      return null;
     }
+  } catch (e) {
+    throw e;
+  }
 }
