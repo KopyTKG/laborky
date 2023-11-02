@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Get, deleteParam } from "../actions";
 import { Button } from "@nextui-org/react";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 function User() {
   const [osCislo, setOsCislo] = useState<any>();
@@ -27,7 +28,9 @@ function Logout() {
     });
   }
   return (
-    <Button color="danger" onClick={logout}>
+    <Button color="danger" onClick={logout}
+      endContent={<ArrowRightOnRectangleIcon className="w-5"/>}
+    >
       Odhlásit se
     </Button>
   );

@@ -4,7 +4,6 @@ import { User } from "../clientSide";
 
 export default function ProfilePage() {
     return (
-        <main className="h-screen grid flex-col">
             <div className="profile flex self-start">
                <div className="user">
                    <User/>
@@ -15,6 +14,5 @@ export default function ProfilePage() {
                     ))}
                </div>
             </div>
-        </main>
     )
 }

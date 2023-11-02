@@ -4,30 +4,4 @@
 
 
 @import "./components/variables";
-@import "./components/default";
-
-/* Generators */
-@import "./components/mixins";
-@import "./components/buttons";
-@import "./components/fonts";
-
-
-// components
 @import "./components/scrollbar";
-@import "./components/nav";
-@import "./components/footer";
-@import "./components/box";
-@import "./components/container";
-@import "./components/item";
-@import "./components/pie";
-@import "./components/loading";
-@import "./components/pill";
-@import "./components/profile";
-@import "./components/category";
-
-
-// Fallbacks
-@import "./components/fallbacks/spinner";
-@import "./components/fallbacks/profile";
-@import "./components/fallbacks/linkbox";
-@import "./components/fallbacks/box";

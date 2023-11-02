@@ -1,20 +1,19 @@
 ::-webkit-scrollbar {
-    width: 5px;
-    background-color: $SecondaryColor;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-    -webkit-box-shadow: none;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    background: $PrimaryColor
-  }
-  ::-webkit-scrollbar-thumb:window-inactive {
-  background:darken($PrimaryColor, 5%)
-  }
-  
+  width: 5px;
+  background-color: $SecondaryColor;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: $PrimaryColor;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+  background: darken($PrimaryColor, 5%);
+}
