@@ -40,25 +40,11 @@ export default function NavbarComponent() {
           <Logout />
         </NavbarItem>
         <NavbarItem>
-          <Link href="/student/profil"> <User/> </Link>
+          <Link href="/student/profil">
+            
+             <User/> </Link>
         </NavbarItem>
       </NavbarBrand>
     </Navbar>
   );
 }
-
-/*
-
-<nav className="w-full">
-            <div className='buttons'>
-                <a href="/student">Domů</a>
-                <a href="/student/moje">Moje termíny</a>
-            </div>
-            <div className="title">Laborky UJEP</div>
-            <a className="user" href="/student/profil">
-                <div className="icon"></div>
-                F -----
-            </a>
-        </nav>
-
-*/

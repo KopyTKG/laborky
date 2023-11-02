@@ -1,18 +1,17 @@
-import { Moje } from "@/data/terminy"
-import Pill from "@/modules/pill.module"
+import { Moje } from "@/data/terminy";
+import Pill from "@/modules/pill.module";
+import Pills from "@/modules/terminy.display";
 
 export default function MojeTerminyPage() {
-
-    return (
-        <main>
-            <div className="container">
-               <h1> Moje termíny</h1>
-               <div className="pills">
-                    {Moje.map((termin) => (
-                        <Pill key={termin.id} {...termin} owned={true} enabled={termin.id == 1?true: false}/>
-                        ))}
-                </div>
-            </div>
-        </main>
-    )
+  return (
+    <main className="h-screen">
+      <div className="w-full flex flex-col gap-5 items-center h-screen">
+        <div className="text-4xl font-bold underline pb-5 mt-5">
+          {" "}
+          Moje termíny
+        </div>
+        <Pills data={Moje} owned={true} />
+      </div>
+    </main>
+  );
 }
