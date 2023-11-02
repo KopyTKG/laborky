@@ -8,7 +8,7 @@
 | FrontEnd | <a href="https://github.com/kopytkg">Kopy / Martin</a> | 
 | FrontEnd | <a href="https://github.com/DanielRiha8906">Aerceas / Dan</a> |  
 | BackEnd  | <a href="https://github.com/Midiros">Midiros / Adam</a> |
-| BackEnd | <a href=""> Alex </a> |
+| BackEnd | <a href="https://github.com/Bumross"> Alex </a> |
 
 </p>
 
