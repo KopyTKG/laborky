@@ -4,8 +4,7 @@ import { User } from "../clientSide";
 
 export default function ProfilePage() {
     return (
-        <main>
-            <div className="profile">
+            <div className="profile flex self-start">
                <div className="user">
                    <User/>
                </div>
@@ -15,6 +14,5 @@ export default function ProfilePage() {
                     ))}
                </div>
             </div>
-        </main>
     )
 }

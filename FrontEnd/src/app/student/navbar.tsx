@@ -7,17 +7,18 @@ import {
   Button,
 } from "@nextui-org/react";
 import { Logout, User } from "./clientSide";
+import { Bars3Icon, HomeIcon } from "@heroicons/react/24/outline";
 
 export default function NavbarComponent() {
   return (
-    <Navbar className="w-full flex bg-gray-800">
+    <Navbar className="w-full flex">
       <NavbarContent>
         <NavbarItem>
           <Button
             as={Link}
             href="/student"
             color="primary"
-            showAnchorIcon
+            endContent={<HomeIcon className="w-5"/>}
             variant="solid"
           >
             Domů
@@ -28,7 +29,7 @@ export default function NavbarComponent() {
             as={Link}
             href="/student/moje"
             color="primary"
-            showAnchorIcon
+            endContent={<Bars3Icon className="w-5"/>}
             variant="solid"
           >
             Moje termíny
@@ -40,25 +41,11 @@ export default function NavbarComponent() {
           <Logout />
         </NavbarItem>
         <NavbarItem>
-          <Link href="/student/profil"> <User/> </Link>
+          <Link href="/student/profil">
+            
+             <User/> </Link>
         </NavbarItem>
       </NavbarBrand>
     </Navbar>
   );
 }
-
-/*
-
-<nav className="w-full">
-            <div className='buttons'>
-                <a href="/student">Domů</a>
-                <a href="/student/moje">Moje termíny</a>
-            </div>
-            <div className="title">Laborky UJEP</div>
-            <a className="user" href="/student/profil">
-                <div className="icon"></div>
-                F -----
-            </a>
-        </nav>
-
-*/
