@@ -1,12 +1,13 @@
 import { Categorie } from "@/data/categorie";
 import Category from "@/modules/category.module";
+import { User } from "../clientSide";
 
 export default function ProfilePage() {
     return (
         <main>
             <div className="profile">
                <div className="user">
-                   F -----
+                   <User/>
                </div>
                <div className="cats">
                     {Categorie.map((cat) => (

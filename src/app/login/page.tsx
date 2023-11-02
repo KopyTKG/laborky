@@ -18,27 +18,7 @@ export default function Home() {
 
     
     if (params.stagUserRole != null) {
-      const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      const apiUrl = `https://ws.ujep.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=${searchParams.get("stagUserTicket")}`;
-      fetch(
-        `${corsProxyUrl}${apiUrl}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Connection: "keep-alive",
-          },
-        }
-      ).then(async (res) => {
-        if (res.ok) {
-          const data = await res.json();
-          //Set("osCislo", data.stagUserInfo[0].osCislo);
-          console.log(data);
-        } else {
-          console.error("Error:", res.status);
-        }
-      });
+      redirect('/');
     } else if (!window.location.href.includes(redirectUrl)) {
       // Redirect the user to the specified URL
       window.location.href = redirectUrl;

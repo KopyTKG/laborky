@@ -11,7 +11,9 @@ export async function setStag(params: any) {
 }
 
 export async function Set(key: string, value: string) {
-  cookies().set(key, value);
+  const oneDay = Date.now() + 60 * 60 * 1000 * 1.15 ;
+
+  await cookies().set(key, value, { expires: oneDay });
   return value;
 }
 
@@ -38,4 +40,8 @@ export async function deleteParam(param: string) {
   } catch (e) {
     throw e;
   }
+}
+
+export async function Get(key: string) {
+  return cookies().get(key);
 }

@@ -6,6 +6,7 @@ import {
   Link,
   Button,
 } from "@nextui-org/react";
+import { Logout, User } from "./clientSide";
 
 export default function NavbarComponent() {
   return (
@@ -34,9 +35,12 @@ export default function NavbarComponent() {
           </Button>
         </NavbarItem>
       </NavbarContent>
-      <NavbarBrand className="flex w-full justify-end">
+      <NavbarBrand className="flex w-full justify-end gap-5">
         <NavbarItem>
-          <Link href="/student/profil"> F ---- </Link>
+          <Logout />
+        </NavbarItem>
+        <NavbarItem>
+          <Link href="/student/profil"> <User/> </Link>
         </NavbarItem>
       </NavbarBrand>
     </Navbar>
