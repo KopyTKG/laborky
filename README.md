@@ -23,6 +23,6 @@ TDB
  Verze
 </h3>
 
-| Verze | Status | Podpora |
-| ------ | -----| ---- |
-|  V 0.1.0 | Latest | :white_check_mark: | 
+| Verze FD | Verze BD | Status | Podpora |
+| --- | --- | -----| ---- |
+|  V 0.1.0 | V ---- | Latest | :white_check_mark: | 
