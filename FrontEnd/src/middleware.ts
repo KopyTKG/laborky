@@ -7,8 +7,11 @@ export async function middleware(request: NextRequest) {
       const group = request.cookies.get("stagUserRole")?.value;
       if (group == "ST") {
         request.nextUrl.pathname = "/student";
-      } else {
+      } else if (group == "VY") {
         request.nextUrl.pathname = "/ucitel";
+      } else {
+        request.nextUrl.pathname = "/login";
+        request.cookies.clear();
       }
       return NextResponse.redirect(new URL(request.nextUrl));
     }
@@ -55,7 +58,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/student", "/student/profil", "/student/moje"],
+  matcher: ["/", "/student", "/student/profil", "/student/moje", '/ucitel'],
 };
 function BaseAuth(request: NextRequest) {
   if (
