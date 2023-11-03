@@ -36,3 +36,6 @@
 /FrontEnd/next-env.d.ts
 
 /FrontEnd/package-lock.json
+
+/FrontEnd/.env
+/FrontEnd/.env.local
