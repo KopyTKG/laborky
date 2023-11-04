@@ -1,108 +1,60 @@
+import { randomInt, randomUUID } from "crypto";
 
-const Terminy = [
-    {
-        id: 1,
-        title: 'ZPS Laboratorní cvičení 1',
-        type: 1,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 2,
-        location: 'CP1.01'
-    },
-    {
-        id: 2,
-        title: 'ZPS Laboratorní cvičení 2',
-        type: 2,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 5,
-        location: 'CP1.01'
-    },
-    {
-        id: 3,
-        title: 'ZPS Laboratorní cvičení 1',
-        type: 1,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 14,
-        location: 'CP1.01'
-    },
-    {
-        id: 4,
-        title: 'ZPS Laboratorní cvičení 2',
-        type: 2,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 20,
-        location: 'CP1.01'
-    },
-    {
-        id: 5,
-        title: 'ZPS Laboratorní cvičení 3',
-        type: 3,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 0,
-        location: 'CP1.01'
-    },
-    {
-        id: 6,
-        title: 'ZPS Laboratorní cvičení 1',
-        type: 1,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 12,
-        location: 'CP1.01'
-    },
-    {
-        id: 7,
-        title: 'ZPS Laboratorní cvičení 2',
-        type: 2,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 9,
-        location: 'CP1.01'
-    },
-]
 
-const Moje = [
+const Terminy: Array<Object> = [];
+
+for (let i = 0; i < 40; i++) {
+  const obj = {
+    _id: randomUUID(),
+    location: 'CP1.01',
+    start: new Date("2023-12-01T08:30:00.000Z"), // Update with your desired start time
+    end: new Date("2023-12-01T10:00:00.000Z"), // Update with your desired end time
+    predmet: 'ZPS',
+    cislo: Math.floor(Math.random() * 3) + 1, // Random number between 1 and 3
+    kapacita: 10,
+    zapsany: [] as string[],
+  };
+
+  for (let j = 0; j < randomInt(1, 21); j++) {
+    obj.zapsany.push(randomUUID());
+  }
+
+  Terminy.push(obj);
+}
+
+const Moje: Array<Object> = [
+
     {
-        id: 1,
-        title: 'ZPS Laboratorní cvičení 1',
-        type: 1,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 2,
-        location: 'CP1.01'
-    },
-    {
-        id: 2,
-        title: 'ZPS Laboratorní cvičení 2',
-        type: 2,
-        start: '8:30',
-        end: '10:00',
-        date: '32.13.9999',
-        cap: 20,
-        taken: 5,
-        location: 'CP1.01'
+        _id: randomUUID(),
+        location: 'CP1.01',
+        start: new Date(), // Update with your desired start time
+        end: new Date(), // Update with your desired end time
+        predmet: 'PCA',
+        cislo: 1,
+        kapacita: 10,
+        zapsany: ['1f3as45fefvae4'],
+      }
+];
+
+for (let i = 0; i < 3; i++) {
+    const obj = {
+      _id: randomUUID(),
+      location: 'CP1.01',
+      start: new Date("2023-12-01T08:30:00.000Z"), // Update with your desired start time
+      end: new Date("2023-12-01T10:00:00.000Z"), // Update with your desired end time
+      predmet: 'ZPS',
+      cislo: i+1,
+      kapacita: 10,
+      zapsany: ['1f3as45fefvae4'] as string[],
+    };
+  
+    for (let j = 0; j < randomInt(1, 21); j++) {
+      obj.zapsany.push(randomUUID());
     }
-]
+  
+    Moje.push(obj);
+  }
+
 
 
 export {
