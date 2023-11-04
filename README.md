@@ -26,4 +26,4 @@ TDB
 | Verze FD | Verze BD | Status | Podpora |
 | --- | --- | -----| ---- |
 |  V 0.2.0 | V ---- | Latest | :white_check_mark: | 
-|  V 0.1.0 | V ---- | Latest | :X: | 
+|  V 0.1.0 | V ---- | Latest | :x: | 
