@@ -1,14 +1,23 @@
 import Pill from "./pill.module";
 
+export default function Pills(props: any) {
+  let Terminy = (props.data as any[]).sort((a, b) => {
+    if (a.cislo < b.cislo) {
+      return -1;
+    }
+    if (a.cislo > b.cislo) {
+      return 1;
+    }
+    return 0;
+  });
 
-export default function Pills(props :any) {
-    return (
-        <>
-        <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row  gap-2">
-                    {props.data.map((termin: { id: any; }) => (
-                        <Pill key={termin.id} owned={props.owned? true : false} {...termin}/>
-                        ))}
-                </div>
-        </>
-    )
+  return (
+    <>
+      <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+        {Terminy.map((termin: { _id: any, zapsany: string[] }) => (
+          <Pill key={termin._id} owned={termin.zapsany.includes('1f3as45fefvae4')? true : false} {...termin} />
+        ))}
+      </div>
+    </>
+  );
 }
