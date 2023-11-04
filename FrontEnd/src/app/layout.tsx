@@ -4,6 +4,7 @@ import "../sass/index.scss";
 
 import "./globals.css";
 import { Providers } from "./providers";
+import Theme from "@/modules/theme.module";
 
 export const metadata: Metadata = {
   title: "Laborky UJEP",
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <Providers>
-          <main className="min-h-screen h-max pb-3 dark text-foreground bg-background">
+          <Theme>
+          <main id="main" className="min-h-screen h-max pb-3 dark text-foreground bg-background">
             {children}
           </main>
+          </Theme>
         </Providers>
       </body>
     </html>
