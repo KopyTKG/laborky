@@ -1,53 +1,35 @@
-const Categorie = [
-    {
-        title: 'ZPS',
-        labs: [
-            {
-                name: "Laboratorni cviceni 1",
-                done: true
-            },
-            {
-                name: 'Laboratorni cviceni 2',
-                done: false
-            }
-        ]
-    },
-    {
-        title: 'PCA',
-        labs: [
-            {
-                name: "Laboratorni cviceni 1",
-                done: true
-            },
-            {
-                name: 'Laboratorni cviceni 2',
-                done: false
-            },
-            {
-                name: 'Laboratorni cviceni 3',
-                done: false
-            }
-        ]
-    },
-    {
-        title: 'ZEL',
-        labs: [
-            {
-                name: "Laboratorni cviceni 1",
-                done: true
-            },
-            {
-                name: 'Laboratorni cviceni 2',
-                done: false
-            },
-            {
-                name: 'Laboratorni cviceni 3',
-                done: false
-            }
-        ]
-    }
-]
+import { randomUUID } from "crypto"
+
+const User = {
+    _id: randomUUID(),
+    osCislo: "F-----",
+    Laborky: [
+        {
+            nazev: "PCA",
+            cviceni: [
+                false, false
+            ],
+        },
+        {
+            nazev: "ZPS",
+            cviceni: [
+                true, true, false
+            ],
+        },
+        {
+            nazev: "ZEL",
+            cviceni: [
+                true, false
+            ]
+        }
+    ],
+    Terminy: [
+        //TerminID
+        () => {for (let i = 0; i < 5; i++) return randomUUID()}
+    ]
+
+}
 
 export {
-    Categorie
+    User
 }
