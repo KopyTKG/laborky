@@ -1,64 +1,36 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-
 export async function middleware(request: NextRequest) {
-  if (BaseAuth(request) && UserAuth(request)) {
+  if (
+    BaseAuth(request) &&
+    Validate(request.cookies.get("stagUserInfo")?.value || "")
+  ) {
+    let userInfo = request.cookies.get("stagUserInfo")?.value || "";
+    let decoded = base64ToText(userInfo) || { stagUserInfo: [{}] };
+    let user = decoded?.stagUserInfo[0];
     if (request.url.endsWith("/")) {
-      const group = request.cookies.get("stagUserRole")?.value;
-      if (group == "ST") {
+      if (user.role == "ST") {
         request.nextUrl.pathname = "/student";
-      } else if (group == "VY") {
+      } else if (user.role == "VY") {
         request.nextUrl.pathname = "/ucitel";
-      } else {
-        request.nextUrl.pathname = "/login";
-        request.cookies.clear();
       }
       return NextResponse.redirect(new URL(request.nextUrl));
-    }
-
-    if (request.url.endsWith("/login")) {
-      request.nextUrl.pathname = "/";
-      return NextResponse.redirect(new URL(request.nextUrl));
-    }
-  } else if (BaseAuth(request)) {
-    if (request.url.endsWith("/")) {
-      const apiUrl = `https://ws.ujep.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=${
-        request.cookies.get("stagUserTicket")?.value
-      }`;
-      const data = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Connection: "keep-alive",
-        },
-      });
-      if (!data.ok) {
-        console.error("Error:", data.status);
-      } else {
-        console.log(data);
-        const parsed = await data.json();
-        const redirectUrl = `?osCislo=${
-          parsed.stagUserInfo[0].osCislo
-        }&stagUserRole=${request.cookies.get("stagUserRole")?.value}`;
-        if (request.url !== redirectUrl) {
-          request.nextUrl.pathname = "/";
-          request.nextUrl.search = redirectUrl;
-          return NextResponse.redirect(new URL(request.nextUrl));
-        }
+    } else {
+      if (!request.url.includes("student") && user.role == "ST") {
+        return Kick(request);
+      } else if (!request.url.includes("ucitel") && user.role == "VY") {
+        return Kick(request);
       }
     }
   } else {
     if (!request.url.endsWith("/login")) {
-      request.nextUrl.pathname = "/login";
-      request.cookies.clear();
-      return NextResponse.redirect(new URL(request.nextUrl));
+      return Kick(request);
     }
   }
 }
 
 export const config = {
-  matcher: ["/", "/student", "/student/profil", "/student/moje", '/ucitel'],
+  matcher: ["/", "/student", "/student/profil", "/student/moje", "/ucitel"],
 };
 function BaseAuth(request: NextRequest) {
   if (
@@ -69,21 +41,38 @@ function BaseAuth(request: NextRequest) {
     request.cookies.get("stagUserTicket")?.value != "" &&
     request.cookies.get("stagUserName")?.value != "" &&
     request.cookies.get("stagUserRole")?.value != "" &&
-    request.cookies.get("stagUserInfo")?.value != "" 
-  
+    request.cookies.get("stagUserInfo")?.value != ""
   ) {
     return true;
   } else {
     return false;
   }
 }
-function UserAuth(request: NextRequest) {
-  if (
-    request.cookies.has("osCislo") &&
-    request.cookies.get("osCislo")?.value != ""
-  ) {
+
+function Validate(base: string) {
+  try {
+    base64ToText(base);
     return true;
-  } else {
+  } catch (e) {
     return false;
   }
+}
+
+function base64ToText(base64: string) {
+  const binaryString = atob(base64);
+  const Bytes = new Uint8Array(
+    Array.from(binaryString, (m) => m.charCodeAt(0))
+  );
+  return JSON.parse(new TextDecoder().decode(Bytes));
+}
+
+function Kick(request: NextRequest) {
+  request.nextUrl.pathname = "/login";
+  request.cookies.clear();
+  return NextResponse.redirect(new URL(request.nextUrl));
+}
+
+
+export {
+  base64ToText
 }
