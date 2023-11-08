@@ -20,11 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <Providers>
-          <Theme>
           <main id="main" className="min-h-screen h-max pb-3 dark text-foreground bg-background">
             {children}
           </main>
-          </Theme>
         </Providers>
       </body>
     </html>
