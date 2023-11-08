@@ -1,10 +1,11 @@
 "use client";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { Switch } from "@nextui-org/react";
+import { redirect } from "next/dist/server/api-utils";
 import { useEffect, useState } from "react";
 
 export default function Theme(props: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") === "dark" ? false : true);
+  const [theme, setTheme] = useState(true);
 
  
 
@@ -12,22 +13,32 @@ export default function Theme(props: { children: React.ReactNode }) {
 
   useEffect(() => {
     SwitchTheme();
-  }, [theme]);
+  }, []);
+
   function SwitchTheme() {
     let root = document.getElementById("main");
-
-    if (localStorage.getItem("theme") === "dark") {
+    const urlParams = new URLSearchParams(window.location.search);
+    let theme = urlParams.get("theme");
+    if (theme === "dark") {
       root?.classList.remove("dark");
       localStorage.setItem("theme", "light");
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("theme", "light");
+      window.location.href = currentUrl.href;
+      setTheme(true);
     } else {
       root?.classList.add("dark");
       localStorage.setItem("theme", "dark");
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("theme", "dark");
+      window.location.href = currentUrl.href;
+      setTheme(false);
     }
   }
   return (
     <>
       <Switch
-        defaultSelected={theme}
+        isSelected={theme}
         startContent={<SunIcon />}
         endContent={<MoonIcon />}
         size="md"
