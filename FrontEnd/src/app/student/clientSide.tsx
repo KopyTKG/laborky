@@ -1,46 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Get, deleteParam } from "../actions";
-import { Button } from "@nextui-org/react";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
-import { base64ToText } from "@/middleware";
+import { Suspense, useEffect, useState } from "react";
 
 function User() {
-  const [osCislo, setOsCislo] = useState<any>();
+  const [osCislo, setOsCislo] = useState<string>("F-----");
   useEffect(() => {
-    try {
-      Get("stagUserInfo")
-      .then((raw) => {
-        let userInfo = base64ToText(raw?.value || "")
-        setOsCislo(userInfo?.stagUserInfo[0].userName);
-      });
-    } catch (e) {
-      setOsCislo("F-----");
-    }
-  }, [osCislo]);
-
-  if (!osCislo) {
-    return <>F-----</>;
-  } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParamValue = urlParams.get('user');
+      setOsCislo(searchParamValue || "");
+  }, []);
     return <>{osCislo}</>;
-  }
+  
 }
 
-function Logout() {
-  function logout() {
-    deleteParam("stagUserTicket").then(() => {
-      window.location.href = "/";
-    });
-  }
-  return (
-    <Button
-      color="danger"
-      onClick={logout}
-      endContent={<ArrowRightOnRectangleIcon className="w-5" />}
-    >
-      Odhlásit se
-    </Button>
-  );
-}
-
-export { User, Logout };
+export { User };

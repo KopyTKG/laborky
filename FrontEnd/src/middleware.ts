@@ -22,6 +22,11 @@ export async function middleware(request: NextRequest) {
         return Kick(request);
       }
     }
+    if (!request.nextUrl.searchParams.has("user")) {
+      request.nextUrl.searchParams.append(`user`, user.userName);
+      return NextResponse.redirect(new URL(request.nextUrl));
+
+    }
   } else {
     if (!request.url.endsWith("/login")) {
       return Kick(request);
@@ -72,7 +77,4 @@ function Kick(request: NextRequest) {
   return NextResponse.redirect(new URL(request.nextUrl));
 }
 
-
-export {
-  base64ToText
-}
+export { base64ToText };

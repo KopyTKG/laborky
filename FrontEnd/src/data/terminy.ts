@@ -5,7 +5,7 @@ const Terminy: Array<Object> = [];
 
 for (let i = 0; i < 40; i++) {
   const obj = {
-    _id: randomUUID(),
+    _id: () => {return randomUUID()},
     location: 'CP1.01',
     start: new Date("2023-12-01T08:30:00.000Z"), // Update with your desired start time
     end: new Date("2023-12-01T10:00:00.000Z"), // Update with your desired end time
@@ -25,7 +25,7 @@ for (let i = 0; i < 40; i++) {
 const Moje: Array<Object> = [
 
     {
-        _id: randomUUID(),
+        _id: () => {return randomUUID()},
         location: 'CP1.01',
         start: new Date(), // Update with your desired start time
         end: new Date(), // Update with your desired end time
@@ -38,7 +38,7 @@ const Moje: Array<Object> = [
 
 for (let i = 0; i < 3; i++) {
     const obj = {
-      _id: randomUUID(),
+      _id: () => {return randomUUID()},
       location: 'CP1.01',
       start: new Date("2023-12-01T08:30:00.000Z"), // Update with your desired start time
       end: new Date("2023-12-01T10:00:00.000Z"), // Update with your desired end time

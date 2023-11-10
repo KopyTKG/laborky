@@ -1,5 +1,7 @@
 'use client'
 import {
+  Chip,
+  Divider,
   Table,
   TableBody,
   TableCell,
@@ -9,11 +11,9 @@ import {
 } from "@nextui-org/react";
 export default function laborator(props: any) {
   return (
-    <div className="category">
-      <div className="title">{props.state.nazev}</div>
-      <div className="labs">
-        {" "}
-        <Table hideHeader>
+    <div >
+      <div className="text-2xl">{props.state.nazev}</div>
+        <Table hideHeader className="min-w-max max-w-full mb-6 ">
           <TableHeader>
             <TableColumn>Name</TableColumn>
             <TableColumn>Value</TableColumn>
@@ -21,26 +21,26 @@ export default function laborator(props: any) {
           <TableBody>
             {/* Tady se vytvori ta tabulka -> info tady mam z tech lab */}
             {props.state.cviceni.map((lab: any, index: any) => (
-              <>
-                <TableRow>
-                  <TableCell>
+                <TableRow key={index}>
+                  <TableCell className="text-md">
                   Laboratorni Cviceni {index +1}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="flex justify-end" >
                     {lab ? (
-                      <div className="done">
+                      <Chip color="success">
                         Splnil
-                      </div> /*tady jednotlive radky, tady se bude renderovat*/
+                      </Chip>
                     ) : (
-                      <div className="not-done">Nesplnil</div>
+                      <Chip color="danger">
+
+                        Nesplnil
+                      </Chip>
                     )}
                   </TableCell>
                 </TableRow>
-              </>
           ))}
           </TableBody>
         </Table>
-      </div>
     </div>
   );
 }

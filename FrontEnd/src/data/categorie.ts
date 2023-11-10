@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto"
 
 const User = {
-    _id: randomUUID(),
+    _id: () => {return randomUUID()},
     osCislo: "F-----",
     Laborky: [
         {
