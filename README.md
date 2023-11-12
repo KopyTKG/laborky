@@ -12,6 +12,16 @@
 
 </p>
 
+<h2> Čti před spuštením </h2>
+Backend nebude fungovat bez vytvorení `BackEnd/.env` souboru.
+Do toho souboru je nutno dát
+
+```bash
+PORT=9999 // Pro testovani bylo pouzito 3010
+HOST=`0.0.0.0` // neboli localhost
+```
+
+
 <h2> Popis projektu </h2>
 
 <p>
