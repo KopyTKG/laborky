@@ -1,5 +1,7 @@
-'use client'
 import {
+  Chip,
+  Divider,
+  Spacer,
   Table,
   TableBody,
   TableCell,
@@ -9,38 +11,35 @@ import {
 } from "@nextui-org/react";
 export default function laborator(props: any) {
   return (
-    <div className="category">
-      <div className="title">{props.state.nazev}</div>
-      <div className="labs">
-        {" "}
-        <Table hideHeader>
-          <TableHeader>
-            <TableColumn>Name</TableColumn>
-            <TableColumn>Value</TableColumn>
-          </TableHeader>
-          <TableBody>
-            {/* Tady se vytvori ta tabulka -> info tady mam z tech lab */}
-            {props.state.cviceni.map((lab: any, index: any) => (
-              <>
-                <TableRow>
-                  <TableCell>
-                  Laboratorni Cviceni {index +1}
-                  </TableCell>
-                  <TableCell>
-                    {lab ? (
-                      <div className="done">
-                        Splnil
-                      </div> /*tady jednotlive radky, tady se bude renderovat*/
-                    ) : (
-                      <div className="not-done">Nesplnil</div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              </>
+    <div className="flex flex-col">
+      <div className="text-2xl">{props.state.nazev}</div>
+      <Table hideHeader>
+        <TableHeader>
+          <TableColumn>Name</TableColumn>
+          <TableColumn>Value</TableColumn>
+        </TableHeader>
+        <TableBody>
+          {/* Tady se vytvori ta tabulka -> info tady mam z tech lab */}
+          {props.state.cviceni.map((lab: any, index: any) => (
+            <TableRow key={props.state.nazev + index}>
+              <TableCell>Laboratorni Cviceni {index + 1}</TableCell>
+              <TableCell className="flex justify-end">
+                {lab ? (
+                  <Chip color="success" size="md">
+                    Splnil
+                  </Chip>
+                ) : (
+                  <Chip color="danger" size="md">
+                    Nesplnil
+                  </Chip>
+                )}
+              </TableCell>
+            </TableRow>
           ))}
-          </TableBody>
-        </Table>
-      </div>
+        </TableBody>
+      </Table>
+      <Spacer y={2} />
+      <Divider/>
     </div>
   );
 }
