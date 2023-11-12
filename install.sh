@@ -10,4 +10,5 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 else
     echo "Windows"
     start powershell -Command 'cd FrontEnd | npm i'
+    start powershell -Command 'cd BackEnd | python -m venv venv | venv/scripts/activate | pip install -r requirements.txt'
 fi

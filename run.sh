@@ -9,4 +9,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 else
     echo "Windows"
     start powershell -Command 'cd FrontEnd | npm run dev'
+    start powershell -Command 'cd BackEnd | python server.py'
+
 fi
