@@ -13,7 +13,7 @@ export default function laborator(props: any) {
   return (
     <div >
       <div className="text-2xl">{props.state.nazev}</div>
-        <Table hideHeader className="min-w-max max-w-full mb-6 ">
+        <Table hideHeader className="min-w-max max-w-full mb-6" aria-label={props.state.nazev + " Tabulka laborek"}>
           <TableHeader>
             <TableColumn>Name</TableColumn>
             <TableColumn>Value</TableColumn>

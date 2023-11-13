@@ -11,18 +11,23 @@ import {
   NavbarMenu,
   NavbarMenuItem,
 } from "@nextui-org/react";
-import { User } from "./clientSide";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteParam } from "../actions";
 
 export default function NavbarComponent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const [osCislo, setOsCislo] = useState("");
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const user = searchParams.get('user') || '';
+    setOsCislo(user);
+  }, []);
   function logout() {
     deleteParam("stagUserTicket").then(() => {
       window.location.href = "/";
@@ -118,7 +123,7 @@ export default function NavbarComponent() {
         <NavbarItem>
           <Link href="/student/profil" className="flex gap-2">
             <Avatar size="sm" color="default" />
-              <User />
+              {osCislo}
           </Link>
         </NavbarItem>
       </NavbarBrand>

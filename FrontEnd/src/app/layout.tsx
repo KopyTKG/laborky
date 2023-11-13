@@ -4,7 +4,6 @@ import "../sass/index.scss";
 
 import "./globals.css";
 import { Providers } from "./providers";
-import Theme from "@/modules/theme.module";
 
 export const metadata: Metadata = {
   title: "Laborky UJEP",

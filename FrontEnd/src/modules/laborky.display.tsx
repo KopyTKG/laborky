@@ -1,7 +1,7 @@
 import { User as UserData } from "@/data/categorie";
 import Laborator from "@/modules/laborator.module";
 import { randomUUID } from "crypto";
-export default function Terminy() {
+export default function Laborky() {
   return (
     <>
       {UserData.Laborky.map((cat) => (

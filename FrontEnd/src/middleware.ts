@@ -15,18 +15,19 @@ export async function middleware(request: NextRequest) {
         request.nextUrl.pathname = "/ucitel";
       }
       return NextResponse.redirect(new URL(request.nextUrl));
-    } else {
-      if (!request.url.includes("student") && user.role == "ST") {
-        return Kick(request);
-      } else if (!request.url.includes("ucitel") && user.role == "VY") {
-        return Kick(request);
-      }
     }
+    
     if (!request.nextUrl.searchParams.has("user")) {
       request.nextUrl.searchParams.append(`user`, user.userName);
       return NextResponse.redirect(new URL(request.nextUrl));
-
     }
+
+    if (!request.url.includes("student") && user.role == "ST") {
+      return Kick(request);
+    } else if (!request.url.includes("ucitel") && user.role == "VY") {
+      return Kick(request);
+    }
+
   } else {
     if (!request.url.endsWith("/login")) {
       return Kick(request);
