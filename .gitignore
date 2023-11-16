@@ -45,3 +45,4 @@ FrontEnd/.env.local
 
 BackEnd/venv/
 BackEnd/.env
+FrontEnd/.env
