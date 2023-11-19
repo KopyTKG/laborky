@@ -5,7 +5,7 @@ import { setStag } from '../actions'
 export default function Home() {
  //const {stag, setStag} = useAuth();
  useEffect(() => {
-  const redirectUrl = `https://ws.ujep.cz/ws/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login`
+  const redirectUrl = `https://ws.ujep.cz/ws/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
   const searchParams = new URLSearchParams(window.location.search)
   const params = {
    stagUserTicket: searchParams.get('stagUserTicket'),

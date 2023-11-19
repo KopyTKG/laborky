@@ -14,14 +14,14 @@ export async function middleware(request: NextRequest) {
    return NextResponse.redirect(new URL(request.nextUrl))
   } else {
    if (!request.url.includes('student') && user.role == 'ST') {
-    return Kick(request)
+    return await Kick(request)
    } else if (!request.url.includes('ucitel') && user.role == 'VY') {
-    return Kick(request)
+    return await Kick(request)
    }
   }
  } else {
   if (!request.url.endsWith('/login')) {
-   return Kick(request)
+   return await Kick(request)
   }
  }
 }
@@ -64,10 +64,37 @@ function base64ToText(base64: string) {
  return JSON.parse(new TextDecoder().decode(Bytes))
 }
 
-function Kick(request: NextRequest) {
- request.nextUrl.pathname = '/login'
- request.cookies.clear()
- return NextResponse.redirect(new URL(request.nextUrl))
+async function Kick(request: NextRequest) {
+ const ticket = request.cookies.get('stagUserTicket')?.value || ''
+ const url = `https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByStudent?stagUser=${ticket}&osCislo=F22118`
+ const response = await fetch(url, {
+  method: 'GET',
+  headers: {
+   Accept: 'application/json',
+   'Content-Type': 'application/json',
+  },
+ })
+ console.log(url)
+ console.log(response.status)
+
+ //  if (ticket == '') {
+ // request.nextUrl.pathname = '/login'
+ // return NextResponse.redirect(new URL(request.nextUrl))
+ //  }
+ //  const url = `https://ws.ujep.cz/ws/services/rest2/help/invalidateTicket?ticket=${ticket}`
+ //  const response = await fetch(url, {
+ // method: 'GET',
+ // headers: {
+ //  Accept: 'text/plain',
+ // },
+ //  })
+ //  if (response.ok) {
+ // request.cookies.clear()
+ // request.nextUrl.pathname = '/login'
+ // return NextResponse.redirect(new URL(request.nextUrl))
+ //  } else {
+ // throw new Error('Ticket not valid')
+ //  }
 }
 
 export { base64ToText }

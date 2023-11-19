@@ -27,7 +27,7 @@ function User() {
 
 function Logout() {
  function logout() {
-  deleteParam('stagUserTicket').then(() => {
+  deleteParam('stagUserName').then(() => {
    window.location.href = '/'
   })
  }
