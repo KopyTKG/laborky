@@ -19,11 +19,12 @@ def GetStagUser(Ticket):
 
 @app.get("/test")
 def TestRequest():
-    ticket = "6be64e1499a966ef85538ef7f5bfdebe353838550a17e49f001ac0e46a384f24"
-    token = GetStagUser(ticket)
+    ticket = "762f667590053e32ae2e528906ed59141a0bae39985e5f985a5b656a9b20cb8a"
+    # token = GetStagUser(ticket)
     user = "F22118"
-    print(token)
-    url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByKatedra?stagUser=" + ticket + "&semestr=ZS&katedra=KI"
+    # print(token)
+    
+    url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByKatedra?stagUser=F22118&semestr=ZS&katedra=KI"
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -33,7 +34,7 @@ def TestRequest():
     response = requests.get(url, headers=headers)
     print(url)
     print(str(response.headers))
-    return GetStagUser(ticket)
+    return 'success', 200
 
 
 
