@@ -38,4 +38,20 @@ def TestRequest():
 
 
 
-app.run(host=os.getenv('HOST'), port=os.getenv('PORT'))
+
+if __name__ == "__main__":
+    # app.run(host=os.getenv('HOST'), port=os.getenv('PORT'))
+    url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByKatedra"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://ws.ujep.cz",
+    }
+    params = {
+        'semestr': 'ZS',
+        'katedra': 'KI',
+    }
+    ticket = '530fd05809a860ff21e8e6a57d96e1869c9eb72659608d34c9f5f929350ca8f2'
+    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
+    print(response.json())
