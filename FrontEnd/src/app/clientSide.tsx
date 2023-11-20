@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Get, deleteParam } from '../actions'
+import { Get, deleteParam } from './actions'
 import { Button } from '@nextui-org/react'
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
 import { base64ToText } from '@/middleware'
@@ -27,7 +27,7 @@ function User() {
 
 function Logout() {
  function logout() {
-  deleteParam('stagUserName').then(() => {
+  deleteParam('stagUserInfo').then(() => {
    window.location.href = '/'
   })
  }

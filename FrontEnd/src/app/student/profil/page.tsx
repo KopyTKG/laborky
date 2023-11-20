@@ -1,4 +1,4 @@
-import { User } from '../clientSide'
+import { User } from '../../clientSide'
 import Terminy from '@/modules/terminy'
 export default function ProfilePage() {
  return (

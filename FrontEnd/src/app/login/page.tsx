@@ -9,12 +9,10 @@ export default function Home() {
   const searchParams = new URLSearchParams(window.location.search)
   const params = {
    stagUserTicket: searchParams.get('stagUserTicket'),
-   stagUserName: searchParams.get('stagUserName'),
-   stagUserRole: searchParams.get('stagUserRole'),
    stagUserInfo: searchParams.get('stagUserInfo'),
   }
   setStag(params).then(() => {
-   if (params.stagUserRole != null) {
+   if (params.stagUserTicket != null && params.stagUserInfo != null) {
     window.location.href = '/'
    } else if (!window.location.href.includes(redirectUrl)) {
     // Redirect the user to the specified URL

@@ -25,9 +25,9 @@ export default function laborator(props: any) {
       <TableRow key={props.state.nazev + index}>
        <TableCell>Laboratorni Cviceni {index + 1}</TableCell>
        <TableCell className="flex justify-end">
-        {lab ? (
+        {lab != '' ? (
          <Chip color="success" size="md">
-          Splnil
+          {new Date(lab).toLocaleDateString()}
          </Chip>
         ) : (
          <Chip color="danger" size="md">

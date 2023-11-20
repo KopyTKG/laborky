@@ -8,15 +8,15 @@ const User = {
  Laborky: [
   {
    nazev: 'PCA',
-   cviceni: [false, false],
+   cviceni: ['', ''],
   },
   {
    nazev: 'ZPS',
-   cviceni: [true, true, false],
+   cviceni: [new Date(), new Date(), ''],
   },
   {
    nazev: 'ZEL',
-   cviceni: [true, false],
+   cviceni: [new Date(), ''],
   },
  ],
  Terminy: [
