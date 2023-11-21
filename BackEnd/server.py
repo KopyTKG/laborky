@@ -1,41 +1,48 @@
-from flask import Flask
+from flask import Flask, request
+from classes.stag import *
+from jose import jwt
 import dotenv, os, requests, json
+
 
 dotenv.load_dotenv();
 
 app = Flask(__name__)
 
-def GetStagUser(Ticket):
-    url = "https://ws.ujep.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + Ticket
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive",
-    }
-    response = requests.get(url, headers=headers)
-    print(response)
-    return str(response.json())
-
 
 @app.get("/test")
 def TestRequest():
-    ticket = "762f667590053e32ae2e528906ed59141a0bae39985e5f985a5b656a9b20cb8a"
-    # token = GetStagUser(ticket)
-    user = "F22118"
-    # print(token)
+    return 'OK', 200
+
+@app.route("/validate", methods=["GET"])
+def ValidateUser():
+    headers = request.headers
+    auth = headers.get("Authorization")
+    if auth:
+        try: 
+            res = GetStagUser(auth)
+            strStag = json.dumps(res)
+            token = jwt.encode(res, os.getenv('SECRET'), algorithm="HS256")
+            return token
+        except:
+            return "Unauthorized", 401
+    else:
+        return "Not Acceptable", 406
+
+if __name__ == "__main__":
+    app.run(host=os.getenv('HOST'), port=os.getenv('PORT'))
+
     
-    url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByKatedra?stagUser=F22118&semestr=ZS&katedra=KI"
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive",
-        "Accept-Origin": "https://ws.ujep.cz",
-    }
-    response = requests.get(url, headers=headers)
-    print(url)
-    print(str(response.headers))
-    return 'success', 200
-
-
-
-app.run(host=os.getenv('HOST'), port=os.getenv('PORT'))
+"""
+url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
+params = {
+    'budova':'CP',
+    'mistnost':'6.13',
+    'semestr': 'ZS',
+    'katedra': 'KI',
+}
+ticket = 'a7fdf5c7e56ebdc48356eb0a3701ad5fa5524f8920d36f4c11ca4681aec209f4'
+response = Get(url=url,params=params,ticket=ticket)
+print(response)
+with open("dump.json", "w") as outfile:
+json.dump(response, outfile)
+"""
