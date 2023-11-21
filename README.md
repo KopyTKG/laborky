@@ -1,29 +1,44 @@
-<h1> UJEP Laboratorní cvičení </h1>
+# UJEP Laboratorní cvičení [![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
 
-<h2> Skupina </h2>
-<p align="center">
+Práce na pojektový seminář. 
 
-| Pozice | Člen |
-|---------|--------|
-| FrontEnd | <a href="https://github.com/kopytkg">Kopy / Martin</a> | 
-| FrontEnd | <a href="https://github.com/DanielRiha8906">Aerceas / Dan</a> |  
-| BackEnd  | <a href="https://github.com/Midiros">Midiros / Adam</a> |
-| BackEnd | <a href="https://github.com/Bumross"> Alex </a> |
+Popis: Vytvořete přihlašovací systém na laboratorní cvičení, kde vyučující vypisuje termíny a student se k nim přilašuje. Přihlášení k platformě ne nutno zřídit přes [stag](http://stag.ujep.cz/). 
 
-</p>
 
-<h2> Popis projektu </h2>
+## Tým
 
-<p>
+**FrontEnd** - [Martin](https://github.com/kopytkg) , [Dan](https://github.com/DanielRiha8906)
 
-TDB
-</p>
+**BackEnd** - 
+[Adam](https://github.com/Midiros) , [Alex](https://github.com/Bumross)
 
-<h3>
- Verze
-</h3>
 
-| Verze FD | Verze BD | Status | Podpora |
-| --- | --- | -----| ---- |
-|  V 0.2.0 | V ---- | Latest | :white_check_mark: | 
-|  V 0.1.0 | V ---- | Latest | :x: | 
+
+## Instalace
+
+Windows / Linux: 
+```bash
+./install.sh
+```    
+
+## Spuštění
+
+### Před spuštěním 
+1. Vytvoření obou `.env` souborů
+- `BackEnd/.env`
+```env
+PORT=9999 // Pro testovani bylo pouzito 3010
+HOST=`0.0.0.0` // neboli localhost
+```
+- `FrontEnd/.env`
+```env
+NEXT_PUBLIC_BASE="http://localhost:3000"
+NEXT_PUBLIC_API_URL="https://localhost:9999" // url je určená v BackEnd env
+```
+
+2. Nainstalování všech balíčků viz [Instalace](#instalace)
+
+### Spuštění
+```bash
+./run.sh
+```
