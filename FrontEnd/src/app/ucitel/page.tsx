@@ -1,71 +1,73 @@
-import { Divider, Link } from '@nextui-org/react'
+'use client'
+import Predmet from '@/modules/cards/predmet.card'
+import Skupina from '@/modules/cards/skupina.card'
+import Termin from '@/modules/cards/termin.card'
 import React from 'react'
 
 const tmp = [
  {
-  name: 'Cvičeni 1 (10)',
+  name: 'Cvičeni 1',
+  predmet: 'PCA',
+  count: 10,
   type: 1,
   date: '2022-01-01',
+  capacity: 10,
+  taken: 5,
  },
  {
-  name: 'Cvičeni 2 (10)',
+  name: 'Cvičeni 2',
+  predmet: 'PCA',
+  count: 10,
   type: 2,
-
+  taken: 5,
+  capacity: 14,
   date: '2022-01-01',
  },
  {
-  name: 'Cvičeni 3 (5)',
+  name: 'Cvičeni 3',
+  predmet: 'PCA',
   type: 3,
-
+  count: 5,
+  taken: 0,
+  capacity: 5,
   date: '2022-01-01',
  },
 ]
 export default function UcitelPage() {
  return (
   <main className="container min-h-screen mx-auto mt-5">
-   <div className="grid grid-cols-1 md:grid-cols-3  gap-2">
-    <Link
-     href="/ucitel/predmet/pca"
-     className="w-full bg-orange-400 text-black h-32 rounded-2xl flex flex-col justify-center items-center text-3xl font-bold ">
-     PCA
-    </Link>
-    <div className="flex flex-col gap-2 col-span-2">
+   <div className="flex w-full  gap-2 justify-center">
+    <Column className="items-end pr-4">
+     <Predmet name="PCA" />
+    </Column>
+    <Column>
      {tmp.map((item) => (
-      <div key={item.name}>
-       <Link
-        href={`/ucitel/predmet/pca?cv=${item.type}`}
-        className="w-full bg-gray-300 text-black h-32 rounded-2xl flex flex-col justify-center items-center text-3xl font-bold">
-        <Node>{item.name}</Node>
-       </Link>
-       <Link
-        href={`/ucitel/predmet/pca?q=${item.type}`}
-        className="w-full bg-gray-300 text-black h-32 rounded-2xl flex flex-col justify-center items-center text-3xl font-bold">
-        <Node>{item.date}</Node>
-       </Link>
-      </div>
+      <Skupina
+       key={item.name}
+       name={item.name}
+       predmet={item.predmet}
+       id={item.type.toString()}
+       count={item.count}
+      />
      ))}
-    </div>
-   </div>
-   <Divider className="my-5" />
-   <div className="grid grid-cols-1 md:grid-cols-3  gap-2">
-    <Link
-     href="/ucitel/predmet/zps"
-     className="w-full bg-red-400 text-black h-32 rounded-2xl flex flex-col justify-center items-center text-3xl font-bold ">
-     ZPS
-    </Link>
-    <div className="flex flex-col gap-2 col-span-2">
+    </Column>
+    <Column>
      {tmp.map((item) => (
-      <div key={item.name} className="flex gap-2">
-       <Node>{item.name}</Node>
-       <Node>{item.date}</Node>
-      </div>
+      <Termin
+       key={item.name}
+       name={item.predmet}
+       date={new Date(item.date)}
+       id={item.type.toString()}
+       capacity={item.count}
+       taken={item.taken}
+      />
      ))}
-    </div>
+    </Column>
    </div>
   </main>
  )
 }
 
-function Node({ children }: { children: React.ReactNode }) {
- return <>{children}</>
+function Column({ children, className }: { children: React.ReactNode; className?: string }) {
+ return <div className={`flex flex-col gap-2 max-w-80 ${className}`}>{children}</div>
 }
