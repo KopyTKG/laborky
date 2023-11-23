@@ -8,7 +8,7 @@ import {
  Avatar,
 } from '@nextui-org/react'
 import { Logout, User } from '../clientSide'
-import { Bars3Icon, HomeIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, HomeIcon, UsersIcon } from '@heroicons/react/24/outline'
 
 const baseUrl = '/ucitel'
 const Links = [
@@ -18,9 +18,14 @@ const Links = [
   icon: <HomeIcon className="w-5" />,
  },
  {
-  label: 'Moje termíny',
-  href: `${baseUrl}/moje`,
+  label: 'Moje předměty',
+  href: `${baseUrl}/predmety`,
   icon: <Bars3Icon className="w-5" />,
+ },
+ {
+  label: 'Studenti',
+  href: `${baseUrl}/studenti`,
+  icon: <UsersIcon className="w-5" />,
  },
 ]
 

@@ -14,7 +14,7 @@ export default function Skupina({
  return (
   <>
    <Tooltip content={`Zobrazit terminy pro cvičení ${id}`} showArrow={true} delay={500}>
-    <Link href={`/ucitel/predmet/${predmet}?cv=${id}`} className="w-72 h-28">
+    <Link href={`/ucitel/predmety/${predmet}?cv=${id}`} className="w-72 h-28">
      <Card className="border-2 border-white bg-gray-300 text-black min-w-unit-24 w-full h-full">
       <CardBody className="flex flex-col justify-center items-center  py-5 px-10 ">
        <div className="text-3xl font-bold">{name}</div>

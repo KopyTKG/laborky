@@ -43,6 +43,7 @@ FrontEnd/.env.local
 
 # BackEnd
 
+BackEnd/classes/__pycache__/
 BackEnd/venv/
 BackEnd/.env
 FrontEnd/.env

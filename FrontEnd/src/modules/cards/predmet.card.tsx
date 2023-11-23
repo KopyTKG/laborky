@@ -14,7 +14,7 @@ export default function Predmet({ name }: { name: string }) {
  return (
   <>
    <Tooltip content="Zobrazit terminy pro tento předmet" showArrow={true} delay={500}>
-    <Link href={`/ucitel/predmet/${name}`} className="w-max h-max">
+    <Link href={`/ucitel/predmety/${name}`} className="w-max h-max">
      <Card className={`${color} border-2`}>
       <CardBody className="flex flex-col justify-center items-center text-4xl font-bold py-5 px-10 ">
        {name}
