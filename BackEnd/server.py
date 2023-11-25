@@ -1,37 +1,20 @@
-from flask import Flask, request
+from fastapi import FastAPI
 from classes.stag import *
 from jose import jwt
 import dotenv, os, requests, json
 
 
-dotenv.load_dotenv();
-
-app = Flask(__name__)
+dotenv.load_dotenv()
 
 
-@app.get("/test")
-def TestRequest():
-    return 'OK', 200
+app = FastAPI()
 
-@app.route("/validate", methods=["GET"])
-def ValidateUser():
-    headers = request.headers
-    auth = headers.get("Authorization")
-    if auth:
-        try: 
-            res = GetStagUser(auth)
-            strStag = json.dumps(res)
-            token = jwt.encode(res, os.getenv('SECRET'), algorithm="HS256")
-            return token
-        except:
-            return "Unauthorized", 401
-    else:
-        return "Not Acceptable", 406
 
-if __name__ == "__main__":
-    app.run(host=os.getenv('HOST'), port=os.getenv('PORT'))
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
-    
+
 """
 url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
 params = {
