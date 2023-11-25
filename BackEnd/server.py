@@ -14,6 +14,8 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+if __name__ == "__main__":
+    uvicorn.run(app, host=os.getenv("HOST") port=os.getenv("PORT"))
 
 """
 url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
