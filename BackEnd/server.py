@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from classes.stag import *
 from jose import jwt
 import dotenv, os, requests, json
+import uvicorn
 
 
 dotenv.load_dotenv()
@@ -15,7 +16,7 @@ async def root():
     return {"message": "Hello World"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=os.getenv("HOST") port=os.getenv("PORT"))
+    uvicorn.run(app, host=os.getenv("HOST"), port=int(os.getenv("PORT")))
 
 """
 url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
