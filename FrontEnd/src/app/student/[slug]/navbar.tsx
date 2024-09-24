@@ -7,42 +7,46 @@ import {
  Button,
  Avatar,
 } from '@nextui-org/react'
-import { Logout, User } from '../clientSide'
 import Icon from '@/components/icon'
 
-export default function NavbarComponent() {
+export default function NavbarComponent({ id }: { id: string }) {
  return (
   <Navbar className="w-full flex" isBordered isBlurred>
    <NavbarContent>
     <NavbarItem>
      <Button
       as={Link}
-      href="/student"
+      href={`/student/${id}`}
       color="primary"
       endContent={<Icon name="house" className="w-5" />}
-      variant="solid">
+      variant="solid"
+     >
       Domů
      </Button>
     </NavbarItem>
     <NavbarItem>
      <Button
       as={Link}
-      href="/student/moje"
+      href={`/student/${id}/moje`}
       color="primary"
       endContent={<Icon name="menu" className="w-5" />}
-      variant="solid">
+      variant="solid"
+     >
       Moje termíny
      </Button>
     </NavbarItem>
    </NavbarContent>
    <NavbarBrand className="flex w-full justify-end gap-5">
     <NavbarItem>
-     <Logout />
+     <Button as={Link} href="/logout" className="flex gap-2" color="danger">
+      Odhlásit se
+      <Icon name="log-out" />
+     </Button>
     </NavbarItem>
     <NavbarItem>
-     <Link href="/student/profil" className="flex gap-2">
+     <Link href={`/student/${id}/profil`} className="flex gap-2">
       <Avatar size="sm" color="default" />
-      <User />
+      {id}
      </Link>
     </NavbarItem>
    </NavbarBrand>

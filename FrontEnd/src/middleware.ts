@@ -5,22 +5,38 @@ export async function middleware(request: NextRequest) {
   let userInfo = request.cookies.get('stagUserInfo')?.value || ''
   let decoded = base64ToText(userInfo) || { stagUserInfo: [{}] }
   let user = decoded?.stagUserInfo[0]
+  const id = decoded?.stagUserInfo[0].osCislo
+
   if (request.url.endsWith('/')) {
    if (user.role == 'ST') {
-    request.nextUrl.pathname = '/student'
+    request.nextUrl.pathname = '/student/' + id
    } else if (user.role == 'VY') {
     request.nextUrl.pathname = '/ucitel'
    }
    return NextResponse.redirect(new URL(request.nextUrl))
   }
+
+  const match = request.url.match(/([A-Za-z])[1-9]+/)
+  if (match && request.url.includes('student')) {
+   const urlID = [...match][0]
+   if (urlID != id) {
+    request.nextUrl.pathname = `/student/${id}`
+    return NextResponse.redirect(request.nextUrl)
+   }
+  } else if (request.url.includes('student')) {
+   request.nextUrl.pathname = `/student/${id}`
+   return NextResponse.redirect(request.nextUrl)
+  }
+
+  // TBA // https://laborky.ujep.cz/terminy?t=zel parsing
+
   // CONTROL FOR USER AUTH
   //   else {
   //    if (!request.url.includes('student') && user.role == 'ST') {
   // return await Kick(request)
   //    } else if (!request.url.includes('ucitel') && user.role == 'VY') {
   // return await Kick(request)
-  //    }
-  //   }
+  //    }  //   }
  } else {
   if (!request.url.endsWith('/login')) {
    return await Kick(request)
@@ -29,7 +45,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
- matcher: ['/', '/student', '/student/profil', '/student/moje', '/ucitel'],
+ matcher: ['/', '/student/:path*', '/ucitel'],
 }
 function BaseAuth(request: NextRequest) {
  if (
