@@ -8,7 +8,7 @@ import {
  Avatar,
 } from '@nextui-org/react'
 import { Logout, User } from '../clientSide'
-import { Bars3Icon, HomeIcon } from '@heroicons/react/24/outline'
+import Icon from '@/components/icon'
 
 export default function NavbarComponent() {
  return (
@@ -19,7 +19,7 @@ export default function NavbarComponent() {
       as={Link}
       href="/student"
       color="primary"
-      endContent={<HomeIcon className="w-5" />}
+      endContent={<Icon name="house" className="w-5" />}
       variant="solid">
       Domů
      </Button>
@@ -29,7 +29,7 @@ export default function NavbarComponent() {
       as={Link}
       href="/student/moje"
       color="primary"
-      endContent={<Bars3Icon className="w-5" />}
+      endContent={<Icon name="menu" className="w-5" />}
       variant="solid">
       Moje termíny
      </Button>

@@ -13,6 +13,7 @@ export async function middleware(request: NextRequest) {
    }
    return NextResponse.redirect(new URL(request.nextUrl))
   }
+  // CONTROL FOR USER AUTH
   //   else {
   //    if (!request.url.includes('student') && user.role == 'ST') {
   // return await Kick(request)

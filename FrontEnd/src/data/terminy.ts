@@ -6,8 +6,8 @@ for (let i = 0; i < 40; i++) {
  const obj = {
   _id: randomUUID(),
   location: 'CP1.01',
-  start: new Date('2023-12-01T08:30:00.000Z'), // Update with your desired start time
-  end: new Date('2023-12-01T10:00:00.000Z'), // Update with your desired end time
+  start: new Date('2025-12-01T08:30:00.000Z'), // Update with your desired start time
+  end: new Date('2025-12-01T10:00:00.000Z'), // Update with your desired end time
   predmet: 'ZPS',
   cislo: Math.floor(Math.random() * 3) + 1, // Random number between 1 and 3
   kapacita: 10,
@@ -38,8 +38,8 @@ for (let i = 0; i < 3; i++) {
  const obj = {
   _id: randomUUID(),
   location: 'CP1.01',
-  start: new Date('2023-12-01T08:30:00.000Z'), // Update with your desired start time
-  end: new Date('2023-12-01T10:00:00.000Z'), // Update with your desired end time
+  start: new Date('2025-12-01T08:30:00.000Z'), // Update with your desired start time
+  end: new Date('2025-12-01T10:00:00.000Z'), // Update with your desired end time
   predmet: 'ZPS',
   cislo: i + 1,
   kapacita: 10,

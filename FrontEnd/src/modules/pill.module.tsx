@@ -1,6 +1,6 @@
-import { CalendarDaysIcon, ClockIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline'
 import { Button, Divider } from '@nextui-org/react'
 import { Card, CardHeader, CardBody, CardFooter } from '@nextui-org/react'
+import Icon from '@/components/icon'
 
 export default function Pill(props: any) {
  const studenti = (props.zapsany as string[]).length
@@ -26,38 +26,40 @@ export default function Pill(props: any) {
    <CardBody>
     <div className="text-md flex flex-col">
      <div className="flex flex-row justify-start gap-1 ">
-      <ClockIcon className="w-6" />
+      <Icon name="clock" className="w-6" />
       <div className="pt-1">
        {new Date(props.start).toLocaleTimeString()} - {new Date(props.end).toLocaleTimeString()}
       </div>
      </div>
      <div className="flex flex-row justify-start gap-1">
-      <CalendarDaysIcon className="w-6" />
+      <Icon name="calendar-days" className="w-6" />
       <div className="pt-1">{new Date(props.end).toLocaleDateString()}</div>
      </div>
      <div className="flex flex-row justify-start gap-1">
-      <MapPinIcon className="w-6" />
+      <Icon name="map-pin" className="w-6" />
       <div className="pt-1">{props.location}</div>
      </div>
     </div>
    </CardBody>
    <CardFooter className="flex justify-between width-full items-center">
     <div className="flex self-start gap-2 items-center">
-     {`${studenti} / ${props.kapacita}`} <UserGroupIcon className="w-7" />
+     {`${studenti} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
     </div>
     <div className=" flex self-end">
      {!props.owned ? (
       <Button
        className="border border-black"
        color={CapRender ? 'danger' : 'success'}
-       isDisabled={VolnoRender}>
+       isDisabled={VolnoRender}
+      >
        {studenti == props.cap ? 'Obsazeno' : 'Zapsat se'}
       </Button>
      ) : (
       <Button
        className="border border-black"
        color="danger"
-       isDisabled={CheckDate(props.start) ? false : true}>
+       isDisabled={CheckDate(props.start) ? false : true}
+      >
        {CheckDate(props.start) ? 'Odepsat se' : 'Nelze se odepsat'}
       </Button>
      )}

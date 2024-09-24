@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Get, deleteParam } from './actions'
+import { Get, deleteParam } from '@/app/actions'
 import { Button } from '@nextui-org/react'
-import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
 import { base64ToText } from '@/middleware'
+import Icon from '@/components/icon'
 
 function User() {
  const [osCislo, setOsCislo] = useState<any>()
@@ -32,10 +32,7 @@ function Logout() {
   })
  }
  return (
-  <Button
-   color="danger"
-   onClick={logout}
-   endContent={<ArrowRightOnRectangleIcon className="w-5" />}>
+  <Button color="danger" onClick={logout} endContent={<Icon name="log-out" className="w-5" />}>
    Odhlásit se
   </Button>
  )
