@@ -1,4 +1,4 @@
-import { CalendarDaysIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import Icon from '@/components/icon'
 import { Card, CardBody, Link, Tooltip } from '@nextui-org/react'
 
 export default function Termin({
@@ -26,11 +26,11 @@ export default function Termin({
         <div className="text-2xl font-bold">{name}</div>
        </div>
        <div className="flex flex-row gap-2">
-        <CalendarDaysIcon className="w-6" />
+        <Icon name="calendar-days" className="w-6" />
         <div className="text-2xl font-bold">{date.toLocaleDateString()}</div>
        </div>
        <div className="flex flex-row gap-2">
-        <UserGroupIcon className="w-6" />
+        <Icon name="users" className="w-6" />
         <div className="text-xl font-bold">
          {taken} / {capacity}
         </div>

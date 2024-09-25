@@ -8,33 +8,39 @@ import {
  Avatar,
 } from '@nextui-org/react'
 import Icon from '@/components/icon'
+import { tLink } from '@/lib/types'
+
+const links: tLink[] = [
+ {
+  label: 'Domů',
+  href: '/student/#id',
+  icon: 'house',
+ },
+ {
+  label: 'Moje termíny',
+  href: '/student/#id/moje',
+  icon: 'menu',
+ },
+]
 
 export default function NavbarComponent({ id }: { id: string }) {
  return (
   <Navbar className="w-full flex" isBordered isBlurred>
    <NavbarContent>
-    <NavbarItem>
-     <Button
-      as={Link}
-      href={`/student/${id}`}
-      color="primary"
-      endContent={<Icon name="house" className="w-5" />}
-      variant="solid"
-     >
-      Domů
-     </Button>
-    </NavbarItem>
-    <NavbarItem>
-     <Button
-      as={Link}
-      href={`/student/${id}/moje`}
-      color="primary"
-      endContent={<Icon name="menu" className="w-5" />}
-      variant="solid"
-     >
-      Moje termíny
-     </Button>
-    </NavbarItem>
+    {links.map((item: tLink) => {
+     return (
+      <NavbarItem key={item.href}>
+       <Button
+        as={Link}
+        href={item.href.replace('#id', id)}
+        color="primary"
+        endContent={<Icon name={item.icon as any} className="w-5" />}
+        variant="solid">
+        {item.label}
+       </Button>
+      </NavbarItem>
+     )
+    })}
    </NavbarContent>
    <NavbarBrand className="flex w-full justify-end gap-5">
     <NavbarItem>

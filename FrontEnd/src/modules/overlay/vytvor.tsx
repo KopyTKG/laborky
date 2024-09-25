@@ -1,5 +1,5 @@
 'use client'
-import { BellAlertIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
+import Icon from '@/components/icon'
 import {
  Button,
  Checkbox,
@@ -83,7 +83,7 @@ export default function Vytvor() {
          <div className="pt-8">
           <Checkbox color="warning" size="lg" defaultSelected>
            <div className="flex flex-row gap-2">
-            <BellAlertIcon className="w-6" />
+            <Icon name="bell-ring" className="w-6" />
             <h3>Upozornit studenty</h3>
            </div>
           </Checkbox>
@@ -105,7 +105,7 @@ export default function Vytvor() {
    <div className="fixed right-5 bottom-20">
     <Tooltip content="Vytvořit nový termín" showArrow={true} delay={500}>
      <Button onPress={onOpen} color="primary" className="w-max h-max py-2 flex gap-2">
-      <PlusCircleIcon className="w-10 h-10" />
+      <Icon name="circle-plus" className="w-10 h-10" />
       <h3 className="text-2xl">Nový termín</h3>
      </Button>
     </Tooltip>

@@ -1,30 +1,50 @@
+'use client'
 import Node from '@/components/node'
-import { Moje as data } from '@/data/terminy'
+import { useLayoutEffect, useState } from 'react'
+import { tTermin } from '@/lib/types'
+import { Get } from '@/app/actions'
 
-type Ttermin = {
- _id: number
- zapsany: string[]
-}
+export default function VypsaneTerminy() {
+ const [Terminy, setTerminy] = useState<tTermin[]>([])
 
-export default function ZapsaneTerminy() {
- function loadAPI() {
-  // needs to be API call to from validation and fetching data
-  return data as Ttermin[]
- }
-
- function loadID() {
-  // needs to get some ID from API / cookies / local storage for user
-  return '1f3as45fefvae4'
- }
-
- const Terminy: Ttermin[] = loadAPI()
- const ID: string = loadID()
+ useLayoutEffect(() => {
+  const fetchTerminy = async () => {
+   try {
+    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/terminy`)
+    url.searchParams.set('t', 'zapsane')
+    const cookie = await Get('stagUserTicket')
+    if (cookie) {
+     url.searchParams.set('ticket', cookie.value)
+    }
+    const headers = {
+     Accept: 'application/json',
+     'Content-Type': 'application/json',
+     Connection: 'keep-alive',
+     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
+    }
+    const res = await fetch(url.toString(), { method: 'GET', headers })
+    if (res.status != 200) {
+     window.location.href = '/logout'
+    } else if (res.status == 200) {
+     let jsonParsed = await res.json()
+     setTerminy(jsonParsed.data)
+    }
+   } catch {
+    window.location.href = '/logout'
+   }
+  }
+  fetchTerminy()
+ }, [])
 
  return (
   <>
    <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
-    {Terminy.map((termin: Ttermin) => (
-     <Node key={termin._id} owned={termin.zapsany.includes(ID) ? true : false} {...termin} />
+    {Terminy.map((termin: tTermin) => (
+     <Node
+      key={termin._id}
+      owned={termin.zapsany.includes(`1f3as45fefvae4`) ? true : false}
+      {...termin}
+     />
     ))}
    </div>
   </>

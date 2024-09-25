@@ -7,25 +7,25 @@ import {
  Button,
  Avatar,
 } from '@nextui-org/react'
-import { Logout, User } from '../clientSide'
-import { Bars3Icon, HomeIcon, UsersIcon } from '@heroicons/react/24/outline'
+import Icon from '@/components/icon'
+import { tLink } from '@/lib/types'
 
 const baseUrl = '/ucitel'
-const Links = [
+const Links: tLink[] = [
  {
   label: 'Domů',
   href: `${baseUrl}`,
-  icon: <HomeIcon className="w-5" />,
+  icon: 'house',
  },
  {
   label: 'Moje předměty',
   href: `${baseUrl}/predmety`,
-  icon: <Bars3Icon className="w-5" />,
+  icon: 'menu',
  },
  {
   label: 'Studenti',
   href: `${baseUrl}/studenti`,
-  icon: <UsersIcon className="w-5" />,
+  icon: 'users',
  },
 ]
 
@@ -35,7 +35,13 @@ export default function NavbarComponent() {
    <NavbarContent>
     {Links.map((link) => (
      <NavbarItem key={link.label}>
-      <Button as={Link} href={link.href} color="primary" endContent={link.icon} variant="solid">
+      <Button
+       as={Link}
+       href={link.href}
+       color="primary"
+       endContent={<Icon name={link.icon as any} className="w-5" />}
+       variant="solid"
+      >
        {link.label}
       </Button>
      </NavbarItem>
@@ -43,12 +49,15 @@ export default function NavbarComponent() {
    </NavbarContent>
    <NavbarBrand className="flex w-full justify-end gap-5">
     <NavbarItem>
-     <Logout />
+     <Button as={Link} href="/logout" className="flex gap-2" color="danger">
+      Odhlásit se
+      <Icon name="log-out" />
+     </Button>
     </NavbarItem>
     <NavbarItem>
      <Link href="/ucitel/profil" className="flex gap-2">
       <Avatar size="sm" color="default" />
-      <User />
+      {'TBD'}
      </Link>
     </NavbarItem>
    </NavbarBrand>
