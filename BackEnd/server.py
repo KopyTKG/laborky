@@ -13,7 +13,7 @@ app = FastAPI(debug=True)
 
 @app.get("/")
 async def root():
-    ticket = "d97288fe1affd1e136202b52df00406d7f76d4a9a8ad6503da0ce78bfc07c61e"
+    ticket = os.getenv('TICKET')
     function = Tracked_Predmety()
     user = GetStudentPredmetyAbsolvoval(ticket, function)
     return user
