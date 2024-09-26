@@ -26,3 +26,38 @@ def GetStagUser(Ticket):
         raise Exception(response.text)
 
     return response.json()
+def GetPredmetyByStudent(Ticket):
+    url = "https://ws.ujep.cz/ws/services/rest2/predmety/getPredmetyByStudent"
+    params = {
+        "osCislo": "F22153",
+        "semestr": "ZS"
+    }
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://ws.ujep.cz",
+    }
+    response = requests.get(url,headers=headers, params=params, cookies={'WSCOOKIE': Ticket})
+    if not response.ok:
+        raise Exception(response.text)
+    return response.json()
+def GetStudentPredmetyAbsolvoval(Ticket, function):
+    url = "https://ws.ujep.cz/ws/services/rest2/student/getStudentPredmetyAbsolvoval"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://ws.ujep.cz",
+    }
+    response = requests.get(url,headers=headers, cookies={'WSCOOKIE': Ticket})
+    if not response.ok:
+        raise Exception(response.text)
+    splneno = []
+    aktivni_predmety = []
+    predmety = response.json()
+    for predmet in predmety["predmetAbsolvoval"]:
+        if predmet["zkratka"] in function:
+            aktivni_predmety.append(predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
+    predmety = [item for item in aktivni_predmety if item not in splneno]
+    return aktivni_predmety, splneno, predmety

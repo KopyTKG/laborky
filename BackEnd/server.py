@@ -1,5 +1,7 @@
+import uvicorn
 from fastapi import FastAPI
 from classes.stag import *
+from classes.db import *
 from jose import jwt
 import dotenv, os, requests, json
 import uvicorn
@@ -7,17 +9,19 @@ import uvicorn
 
 dotenv.load_dotenv()
 
-
-app = FastAPI()
-
+app = FastAPI(debug=True)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    ticket = "d97288fe1affd1e136202b52df00406d7f76d4a9a8ad6503da0ce78bfc07c61e"
+    function = Tracked_Predmety()
+    user = GetStudentPredmetyAbsolvoval(ticket, function)
+    return user
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=os.getenv("HOST"), port=int(os.getenv("PORT")))
+    uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')))
 
+    
 """
 url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
 params = {
