@@ -25,9 +25,6 @@ FrontEnd/npm-debug.log*
 FrontEnd/yarn-debug.log*
 FrontEnd/yarn-error.log*
 
-# local env files
-FrontEnd/.env*.local
-
 # vercel
 FrontEnd/.vercel
 
@@ -37,14 +34,9 @@ FrontEnd/next-env.d.ts
 
 FrontEnd/package-lock.json
 
-FrontEnd/.env
-FrontEnd/.env.local
 
+# leaks
+**/.env
+**/__pycache__/
+**/venv/
 
-# BackEnd
-
-BackEnd/classes/__pycache__/
-BackEnd/__pycache__/
-BackEnd/venv/
-BackEnd/.env
-FrontEnd/.env
