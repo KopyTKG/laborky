@@ -28,12 +28,14 @@ Windows / Linux:
 - `BackEnd/.env`
 ```env
 PORT=9999 # Pro testovani bylo pouzito 3010
-HOST=`0.0.0.0` # neboli localhost
+HOST="0.0.0.0" # neboli all
 ```
 - `FrontEnd/.env`
 ```env
 NEXT_PUBLIC_BASE="http://localhost:3000"
-NEXT_PUBLIC_API_URL="https://localhost:9999" # url je určená v BackEnd env
+
+# url je určená v BackEnd env
+NEXT_PUBLIC_API_URL="http://localhost:9999" 
 
 # DEV VALUE NEED TO BE CHANGED
 NEXT_PUBLIC_STAG_SERVER="https://stag-demo.zcu.cz/ws/"
