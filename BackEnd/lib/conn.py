@@ -22,9 +22,11 @@ class Termin(Base):
     datum = Column("datum", DateTime)
     aktualni_kapacita = Column("aktualni_kapacita", Integer)
     max_kapacita = Column("max_kapacita", Integer)
+    jmeno = Column("jmeno", Text)
     vypsal_id = Column(UUID, ForeignKey('vyucujici.id'))
     vyucuje_id = Column(UUID, ForeignKey('vyucujici.id'))
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
+
 
     predmet = relationship('Predmet', back_populates="termin")
     vypsal = relationship('Vyucujici', back_populates="termin")
