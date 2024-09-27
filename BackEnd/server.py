@@ -71,7 +71,7 @@ async def get_student_moje(): #prijima parametr ticket
 
 
 @app.post("/student/{osobni_cislo}/moje/{id_lab}")
-async def remove_student_from_lab(id_lab):
+async def remove_student_from_lab():
     """ Odhlášení studenta ze cvičení podle id cvičení """
 
     # provede:
