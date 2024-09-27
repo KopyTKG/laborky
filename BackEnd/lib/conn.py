@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, MetaData, Table
+import os, dotenv
 
-DATABASE_URL = "SECRET_URL"
+dotenv.load_dotenv()
+DATABASE_URL= os.getenv('DB_URL')
 
 engine = create_engine(DATABASE_URL)
 
