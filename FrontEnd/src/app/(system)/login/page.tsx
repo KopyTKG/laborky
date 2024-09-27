@@ -1,10 +1,11 @@
 'use client'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { setStag } from '@/app/actions'
 
 export default function Home() {
- useEffect(() => {
-  const redirectUrl = `https://stag-demo.zcu.cz/ws/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
+ useLayoutEffect(() => {
+  console.log('hit')
+  const redirectUrl = `${process.env.NEXT_PUBLIC_STAG_SERVER}login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
   const searchParams = new URLSearchParams(window.location.search)
   const params = {
    stagUserTicket: searchParams.get('stagUserTicket'),
@@ -18,7 +19,7 @@ export default function Home() {
      Accept: 'application/json',
      'Content-Type': 'application/json',
      Connection: 'keep-alive',
-     'Accept-Origin': 'https://stag-demo.zcu.cz',
+     'Accept-Origin': process.env.NEXT_PUBLIC_STAG_SERVER || '',
     }
     fetch(url, { method: 'GET', headers }).then((data) => {
      if (data.status != 200) {
@@ -34,11 +35,5 @@ export default function Home() {
   })
  }, [])
 
- return (
-  <main>
-   <div className="container-row">
-    <h1>Login</h1>
-   </div>
-  </main>
- )
+ return <main></main>
 }

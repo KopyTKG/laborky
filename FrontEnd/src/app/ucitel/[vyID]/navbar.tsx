@@ -29,7 +29,7 @@ const Links: tLink[] = [
  },
 ]
 
-export default function NavbarComponent() {
+export default function NavbarComponent({id}: {id: string}) {
  return (
   <Navbar className="w-full flex" isBordered isBlurred>
    <NavbarContent>
@@ -57,7 +57,7 @@ export default function NavbarComponent() {
     <NavbarItem>
      <Link href="/ucitel/profil" className="flex gap-2">
       <Avatar size="sm" color="default" />
-      {'TBD'}
+      {id}
      </Link>
     </NavbarItem>
    </NavbarBrand>

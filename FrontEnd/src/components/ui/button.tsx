@@ -17,6 +17,8 @@ const buttonVariants = cva(
      'bg-green-400 text-stone-900 shadow-sm hover:bg-green-500/90 dark:bg-green-900 dark:text-neutral-50 dark:hover:bg-green-900/90',
     secondary:
      'bg-neutral-100 text-neutral-900 shadow-sm hover:bg-neutral-100/80 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-800/80',
+    highlight:
+     'rounded-full h-[3rem] aspect-square shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-sky-600 hover:bg-sky-500/60',
    },
    size: {
     default: 'h-9 px-4 py-2',
