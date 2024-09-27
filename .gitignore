@@ -34,6 +34,9 @@ FrontEnd/next-env.d.ts
 
 FrontEnd/package-lock.json
 
+# dummy data
+BackEnd/lib/dummyGen.py
+
 
 # leaks
 **/.env
