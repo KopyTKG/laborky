@@ -27,8 +27,8 @@ Windows / Linux:
 1. Vytvoření obou `.env` souborů
 - `BackEnd/.env`
 ```env
-PORT=9999 // Pro testovani bylo pouzito 3010
-HOST=`0.0.0.0` // neboli localhost
+PORT=3010
+HOST="0.0.0.0"
 ```
 - `FrontEnd/.env`
 ```env
