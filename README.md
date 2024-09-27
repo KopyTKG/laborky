@@ -34,6 +34,9 @@ HOST=`0.0.0.0` // neboli localhost
 ```env
 NEXT_PUBLIC_BASE="http://localhost:3000"
 NEXT_PUBLIC_API_URL="https://localhost:9999" // url je určená v BackEnd env
+
+# DEV VALUE NEED TO BE CHANGED
+NEXT_PUBLIC_STAG_SERVER="https://stag-demo.zcu.cz/ws/"
 ```
 
 2. Nainstalování všech balíčků viz [Instalace](#instalace)
