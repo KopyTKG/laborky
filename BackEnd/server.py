@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from classes.stag import *
 from classes.db import *
+from classes.vyucujici import *
 from jose import jwt
 import dotenv, os, requests, json
 import uvicorn
@@ -15,15 +16,24 @@ app = FastAPI(debug=True)
 async def root():
     ticket = os.getenv('TICKET')
     function = Tracked_Predmety()
-    user = GetStudentPredmetyAbsolvoval(ticket, function)
+    user = GetUcitelPredmety(ticket) 
     return user
 
+
+
+def GetInfo(ticket):
+    info = GetStagUser(ticket)
+    role = info["stagUserInfo"][0]["role"]
+    
+
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')))
+    uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')), debug=True)
 
     
 """
-url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
+url = "https://stag-demo.zcu.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
 params = {
     'budova':'CP',
     'mistnost':'6.13',

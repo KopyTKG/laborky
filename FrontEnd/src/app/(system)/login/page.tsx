@@ -4,7 +4,7 @@ import { setStag } from '@/app/actions'
 
 export default function Home() {
  useEffect(() => {
-  const redirectUrl = `https://ws.ujep.cz/ws/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
+  const redirectUrl = `https://stag-demo.zcu.cz/ws/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
   const searchParams = new URLSearchParams(window.location.search)
   const params = {
    stagUserTicket: searchParams.get('stagUserTicket'),
@@ -18,7 +18,7 @@ export default function Home() {
      Accept: 'application/json',
      'Content-Type': 'application/json',
      Connection: 'keep-alive',
-     'Accept-Origin': 'https://ws.ujep.cz',
+     'Accept-Origin': 'https://stag-demo.zcu.cz',
     }
     fetch(url, { method: 'GET', headers }).then((data) => {
      if (data.status != 200) {

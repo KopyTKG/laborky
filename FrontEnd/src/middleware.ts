@@ -85,7 +85,7 @@ async function Kick(request: NextRequest) {
   request.nextUrl.pathname = '/login'
   return NextResponse.redirect(new URL(request.nextUrl))
  }
- const url = `https://ws.ujep.cz/ws/services/rest2/help/invalidateTicket?ticket=${ticket}`
+ const url = `https://stag-demo.zcu.cz/ws/services/rest2/help/invalidateTicket?ticket=${ticket}`
  const response = await fetch(url, {
   method: 'GET',
   headers: {

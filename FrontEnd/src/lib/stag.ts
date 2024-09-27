@@ -1,10 +1,10 @@
 export async function getStagUser(ticket: string): Promise<any> {
- const url = `https://ws.ujep.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=${ticket}`
+ const url = `https://stag-demo.zcu.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=${ticket}`
  const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
   Connection: 'keep-alive',
-  'Accept-Origin': 'https://ws.ujep.cz',
+  'Accept-Origin': 'https://stag-demo.zcu.cz',
  }
 
  const response = await fetch(url, { method: 'GET', headers })
