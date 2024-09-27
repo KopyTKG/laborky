@@ -19,7 +19,7 @@ export default function Home() {
      Accept: 'application/json',
      'Content-Type': 'application/json',
      Connection: 'keep-alive',
-     'Accept-Origin': 'https://ws.ujep.cz',
+     'Accept-Origin': process.env.NEXT_PUBLIC_STAG_SERVER || '',
     }
     fetch(url, { method: 'GET', headers }).then((data) => {
      if (data.status != 200) {
