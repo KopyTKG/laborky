@@ -1,10 +1,10 @@
 import requests
 
-def get_predmet_by_student(ticket, semestr):
+def get_predmet_by_student(ticket, semestr, userid):
     """ Vrátí všechny zapsané předměty studentem v daném semestru (ZS / LS)"""
     url = "https://stag-demo.zcu.cz/ws/services/rest2/predmety/getPredmetyByStudent"
     params = {
-        "osCislo": "F22153",
+        "osCislo": userid,
         "semestr": semestr,
     }
     headers = {
