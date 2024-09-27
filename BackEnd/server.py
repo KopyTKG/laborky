@@ -127,11 +127,6 @@ async def root():
     user = GetUcitelPredmety(ticket) 
     return user
 
-
-
-def GetInfo(ticket):
-    info = GetStagUser(ticket)
-    role = info["stagUserInfo"][0]["role"]
     
 
 
