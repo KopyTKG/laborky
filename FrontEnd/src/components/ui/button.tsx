@@ -15,8 +15,11 @@ const buttonVariants = cva(
      'bg-red-500 text-neutral-50 shadow-sm hover:bg-red-600/90 dark:bg-red-900 dark:text-neutral-50 dark:hover:bg-red-900/90',
     success:
      'bg-green-400 text-stone-900 shadow-sm hover:bg-green-500/90 dark:bg-green-900 dark:text-neutral-50 dark:hover:bg-green-900/90',
+    outline:
+     'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
     secondary:
      'bg-neutral-100 text-neutral-900 shadow-sm hover:bg-neutral-100/80 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-800/80',
+    ghost: 'hover:bg-accent hover:text-accent-foreground',
     highlight:
      'rounded-full h-[3rem] aspect-square shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-sky-600 hover:bg-sky-500/60',
    },

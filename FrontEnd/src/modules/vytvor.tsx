@@ -11,7 +11,6 @@ import {
  ModalHeader,
  Select,
  SelectItem,
- Tooltip,
  useDisclosure,
 } from '@nextui-org/react'
 import React, { useState } from 'react'
