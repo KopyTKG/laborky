@@ -90,10 +90,12 @@ async def get_student_moje(): #prijima parametr ticket ticket : str | None = Non
 
 ## PROFIL
 @app.get("/profil") # Profil pro studenta a ucitele
-async def get_student_profil(ticket : str | None = None): #prijima parametr ticket
+async def get_student_profil(): #prijima parametr ticket ticket : str | None = None
     """ Vraci zaznam o vsech typech cviceni na dany seznam predmetu, zda je student splnil ci nikoli"""
     ticket = os.getenv("TICKET") # prozatimni reseni
-
+    if ticket is None or ticket == "":
+        return unauthorized
+    
     # provede:
         # DB podle osobniho cisla, vrati zda student ma v minulosti splneno jaky typ cviceni
         # to, co nema oznaceno jako splnil a nebo je zapsan a hodina jeste neprobehla, ma jako nesplnil
@@ -112,7 +114,8 @@ async def get_ucitel_board_next_ones(): # ticket: str | None = None
     ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
-    return "další cvícení v dalším týdnu"
+    list_terminy_tyden_dopredu = terminy_tyden_dopredu(session)
+    return json.dump(list_terminy_tyden_dopredu)
 
 #Všechny týdny
 @app.get("/ucitel/board")
@@ -153,31 +156,37 @@ async def get_terminy_by_predmet(): #ticket: str | None = None
     return json.dump(list_terminu)
 
 
-@app.post("/ucitel/termin/{megamocsracek}")
-async def ucitel_vytvor_termin(ticket: str | None = None):
+@app.post("/ucitel/termin/")
+async def ucitel_vytvor_termin(ticket: str, ucebna:string, datum:datetime, aktualni_kapacita:int, max_kapacita:int,vyucuje_id:string, kod_predmet:string, jmeno:string): 
     """ Učitel vytvoří termín do databáze """
+    if ticket is None or ticket =="":
+        return unauthorized
+    vyspal_id = encode_id(get_userid_and_role(get_stag_user_info(ticket))[0])
 
-    # ticket
-
-    # mistnost, datastart, dateend, kapacitamax, nazev, predmet, ucitel (ticket)
-
-    # provede:
-        # DB - vytvoreni noveho terminu v DB
-
-    return "ok provedeno :-)"
+    if vypsat_termin(session, ucebna, datum, aktualni_kapacita, max_kapacita, vyspal_id, vyucuje_id, kod_predmet, jmeno):
+        return ok
+    else: 
+        return internal_server_error
 
 
 @app.patch("/ucitel/termin/{id_terminu}")
-async def ucitel_zmena_terminu(ticket: str | None = None):
+async def ucitel_zmena_terminu(ticket: str, ucebna:string, datum:datetime, aktualni_kapacita:int, max_kapacita:int,vyucuje_id:string, kod_predmet:string, jmeno:string):
     """ Učitel změní parametry v již vypsaném termínu """
-    # ticket
-    # crUd operace pro adama
+    if ticket is None or ticket == "":
+        return unauthorized
+    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno):
+        return ok
+    return internal_server_error
 
 @app.delete("/ucitel/termin/{id_terminu}")
-async def ucitel_smazani_terminu(ticket: str | None = None):
+async def ucitel_smazani_terminu(ticket: str | None = None): 
     """ Učitel smáže vypsaný termín """
-    # ticket
-    # cruD operace pro adama
+    if ticket is None or ticket == "":
+        return unauthorized
+    if smazat_termin(session, id_terminu):
+        return ok
+    return internal_server_error
+
 
 ## /UCITEL STUDENTI
 @app.get("/ucitel/studenti/{id_lab}")
