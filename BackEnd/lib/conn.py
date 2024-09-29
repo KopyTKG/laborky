@@ -107,16 +107,14 @@ def vytvor_student(session, id):
         session.add(student)
         session.commit()
         return True
-    else:
-        pass
+    return False
 def pridej_vyucujici(session, id, prijmeni):
     if session.query(Vyucujici).filter_by(id=id).first() is None:
         vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
         session.add(vyucujici)
         session.commit()
         return True
-    else:
-        pass
+    return False
 ### USER ACTIONS
 def zapis_predmet(session, kod_predmetu, student_id):
     zapsane_predmety = ZapsanePredmety(uuid=uuid.uuid4(),zapsano=datetime.now(), student_id=student_id, kod_predmet=kod_predmetu)
