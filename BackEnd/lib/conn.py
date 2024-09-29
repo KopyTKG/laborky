@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
+from datetime import datetime
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -94,4 +95,68 @@ class HistorieTerminu(Base):
     student = relationship('Student', back_populates="historie_terminu")
     termin = relationship('Termin', back_populates="historie_terminu")
 
+
+
+### TVORBA UZIVATEL
+def vytvor_student(session, id):
+    student = Student(id=id, datum_vytvoreni=DateTime.now())
+    session.add(student)
+    session.commit()
+def pridej_vyucujici(session, id, prijmeni):
+    vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
+    session.add(vyucujici)
+    session.commit()
+
+### USER ACTIONS
+def zapis_predmet(session):
+    pass
+def upravit_termin(session):
+    pass
+def uznat_termin(session):
+    pass
+def pridat_studenta(session):
+    pass
+
+### PREDMETY
+def vytvor_predmet(session):
+    pass
+def list_predmety(session):
+    pass
+
+### TERMINY
+def list_terminy(session):
+    session.query(Termin).all()
+def vypsat_termin(session):
+    pass
+def list_nadchazejici_terminy(session):
+    dnesni_datum = datetime.now()
+    terminy = session.query(Termin).filter(Termin.datum >= dnesni_datum).all()
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+def list_probehle_terminy(session):
+    dnesni_datum = datetime.now()
+    terminy = session.query(Termin).filter(Termin.datum <= dnesni_datum).all()
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+def list_planovane_terminy_predmet(session):
+    pass
+def list_probehle_terminy_predmet(session):
+    pass
+
+def historie_studenta(session, id):
+    student = session.query(Student).filter_by(id=id).first()
+    if student is None:
+        print("Neplatne ID studenta!")
+        return
+    for history in student.historie_terminu:
+        termin = history.termin
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+
+
+
+
+
+if __name__ == "__main__":
+    historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
+    list_probehle_terminy(session)
 
