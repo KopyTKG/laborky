@@ -1,38 +1,23 @@
 import requests
+from classes.stag import *
+
 
 def get_predmet_by_student(ticket, semestr, userid):
     """ Vrátí všechny zapsané předměty studentem v daném semestru (ZS / LS)"""
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/predmety/getPredmetyByStudent"
+    url = "/ws/services/rest2/predmety/getPredmetyByStudent"
     params = {
         "osCislo": userid,
         "semestr": semestr,
     }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, params=params, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        raise Exception(response.text)
-    return response.json()
+    return get(ticket, url, params)
 
 
 def get_predmet_student_k_dispozici(ticket, predmety_lab):
     """
     Vrati vsechny predmety, pro ktere existuje moznost seminare, ktere student jeste nema splneny, ale zapsany
     """
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentPredmetyAbsolvoval"
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        raise Exception(response.text)
+    url = "/ws/services/rest2/student/getStudentPredmetyAbsolvoval"
+    response = get(ticket, url, params)
     splneno = []
     aktivni_predmety = []
     predmety = response.json()

@@ -1,23 +1,14 @@
 import requests
 import hashlib
+from classes.stag import *
 
 def get_student_info(ticket, osobni_cislo):
     """ Vrátí informace o studentovi podle osobního čísla """
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentInfo"
+    url = "/ws/services/rest2/student/getStudentInfo"
     params = {
         "osCislo": osobni_cislo,
     }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, params=params, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        raise Exception(response.text)
-    
-    response = response.json()
+    response = get(ticket, url, params)
 
     jmeno = response["jmeno"]
     prijmeni = response["prijmeni"]
@@ -41,41 +32,22 @@ def get_ucitel_predmety(ticket, ucitIdno):
     """
      Vrati predmety, ktere ucitel vyucuje 
     """
-
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/predmety/getPredmetyByUcitel"
+    url = "/ws/services/rest2/predmety/getPredmetyByUcitel"
     params = {
         "ucitIdno": ucitIdno,
     }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, params=params, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        raise Exception(response.text)
-    return response.json()
+    return get(ticket, url, params)
 
 
 def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentiByPredmet"
+    url = "/ws/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
         "katedra": katedra,
     }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, params=params, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        raise Exception(response.text)
 
-    response = response.json()["studentPredmetu"]
+    response = get(ticket, url, params)["studentPredmetu"]
     osobni_cisla = []
     for student in response:
         osobni_cisla.append(student["osCislo"])
@@ -84,7 +56,7 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
 
 
 def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
-    """ Porovná zakódované osobní čísla, aby mohl učitel získat Fčíslo studentů """
+    """ Vrátí nekódované Fčísla studentů, bere argument hashovaných Fčísel studentů, které porovná se všemi zapsanými studenty na předmětu """
 
     hash_studenti_na_predmetu = []
     for student in studenti_na_predmetu:

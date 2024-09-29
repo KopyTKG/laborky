@@ -218,8 +218,9 @@ async def get_ucitel_emaily(ticket: str | None = None):
 async def root():
     ticket = os.getenv('TICKET')
     predmety = predmety_pro_cviceni()
-    
 
+    user = get_predmet_by_student(ticket, "ZS", "F22B5862P")
+    return user
 
     
 
