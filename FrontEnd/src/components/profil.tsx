@@ -5,7 +5,7 @@ import { Divider } from '@/components/ui/divider'
 import { tPredmet } from '@/lib/types'
 import { useLayoutEffect, useState } from 'react'
 
-export default function Terminy() {
+export default function Profil() {
  const [predmety, setPredmety] = useState<tPredmet[]>([] as tPredmet[])
  useLayoutEffect(() => {
   const fetchPredmety = async () => {

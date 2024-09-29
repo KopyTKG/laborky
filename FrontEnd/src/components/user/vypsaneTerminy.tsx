@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from 'react'
 import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 
-export default function VypsaneTerminy() {
+export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
  useLayoutEffect(() => {
@@ -40,7 +40,7 @@ export default function VypsaneTerminy() {
   <>
    <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
     {Terminy.map((termin: tTermin) => (
-     <Node key={termin._id} owned={false} {...termin} />
+     <Node key={termin._id} owned={false} {...termin} typ={typ} />
     ))}
    </div>
   </>
