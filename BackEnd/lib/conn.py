@@ -33,6 +33,7 @@ class Termin(Base):
     vypsal_id = Column(String, ForeignKey('vyucujici.id'))
     vyucuje_id = Column(String, ForeignKey('vyucujici.id'))
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
+    cislo_cviceni = Column("cislo_cviceni", Integer)
 
     predmet = relationship('Predmet', back_populates="termin")
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
@@ -60,6 +61,7 @@ class Predmet(Base):
     zkratka_predmetu = Column("zkratka_predmetu", Text)
     katedra = Column("katedra", Text)
     vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
+    pocet_cviceni = Column("pocet_cviceni", Integer)
 
     vyucuje = relationship('Vyucujici', back_populates="predmet")
     termin = relationship('Termin', back_populates="predmet")
@@ -167,6 +169,17 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         termin.aktualni_kapacita += 1
         session.commit()
         return True
+
+def list_uspesni_studenti(session, kod_predmetu):
+    kvota_cviceni = session.query(Predmet.pocet_cviceni).filter(Predmet.kod == kod_predmetu).first()
+    uspesni_studenti = session.query(HistorieTerminu).filter(HistorieTerminu.datum_splneni != None ).group_by(HistorieTerminu.user_id).having(function.count(HistorieTerminu.id) > kvota_cviceni).all()
+    uspesni_studenti_list = [student[0] for student in uspesni_studenti]
+    return uspesni_studenti_list
+
+def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
+    uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None).all()
+    uspesni_studenti_list = [student for student in uspesni_studenti]
+    return uspesni_studenti_list
 
 def smazat_termin(session, id_terminu):
     if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first() is None:
