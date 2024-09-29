@@ -213,15 +213,13 @@ async def get_ucitel_emaily(ticket: str | None = None):
         # vraci json
     return "json vsech informaci, na ktere nemame prava je uchovavat :-)"
 
+
 @app.get("/")
 async def root():
     ticket = os.getenv('TICKET')
     predmety = predmety_pro_cviceni()
     
-    user = get_stag_user_info(ticket)
-    userid, role = get_userid_and_role(user)
 
-    return userid, role
 
     
 
