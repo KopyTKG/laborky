@@ -41,7 +41,7 @@ async def get_student_home(): #prijima parametr ticket ticket: str | None = None
 
     # provede:
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, predmety_pro_cviceni())
-    list_terminu = list_terminu(session)
+    list_terminu = list_dostupnych_terminu(session)
         # jake jsou laborky k dispozici na dany predmet (DB)=
         
         # vraci json vsech laborek, ktere jsou k dispozici
