@@ -6,7 +6,7 @@ from classes.vyucujici import *
 from classes.student import *
 from jose import jwt
 import dotenv, os, requests, json
-
+from lib.conn import *
 
 dotenv.load_dotenv()
 
@@ -14,54 +14,63 @@ app = FastAPI(debug=True)
 
 
 @app.get("/setup")
-async def setup(ticket: str | None = None): # prijima parametr ticket
+async def setup(): # prijima parametr ticket (ticket: str | None = None)
     """ Kontrola přihlášeného uživatele s databází po loginu do systému """
+    ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
-        return "WTF"
-    # ticket = os.getenv('TICKET') # prozatimni reseni
-
+        return 401
     userinfo = get_stag_user_info(ticket)
     userid, role = get_userid_and_role(userinfo)
-
-        # check s databazi
-        # vrati OK 200?
-
+    if role != "ST":
+        prijmeni = userinfo["prijmeni"]
+        userid = "1f92a11172f3109d2529461a19e49dbace23fb32"
+        pridej_vyucujici(session, userid, prijmeni)
+    else: 
+        vytvor_student(session, userid)
     return "login do databaze", userid, role
 
 
 ### Student API
 ## /STUDENT HOME
 @app.get("/student") #/student/{osobni_cislo}
-async def get_student_home(ticket: str | None = None): #prijima parametr ticket
+async def get_student_home(): #prijima parametr ticket ticket: str | None = None
     """ Vrácení všech vypsaných laborek podle toho, na co se student může zapsat """
-    if ticket is None or ticket == "":
-        return "oh no"
-    #ticket = os.getenv('TICKET') # prozatimni reseni
+    #if ticket is None or ticket == "":
+    #    return 401
+    ticket = os.getenv('TICKET') # prozatimni reseni
 
     # provede:
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, predmety_pro_cviceni())
+    list_terminu = list_terminu(session)
         # jake jsou laborky k dispozici na dany predmet (DB)=
         
         # vraci json vsech laborek, ktere jsou k dispozici
         # student na nich neni zapsan!!
 
-    return "student home"
+    return json.dump(list_terminu)
 
 
 #post
 # Change state v labu, jestli se tam přihlašuje nebo odhlašuje
 @app.get("/student/{id_lab}") #osobni číslo gone again
-async def add_student_to_lab(ticket : str | None = None): # prijima argument id labu, na ktery se student registruje
+async def zmena_statusu_zapsani(): # prijima argument id labu, na ktery se student registruje, ticket : str | None = None, typ:str
     """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně """
+    ticket = os.dotenv("TICKET")
     if ticket is None or ticket == "":
         return 401
-
-    # provede:
-        # DB relace mezi studentem a labem
-        # prida do laborek +1 na obsazenost
-
-        # vraci ok 200?
-
+    userinfo = get_stag_user_info(ticket)
+    userid, role = get_userid_and_role(userinfo)
+    #HASH STUDENT
+    if typ == "zapsat":
+        if zapsat_se_na_termin(session, userid, id_lab):
+            return 200
+        else:
+            return 469
+    elif typ == "odhlasit":
+        if odepsat_se_z_terminu(session, userid, id_lab):
+            return 200
+        else:
+            return 400
 
 ## /STUDENT MOJE
 @app.get("/student/moje")
@@ -219,9 +228,10 @@ async def root():
     predmety = predmety_pro_cviceni()
     
     user = get_stag_user_info(ticket)
+    prijmeni = user["prijmeni"]
     userid, role = get_userid_and_role(user)
 
-    return userid, role
+    return user
 
     
 
