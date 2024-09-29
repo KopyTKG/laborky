@@ -1,5 +1,5 @@
 import { headers as h } from 'next/headers'
-import Terminy from '@/modules/terminy'
+import Profil from '@/components/profil'
 export default function ProfilePage() {
  const headers = h()
  const url = headers.get('referer')
@@ -8,7 +8,7 @@ export default function ProfilePage() {
   <>
    <div className="flex flex-col max-w-3xl w-full mx-auto">
     <div className="text-4xl font-bold underline py-5">{user}</div>
-    <Terminy />
+    <Profil />
    </div>
   </>
  )

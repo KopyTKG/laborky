@@ -53,7 +53,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
  matcher: [
   {
-   source: '/((?!login|api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)', // Match all routes except /login
+   source: '/((?!login|logout|api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)', // Match all routes except /login
   },
   '/student/:path*', // Continue matching all routes under /student
   '/ucitel/:path+', // Continue matching all routes under /ucitel
