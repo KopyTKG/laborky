@@ -168,6 +168,13 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         session.commit()
         return True
 
+def smazat_termin(session, id_terminu):
+    if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first() is None:
+        print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
+        return False
+    session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).delete()
+    session.commit()
+    return True
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta).first()
