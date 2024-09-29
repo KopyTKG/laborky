@@ -252,7 +252,6 @@ async def get_ucitel_emaily(): #ticket: str | None = None
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-    emaily_studentu = emaily_studentu[::3]
     json_emailu = json.dump(emaily_studentu)
     return json_emailu
     # provede:
