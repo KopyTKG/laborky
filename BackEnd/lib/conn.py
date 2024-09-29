@@ -102,13 +102,21 @@ class HistorieTerminu(Base):
 
 ### TVORBA UZIVATEL
 def vytvor_student(session, id):
-    student = Student(id=id, datum_vytvoreni=DateTime.now())
-    session.add(student)
-    session.commit()
+    if session.query(Student).filter(Student.id == id).first() is None:
+        student = Student(id=id, datum_vytvoreni=DateTime.now())
+        session.add(student)
+        session.commit()
+    else:
+        print(f"Student s ID {id} uz existuje.")
+        return False
 def pridej_vyucujici(session, id, prijmeni):
-    vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
-    session.add(vyucujici)
-    session.commit()
+    if session.query(Vyucujici).filter(Vyucujici.id == id).first() is None:
+        vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
+        session.add(vyucujici)
+        session.commit()
+    else:
+        print(f"Vyucujici s ID {id} uz existuje.")
+        return False
 
 ### USER ACTIONS
 def zapis_predmet(session, kod_predmetu, student_id):
@@ -119,7 +127,7 @@ def zapis_predmet(session, kod_predmetu, student_id):
 def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None):
     termin = session.query(Termin).filter(Termin.id == id_terminu).first()
     if termin is None:
-        print(f"Term with ID {id_terminu} not found.")
+        print(f"Termin s ID {id_terminu} neexistuje.")
         return
 
     if newDatum is not None:
