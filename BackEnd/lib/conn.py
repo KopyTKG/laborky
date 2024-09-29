@@ -1,8 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime
+from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime, distinct, func
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
 import uuid
 from datetime import datetime, timedelta
+
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -170,11 +171,16 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         session.commit()
         return True
 
+
+# Nepoužíváme
+"""
 def list_uspesni_studenti(session, kod_predmetu):
-    kvota_cviceni = session.query(Predmet.pocet_cviceni).filter(Predmet.kod == kod_predmetu).first()
-    uspesni_studenti = session.query(HistorieTerminu).filter(HistorieTerminu.datum_splneni != None ).group_by(HistorieTerminu.user_id).having(function.count(HistorieTerminu.id) > kvota_cviceni).all()
+    kvota_cviceni = session.query(Predmet.pocet_cviceni).filter(Predmet.kod_predmetu == kod_predmetu).first()
+    uspesni_studenti = session.query(HistorieTerminu).filter(HistorieTerminu.datum_splneni != None ).group_by(HistorieTerminu.student_id).having(func.count(HistorieTerminu.id) > kvota_cviceni[0]).all()
     uspesni_studenti_list = [student[0] for student in uspesni_studenti]
     return uspesni_studenti_list
+"""
+
 
 def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
     uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None).all()
@@ -302,7 +308,65 @@ def terminy_tyden_dopredu(session):
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
+def pocet_cviceni_pro_predmet(session):
+    predmety = session.query(distinct(Predmet.zkratka_predmetu)).all()
+    predmet_pocet_cviceni = {}
 
+    for predmet in predmety:
+        nazev = predmet[0]
+        predmet_obj = session.query(Predmet).filter_by(zkratka_predmetu=nazev).first()
+
+        if predmet_obj:
+            pocet_cviceni = predmet_obj.pocet_cviceni
+            if pocet_cviceni:
+                predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
+            else:
+                predmet_pocet_cviceni[nazev] = []
+
+    return predmet_pocet_cviceni
+
+
+def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
+    for predmet in list(pocet_pro_predmet.keys()):
+        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, predmet)
+
+        if uspesne_terminy:
+            for termin in uspesne_terminy:
+                cisla_cviceni = session.query(Termin.cislo_cviceni)\
+                       .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)\
+                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == predmet)\
+                       .all()
+                if cisla_cviceni:
+                    for cislo in cisla_cviceni:
+                        cislo = cislo[0] - 1
+                        pocet_pro_predmet[predmet][cislo] = 1
+
+    return pocet_pro_predmet
+
+
+def vypis_uspesnych_studentu(session, kod_predmetu):
+    ticket = os.getenv("TICKET")
+
+    studenti = ( # se vztahem k urcitemu predmetu
+        session.query(Student)
+        .join(ZapsanePredmety)
+        .join(Predmet)
+        .filter(Predmet.kod_predmetu == kod_predmetu)
+        .all()
+    )
+
+    pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
+
+    vyhodnoceni_studentu = {}
+
+    for student in studenti:
+        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
+        if 0 in vyhodnoceni[kod_predmetu]:
+            continue
+        else:
+            vyhodnoceni_studentu[student.id] = vyhodnoceni
+
+    return vyhodnoceni_studentu
 
 
 
@@ -332,6 +396,16 @@ if __name__ == "__main__":
     # terminy = list_terminy(session)
     # for termin in terminy:
     #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+
+
+    #vypis = vypis_uspesnych_studentu(session, "MATH202")
+    #print(vypis)
+
+    #vypis = vypis_uspesnych_studentu(session, "CS101")
+    #print(vypis)
+
+    #vypis = list(vypis.keys())
+    #print(vypis)
 
     pass
 

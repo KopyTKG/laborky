@@ -31,19 +31,3 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
 def get_student_profil(ticket, historie_terminu, osCislo=None):
     """ Vraci zaznam o vsech typech cviceni, zda je ma student splnene ci ne """
     pass
-
-"""
-def pocet_cviceni_pro_predmet(session):
-    predmety = session.query(distinct(Predmet.zkratka_predmetu)).all()
-    predmet_pocet_cviceni = {}
-
-    for predmet in predmety:
-        nazev = predmet[0]
-        predmet_obj = session.query(Predmet).filter_by(zkratka_predmetu=nazev).first()
-
-        if predmet_obj:
-            pocet_cviceni = predmet_obj.pocet_cviceni
-            predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
-
-    return predmet_pocet_cviceni
-"""

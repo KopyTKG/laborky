@@ -95,24 +95,15 @@ async def get_student_profil(): #prijima parametr ticket ticket : str | None = N
     ticket = os.getenv("TICKET") # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
-    
-    predmet_pocet_cviceni = pocet_cviceni_pro_predmet(session)
 
     userid, role = get_userid_and_role(get_stag_user_info(ticket))
     userid = encode_id(userid)
-    
-    # historie terminu -> termin.index terminu:
-        # list[index.termin] = 1 (splnil)
 
-    # vraci json: predmet: [0, 0, 1]...
+    pocet_pro_predmet = pocet_cviceni_pro_predmet(session) 
+    vyhodnoceni_studenta = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
 
-    # provede:
-        # DB podle osobniho cisla, vrati zda student ma v minulosti splneno jaky typ cviceni
-        # to, co nema oznaceno jako splnil a nebo je zapsan a hodina jeste neprobehla, ma jako nesplnil
-
-        # vraci predmet - seminare a u kazdeho jestli splnil nebo ne
-
-    return "student profil"
+    # format: {"KodPred": [0, 1, 1]} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
+    return vyhodnoceni_studenta
 
 
 ### Ucitel API 
@@ -188,6 +179,7 @@ async def ucitel_zmena_terminu(ticket: str, ucebna:string, datum:datetime, aktua
         return ok
     return internal_server_error
 
+
 @app.delete("/ucitel/termin/{id_terminu}")
 async def ucitel_smazani_terminu(ticket: str | None = None): 
     """ Učitel smáže vypsaný termín """
@@ -252,7 +244,7 @@ async def post_ucitel_splnit_studentovi(): #ticket: str | None = None, id_stud: 
         # date = curr.date
         # DB - marked as splněno (přidá se date do relace)
 
-@app.get("/ucitel/emaily/{id_terminu}")
+@app.get("/ucitel/emaily/{id_terminu}") # prijima: katedra, zkratka_predmetu, id_terminu
 async def get_ucitel_emaily(): #ticket: str | None = None
     """ Vrátí xslx soubor s emailama studentů přihlášených na daném termínu """
     ticket = os.getenv("TICKET")
@@ -270,6 +262,28 @@ async def get_ucitel_emaily(): #ticket: str | None = None
         # stag API: vyhledej vsechny uzivatele, kteri maji zapsany dany predmet /ws/services/rest2/student/getStudentInfo
             # student - jmeno + prijmeni + mail
         # vraci json
+
+
+@app.get("/ucitel/uspesni_studenti/{zkratka_predmetu}") # prijima: katedra, zkratka_predmetu
+async def get_uspesni_studenti_by_predmet():
+    """ Vrátí seznam studentů, kteří mají všechny cvičení splněné z daného předmětu"""
+    ticket = os.getenv("TICKET")
+    if ticket is None or ticket == "":
+        return unauthorized
+
+    zkratka_predmetu = "CS101"
+    katedra = "Informatics"
+    vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
+    vypis_uspesnych_studentu = vypis_uspesnych_studentu(session, zkratka_predmetu)
+
+    uspesni_studenti = list(vypis_uspesnych_studentu.keys())
+
+    dekodovane = compare_encoded(uspesni_studenti, vsichni_studenti)
+    info = get_studenti_info(ticket, dekodovane)
+
+    return info
+
+
 
 
 @app.get("/")
