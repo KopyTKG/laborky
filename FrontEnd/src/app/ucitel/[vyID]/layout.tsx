@@ -1,5 +1,5 @@
 import React from 'react'
-import NavbarComponent from './navbar'
+import { NavbarTeacher as Navbar } from '@/components/navbars'
 import Vytvor from '@/modules/vytvor'
 
 export default function RootLayout({
@@ -7,11 +7,11 @@ export default function RootLayout({
  params,
 }: {
  children: React.ReactNode
- params: { slug: string }
+ params: { vyID: string }
 }) {
  return (
   <>
-   <NavbarComponent id={params.slug} />
+   <Navbar id={params.vyID} />
    <>{children}</>
    <Vytvor />
   </>

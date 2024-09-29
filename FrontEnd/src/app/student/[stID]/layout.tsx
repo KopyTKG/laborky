@@ -1,16 +1,16 @@
 import React from 'react'
-import NavbarComponent from './navbar'
+import { NavbarStudent as Navbar } from '@/components/navbars'
 
 export default function RootLayout({
  children,
  params,
 }: {
  children: React.ReactNode
- params: { slug: string }
+ params: { stID: string }
 }) {
  return (
   <>
-   <NavbarComponent id={params.slug} />
+   <Navbar id={params.stID} />
    <>{children}</>
   </>
  )
