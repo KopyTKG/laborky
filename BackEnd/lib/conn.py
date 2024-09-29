@@ -194,6 +194,11 @@ def list_predmety(session):
         print(f"Kod: {predmet.kod_predmetu}, Zkratka: {predmet.zkratka_predmetu}, Katedra: {predmet.katedra}, Vyucujici: {predmet.vyucuje.prijmeni}")
     predmet_list = [predmet for predmet in predmety]
     return predmet_list
+
+def list_dostupnych_terminu(session, predmety):
+    terminy = session.query(Termin).filter(Termin.kod_predmet.in_(predmety)).all()
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
 ### TERMINY
 def list_terminy(session):
     terminy = session.query(Termin).all()
@@ -279,4 +284,11 @@ if __name__ == "__main__":
     # for history in historickeTerminy:
     #     termin = history.termin
     #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")\
+
+    terminy = list_dostupnych_predmetu(session, ['CS101','CS102'])
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+
     pass
+
+
