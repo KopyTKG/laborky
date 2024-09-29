@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
+import uuid
 from datetime import datetime
 
 # nacteni DB connection stringu z .env
@@ -39,6 +40,8 @@ class Termin(Base):
     historie_terminu = relationship('HistorieTerminu', back_populates="termin")
 
 
+
+
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
 
@@ -61,7 +64,6 @@ class Predmet(Base):
     vyucuje = relationship('Vyucujici', back_populates="predmet")
     termin = relationship('Termin', back_populates="predmet")
     zapsane_predmety = relationship('ZapsanePredmety', back_populates="predmet")
-
 
 class Student(Base):
     __tablename__ = "student"
@@ -91,6 +93,7 @@ class HistorieTerminu(Base):
     id = Column("id", UUID, primary_key=True)
     student_id = Column(UUID, ForeignKey('student.id'))
     termin_id = Column(UUID, ForeignKey('termin.id'))
+    datum_splneni = Column("datum_splneni", DateTime)
 
     student = relationship('Student', back_populates="historie_terminu")
     termin = relationship('Termin', back_populates="historie_terminu")
@@ -108,40 +111,109 @@ def pridej_vyucujici(session, id, prijmeni):
     session.commit()
 
 ### USER ACTIONS
-def zapis_predmet(session):
-    pass
-def upravit_termin(session):
-    pass
-def uznat_termin(session):
-    pass
-def pridat_studenta(session):
-    pass
+def zapis_predmet(session, kod_predmetu, student_id):
+    zapsane_predmety = ZapsanePredmety(uuid=uuid.uuid4(),zapsano=datetime.now(), student_id=student_id, kod_predmet=kod_predmetu)
+    session.add(zapsane_predmety)
+    session.commit()
+
+def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None):
+    termin = session.query(Termin).filter(Termin.id == id_terminu).first()
+    if termin is None:
+        print(f"Term with ID {id_terminu} not found.")
+        return
+
+    if newDatum is not None:
+        termin.datum = newDatum
+
+    if newUcebna is not None:
+        termin.ucebna = newUcebna
+
+    if newMax_kapacita is not None:
+        termin.max_kapacita = newMax_kapacita
+
+    if newVyucuje_id is not None:
+        termin.vyucuje_id = newVyucuje_id
+
+    if newJmeno is not None:
+        termin.jmeno = newJmeno
+    session.commit()
+
+def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
+    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta).first()
+    termin.datum_splneni = zvolene_datum_splneni or datetime.now()
+    session.commit()
+
+def pridat_studenta(session, student_id, termin_id):
+    session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
+    termin = session.query(Termin).filter(Termin.id == termin_id).first()
+    termin.aktualni_kapacita += 1
+    session.commit()
 
 ### PREDMETY
-def vytvor_predmet(session):
-    pass
+def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id):
+    predmet=Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id)
+    session.add(predmet)
+    session.commit()
 def list_predmety(session):
-    pass
-
+    predmety = session.query(Predmet).all()
+    for predmet in predmety:
+        print(f"Kod: {predmet.kod_predmetu}, Zkratka: {predmet.zkratka_predmetu}, Katedra: {predmet.katedra}, Vyucujici: {predmet.vyucuje.prijmeni}")
+    predmet_list = [predmet for predmet in predmety]
+    return predmet_list
 ### TERMINY
 def list_terminy(session):
-    session.query(Termin).all()
-def vypsat_termin(session):
-    pass
+    terminy = session.query(Termin).all()
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Aktualni kapacita: {termin.aktualni_kapacita}, Max kapacita: {termin.max_kapacita}")
+    termin_list = [termin for termin in terminy]
+    return termin_list
+
+def vypsat_termin(session, id:UUID, ucebna:Text, datum:datetime, aktualni_kapacita:int, max_kapacita:int, vypsal_id:UUID, vyucuje_id:UUID, kod_predmet:Text, jmeno:Text):
+    termin = Termin(id=id, ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno)
+    session.add(termin)
+    session.commit()
+
 def list_nadchazejici_terminy(session):
     dnesni_datum = datetime.now()
     terminy = session.query(Termin).filter(Termin.datum >= dnesni_datum).all()
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
 def list_probehle_terminy(session):
     dnesni_datum = datetime.now()
     terminy = session.query(Termin).filter(Termin.datum <= dnesni_datum).all()
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
-def list_planovane_terminy_predmet(session):
-    pass
-def list_probehle_terminy_predmet(session):
-    pass
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
+def list_planovane_terminy_predmet(session, kod_predmetu):
+    dnesni_datum = datetime.now()
+    terminy = session.query(Termin).filter(Termin.kod_predmet == kod_predmetu, Termin.datum >= dnesni_datum).all()
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
+def list_probehle_terminy_predmet(session, kod_predmetu):
+    dnesni_datum = datetime.now()
+    terminy = session.query(Termin).filter(Termin.kod_predmet == kod_predmetu, Termin.datum <= dnesni_datum).all()
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
+def list_terminy_vyucujici(session, id):
+    terminy = session.query(Termin).filter(Termin.vyucuje_id == id).all()
+    if terminy is None:
+        print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
+        return
+    for termin in terminy:
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
 
 def historie_studenta(session, id):
     student = session.query(Student).filter_by(id=id).first()
@@ -151,12 +223,25 @@ def historie_studenta(session, id):
     for history in student.historie_terminu:
         termin = history.termin
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+    terminy_list = [termin for termin in student.historie_terminu]
+    return terminy_list
 
 
 
 
 
 if __name__ == "__main__":
-    historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
-    list_probehle_terminy(session)
+    # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
+    # list_probehle_terminy(session)
+    # list_probehle_terminy_predmet(session, 'CS101')
+    # list_terminy_vyucujici(session,'10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63')
+    # vypsat_termin(session, uuid.uuid4(), 'CSC 101', datetime.now(), 0, 20, '10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63', '10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63', 'CS101', 'Object oriented programming principles')
+    # upravit_termin(session, '6882d71a-42ab-4fb8-8134-87a72982dd42', newUcebna='6.13')
+    # list_terminy_vyucujici(session, '6a08d4c9-c9ee-4cd9-9464-7b8033b50a8a')
+    # list_probehle_terminy_predmet(session, 'CS101')
 
+    # historickeTerminy = (historie_studenta(session, '0d162f64-61dd-446d-a3e2-404a994e9a9f'))
+    # for history in historickeTerminy:
+    #     termin = history.termin
+    #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")\
+    pass
