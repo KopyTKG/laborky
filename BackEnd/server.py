@@ -14,9 +14,11 @@ app = FastAPI(debug=True)
 
 
 @app.get("/setup")
-async def setup(): # prijima parametr ticket
+async def setup(ticket: str | None = None): # prijima parametr ticket
     """ Kontrola přihlášeného uživatele s databází po loginu do systému """
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    if ticket is None or ticket == "":
+        return "WTF"
+    # ticket = os.getenv('TICKET') # prozatimni reseni
 
     userinfo = get_stag_user_info(ticket)
     userid, role = get_userid_and_role(userinfo)
@@ -29,10 +31,12 @@ async def setup(): # prijima parametr ticket
 
 ### Student API
 ## /STUDENT HOME
-@app.get("/student/{osobni_cislo}")
-async def get_student_home(): #prijima parametr ticket
+@app.get("/student") #/student/{osobni_cislo}
+async def get_student_home(ticket: str | None = None): #prijima parametr ticket
     """ Vrácení všech vypsaných laborek podle toho, na co se student může zapsat """
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    if ticket is None or ticket == "":
+        return "oh no"
+    #ticket = os.getenv('TICKET') # prozatimni reseni
 
     # provede:
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, predmety_pro_cviceni())
@@ -45,10 +49,12 @@ async def get_student_home(): #prijima parametr ticket
 
 
 #post
-@app.get("/student/{osobni_cislo}/{id_lab}")
-async def add_student_to_lab(): # prijima argument id labu, na ktery se student registruje
-    """ Zaregistruje studenta do labu, který je k dispozici na jeho hlavní straně """
-
+# Change state v labu, jestli se tam přihlašuje nebo odhlašuje
+@app.get("/student/{id_lab}") #osobni číslo gone again
+async def add_student_to_lab(ticket : str | None = None): # prijima argument id labu, na ktery se student registruje
+    """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně """
+    if ticket is None or ticket == "":
+        return 401
 
     # provede:
         # DB relace mezi studentem a labem
@@ -58,10 +64,12 @@ async def add_student_to_lab(): # prijima argument id labu, na ktery se student 
 
 
 ## /STUDENT MOJE
-@app.get("/student/{osobni_cislo}/moje")
-async def get_student_moje(): #prijima parametr ticket
+@app.get("/student/moje")
+async def get_student_moje(ticket : str | None = None): #prijima parametr ticket
     """ Vrátí cvičení, na kterých je student aktuálně zapsán"""
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    if ticket is None or ticket == "":
+        return 401
+    # ticket = os.getenv('TICKET') # prozatimni reseni
 
     # provede:
         # DB podle jeho osobniho cisla, kde je student zapsan =
@@ -70,21 +78,9 @@ async def get_student_moje(): #prijima parametr ticket
 
     return "student zapsane terminy"
 
-
-#post
-@app.get("/student/{osobni_cislo}/moje/{id_lab}")
-async def remove_student_from_lab():
-    """ Odhlášení studenta ze cvičení podle id cvičení """
-
-    # provede:
-        # zruší relaci mezi studentem a cvičením
-        # odečte 1 od obsazenosti cvičení
-       # vraci ok 200?
-
-
-## /STUDENT PROFIL
-@app.get("/student/{osobni_cislo}/profil")
-async def get_student_profil(): #prijima parametr ticket
+## PROFIL
+@app.get("/profil") # Profil pro studenta a ucitele
+async def get_student_profil(ticket : str | None = None): #prijima parametr ticket
     """ Vraci zaznam o vsech typech cviceni na dany seznam predmetu, zda je student splnil ci nikoli"""
     ticket = os.getenv("TICKET") # prozatimni reseni
 
@@ -98,19 +94,31 @@ async def get_student_profil(): #prijima parametr ticket
 
 
 ### Ucitel API 
-@app.get("/ucitel/board")
-async def get_ucitel_board(): #prijima ticket
-    """ Vrátí všechny vypsané cvičení """
+#Cvičení příští týden
+@app.get("/ucitel/nadchazejici")
+async def get_ucitel_board_next_ones(ticket: str | None = None):
+    """Vrátí cvičení v dalším týdnu"""
+    if ticket is None or ticket == "":
+        return 401
+    return "další cvícení v dalším týdnu"
 
+#Všechny týdny
+@app.get("/ucitel/board")
+async def get_ucitel_board(ticket: str | None = None): #prijima ticket
+    """ Vrátí všechny vypsané cvičení """
+    if ticket is None or ticket == "":
+        return 401 
     # provede:
         # DB - všechny termíny sestupně podle data
 
     return "vsechna vypsana cviceni EVER"
 
 
-@app.get("/ucitel/{ucitIdnu}")
-async def get_ucitel_moje_vypsane():
+@app.get("/ucitel/moje")
+async def get_ucitel_moje_vypsane(ticket : str | None = None):
     """ Vrátí všechny cvičení, které vypsal uživatel """
+    if ticket is None or ticket == "":
+        return 401
     # ticket - user - role
     # provede:
         # DB - všechny cvícení, které vypsal uživatel
@@ -120,7 +128,7 @@ async def get_ucitel_moje_vypsane():
 
 
 @app.get("/ucitel/board/{predmet}")
-async def get_terminy_by_predmet():
+async def get_terminy_by_predmet(ticket: str | None = None):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     # provede:
         # DB - všechny cvičení pro daný předmět
@@ -128,9 +136,8 @@ async def get_terminy_by_predmet():
     return "cviceni pro dany predmet"
 
 
-#post
-@app.get("/ucitel/termin/{megamocsracek}")
-async def ucitel_vytvor_termin():
+@app.post("/ucitel/termin/{megamocsracek}")
+async def ucitel_vytvor_termin(ticket: str | None = None):
     """ Učitel vytvoří termín do databáze """
 
     # ticket
@@ -143,19 +150,22 @@ async def ucitel_vytvor_termin():
     return "ok provedeno :-)"
 
 
-#put
-@app.get("/ucitel/terminedit/{id_terminu}")
-async def ucitel_zmena_terminu():
+@app.patch("/ucitel/termin/{id_terminu}")
+async def ucitel_zmena_terminu(ticket: str | None = None):
     """ Učitel změní parametry v již vypsaném termínu """
     # ticket
     # crUd operace pro adama
-
+@app.delete("/ucitel/termin/{id_terminu}")
+async def ucitel_smazani_terminu(ticket: str | None = None):
+    """ Učitel smáže vypsaný termín """
+    # ticket
+    # cruD operace pro adama
 
 ## /UCITEL STUDENTI
 @app.get("/ucitel/studenti/{id_lab}")
-async def get_vypis_studentu(): #prijima parametr ticket
+async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticket
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    # ticket = os.getenv('TICKET') # prozatimni reseni
 
         # DB - vsechny studenty (Fcisla) s relaci pro id_lab
         # nacist udaje o studentech : Jmeno, Prijmeni
@@ -165,8 +175,8 @@ async def get_vypis_studentu(): #prijima parametr ticket
     return "jmena studentu + fnu pro dany lab", student_info
 
 
-@app.get("/ucitel/zapis/{id_lab}/{id_stud}")
-async def post_ucitel_zapsat_studenta():
+@app.post("/ucitel/zapis/{id_lab}/")
+async def post_ucitel_zapsat_studenta(ticket: str | None = None, id_stud: str | None = None):
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
     # ticket
     # provede:
@@ -180,9 +190,10 @@ async def post_ucitel_zapsat_studenta():
     return "ok provedeno :-)"
 
 
-@app.get("/ucitel/splneno/{id_lab}/{id_stud}")
-async def post_ucitel_splnit_studentovi():
+@app.post("/ucitel/splneno/{id_lab}/")
+async def post_ucitel_splnit_studentovi(ticket: str | None = None, id_stud: str | None = None):
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
+    
     # provede:
         # date = curr.date
         # DB - marked as splněno (přidá se date do relace)
@@ -191,13 +202,13 @@ async def post_ucitel_splnit_studentovi():
     
 
 @app.get("/ucitel/emaily/{id_lab}")
-async def get_ucitel_emaily():
+async def get_ucitel_emaily(ticket: str | None = None):
     """ Vrátí xslx soubor s emailama studentů přihlášených na daném termínu """
     # ticket
     # provede:
         # DB - vsechny Fcisla, ktere maji relaci s terminem
         # DB - predmet, ktereho se to tyka
-        # stag API: vyhledej vsechny uzivatele, kteri maji zapsany dany predmet
+        # stag API: vyhledej vsechny uzivatele, kteri maji zapsany dany predmet /ws/services/rest2/student/getStudentInfo
             # student - jmeno + prijmeni + mail
         # vraci json
     return "json vsech informaci, na ktere nemame prava je uchovavat :-)"
