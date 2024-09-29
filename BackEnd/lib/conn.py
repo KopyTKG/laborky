@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, Strin
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -216,8 +216,8 @@ def list_studenti_z_terminu(session, termin_id):
     studenti_list = [student.student_id for student in student_list]
     return studenti_list
 
-def vypsat_termin(session, id:UUID, ucebna:Text, datum:datetime, aktualni_kapacita:int, max_kapacita:int, vypsal_id:UUID, vyucuje_id:UUID, kod_predmet:Text, jmeno:Text):
-    termin = Termin(id=id, ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno)
+def vypsat_termin(session, ucebna:Text, datum:datetime, aktualni_kapacita:int, max_kapacita:int, vypsal_id:UUID, vyucuje_id:UUID, kod_predmet:Text, jmeno:Text):
+    termin = Termin(id=uuid.uuid4(), ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno)
     session.add(termin)
     session.commit()
     return True
@@ -275,6 +275,13 @@ def historie_studenta(session, id):
     terminy_list = [termin for termin in student.historie_terminu]
     return terminy_list
 
+def terminy_tyden_dopredu(session):
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=7)
+    terminy = session.query(Termin).filter(Termin.datum >= start_date, Termin.datum <= end_date).order_by(Termin.datum.asc())
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
 
 
 
@@ -305,7 +312,6 @@ if __name__ == "__main__":
     # terminy = list_terminy(session)
     # for termin in terminy:
     #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
-
 
     pass
 
