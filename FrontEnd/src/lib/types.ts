@@ -1,3 +1,5 @@
+import internal from 'stream'
+
 export type tTermin = {
  _id: string
  location: string
@@ -19,4 +21,12 @@ export type tLink = {
 export type tPredmet = {
  nazev: string
  cviceni: Date[]
+}
+
+export type tPredmetInfo = {
+ _id: string
+ zkratka: string
+ nazev: string
+ nCviceni: number
+ vyucujici: string
 }

@@ -38,7 +38,7 @@ export function NavbarTeacher({ id }: { id: string }) {
    icon: 'house',
   },
   {
-   label: 'Moje předměty',
+   label: 'Procházet',
    href: `${url}/predmety`,
    icon: 'menu',
   },

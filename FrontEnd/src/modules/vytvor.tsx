@@ -13,14 +13,47 @@ import {
  SelectItem,
  useDisclosure,
 } from '@nextui-org/react'
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { Button as Btn } from '@/components/ui/button'
+import { tPredmetInfo } from '@/lib/types'
+import { Get } from '@/app/actions'
 
-const Predmety = ['PCA', 'ZPS', 'Neurčeno']
 const Skupiny = ['ZPS', 'ki/ZSP', 'ASD', 'QEEE', 'Neurčeno']
 export default function Vytvor() {
- const [predmet, setPredmet] = useState('')
+ const [predmety, setPredmety] = useState<tPredmetInfo[]>([])
+ const [skupiny, setSkupiny] = useState<string[]>([])
+ const [predmet, setPredmet] = useState<number>(-1)
  const { isOpen, onOpen, onOpenChange } = useDisclosure()
+
+ useLayoutEffect(() => {
+  const fetchTerminy = async () => {
+   try {
+    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/predmety`)
+    url.searchParams.set('t', 'vypsane')
+    const cookie = await Get('stagUserTicket')
+    if (cookie) {
+     url.searchParams.set('ticket', cookie.value)
+    }
+    const headers = {
+     Accept: 'application/json',
+     'Content-Type': 'application/json',
+     Connection: 'keep-alive',
+     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
+    }
+    const res = await fetch(url.toString(), { method: 'GET', headers })
+    if (res.status != 200) {
+     window.location.reload()
+    } else if (res.status == 200) {
+     let jsonParsed = await res.json()
+     setPredmety(jsonParsed.data)
+    }
+   } catch {
+    window.location.href = '/logout'
+   }
+  }
+  fetchTerminy()
+ }, [])
+
  return (
   <>
    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -35,28 +68,24 @@ export default function Vytvor() {
           placeholder="Vyberte předmět"
           isRequired
           onChange={(e) => {
-           setPredmet(e.target.value)
+           setPredmet(predmety.findIndex((item) => item._id === e.target.value))
           }}
          >
-          {Predmety.map((item) => (
-           <SelectItem value={item} key={item}>
-            {item}
+          {predmety.map((item, key) => (
+           <SelectItem value={key} key={item._id}>
+            {item.zkratka}
            </SelectItem>
           ))}
          </Select>
-         {!predmet ? null : predmet === 'Neurčeno' ? (
+         {predmet < 0 || predmety[predmet].zkratka === 'Nic' ? (
           <Input placeholder="Zadejte téma" isRequired />
          ) : (
           <Select placeholder="Vyberte cvičení" isRequired>
-           <SelectItem key={predmet + '1'} value="1">
-            Cvičeni 1
-           </SelectItem>
-           <SelectItem key={predmet + '2'} value="2">
-            Cvičeni 2
-           </SelectItem>
-           <SelectItem key={predmet + '3'} value="3">
-            Cvičeni 3
-           </SelectItem>
+           {Array.from({ length: predmety[predmet].nCviceni }, (_, index) => (
+            <SelectItem key={`${predmet}-${index}`} value={index + 1}>
+             {`Cvičení ${index + 1}`}
+            </SelectItem>
+           ))}
           </Select>
          )}
          <SectionTitle>Místo konání</SectionTitle>

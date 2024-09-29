@@ -44,6 +44,7 @@ export default function VypsaneTerminy() {
       key={termin._id}
       owned={termin.zapsany.includes(`1f3as45fefvae4`) ? true : false}
       {...termin}
+      typ="student"
      />
     ))}
    </div>
