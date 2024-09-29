@@ -106,6 +106,7 @@ def vytvor_student(session, id):
         student = Student(id=id, datum_vytvoreni=DateTime.now())
         session.add(student)
         session.commit()
+        return True
     else:
         print(f"Student s ID {id} uz existuje.")
         return False
@@ -114,6 +115,7 @@ def pridej_vyucujici(session, id, prijmeni):
         vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
         session.add(vyucujici)
         session.commit()
+        return True
     else:
         print(f"Vyucujici s ID {id} uz existuje.")
         return False
@@ -123,12 +125,13 @@ def zapis_predmet(session, kod_predmetu, student_id):
     zapsane_predmety = ZapsanePredmety(uuid=uuid.uuid4(),zapsano=datetime.now(), student_id=student_id, kod_predmet=kod_predmetu)
     session.add(zapsane_predmety)
     session.commit()
+    return True
 
 def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None):
     termin = session.query(Termin).filter(Termin.id == id_terminu).first()
     if termin is None:
         print(f"Termin s ID {id_terminu} neexistuje.")
-        return
+        return False
 
     if newDatum is not None:
         termin.datum = newDatum
@@ -145,6 +148,7 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
     if newJmeno is not None:
         termin.jmeno = newJmeno
     session.commit()
+    return True
 
 def odepsat_z_terminu(session, student_id, termin_id):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first()
@@ -153,12 +157,16 @@ def odepsat_z_terminu(session, student_id, termin_id):
         konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
         konkretni_termin.aktualni_kapacita -= 1
         session.commit()
-
+        return True
+    else:
+        print(f"Termin s ID {termin_id} neexistuje. Nebo na termin nejste prihlasen.")
+        return False
 
 def zapsat_se_na_termin(session, student_id, termin_id):
     session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     if termin.aktualni_kapacita >= termin.max_kapacita:
+        print(f"Termin s ID {termin_id} je plny. Nebo na termin nejste prihlasen.")
         return False
     else:
         termin.aktualni_kapacita += 1
@@ -170,18 +178,21 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta).first()
     termin.datum_splneni = zvolene_datum_splneni or datetime.now()
     session.commit()
+    return True
 
 def pridat_studenta(session, student_id, termin_id):
     session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     termin.aktualni_kapacita += 1
     session.commit()
+    return True
 
 ### PREDMETY
 def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id):
     predmet=Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id)
     session.add(predmet)
     session.commit()
+    return True
 def list_predmety(session):
     predmety = session.query(Predmet).all()
     for predmet in predmety:
@@ -200,6 +211,7 @@ def vypsat_termin(session, id:UUID, ucebna:Text, datum:datetime, aktualni_kapaci
     termin = Termin(id=id, ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno)
     session.add(termin)
     session.commit()
+    return True
 
 def list_nadchazejici_terminy(session):
     dnesni_datum = datetime.now()
@@ -237,7 +249,7 @@ def list_terminy_vyucujici(session, id):
     terminy = session.query(Termin).filter(Termin.vyucuje_id == id).all()
     if terminy is None:
         print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
-        return
+        return False
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
@@ -247,7 +259,7 @@ def historie_studenta(session, id):
     student = session.query(Student).filter_by(id=id).first()
     if student is None:
         print("Neplatne ID studenta!")
-        return
+        return False
     for history in student.historie_terminu:
         termin = history.termin
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
