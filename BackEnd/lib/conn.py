@@ -30,8 +30,8 @@ class Termin(Base):
     aktualni_kapacita = Column("aktualni_kapacita", Integer)
     max_kapacita = Column("max_kapacita", Integer)
     jmeno = Column("jmeno", Text)
-    vypsal_id = Column(UUID, ForeignKey('vyucujici.id'))
-    vyucuje_id = Column(UUID, ForeignKey('vyucujici.id'))
+    vypsal_id = Column(String, ForeignKey('vyucujici.id'))
+    vyucuje_id = Column(String, ForeignKey('vyucujici.id'))
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
 
     predmet = relationship('Predmet', back_populates="termin")
@@ -45,7 +45,7 @@ class Termin(Base):
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
 
-    id = Column("id", UUID, primary_key=True)
+    id = Column("id", String, primary_key=True)
     prijmeni = Column("prijmeni", Text)
 
     terminy_vyucuje = relationship("Termin", foreign_keys=[Termin.vyucuje_id], back_populates="vyucuje")
@@ -59,7 +59,7 @@ class Predmet(Base):
     kod_predmetu = Column("kod_predmetu", Text, primary_key=True)
     zkratka_predmetu = Column("zkratka_predmetu", Text)
     katedra = Column("katedra", Text)
-    vyucuje_id = Column("vyucujici_id", UUID, ForeignKey('vyucujici.id'))
+    vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
 
     vyucuje = relationship('Vyucujici', back_populates="predmet")
     termin = relationship('Termin', back_populates="predmet")
@@ -68,7 +68,7 @@ class Predmet(Base):
 class Student(Base):
     __tablename__ = "student"
 
-    id = Column("id", UUID, primary_key=True)
+    id = Column("id", String, primary_key=True)
     datum_vytvoreni = Column("datum_vytvoreni", DateTime)
 
     zapsane_predmety = relationship('ZapsanePredmety', back_populates="student")
@@ -80,7 +80,7 @@ class ZapsanePredmety(Base):
 
     id = Column("id", UUID, primary_key=True)
     zapsano = Column("zapsano", DateTime)
-    student_id = Column(UUID, ForeignKey('student.id'))
+    student_id = Column(String, ForeignKey('student.id'))
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
 
     student = relationship('Student', back_populates="zapsane_predmety")
@@ -91,7 +91,7 @@ class HistorieTerminu(Base):
     __tablename__ = "historie_terminu"
 
     id = Column("id", UUID, primary_key=True)
-    student_id = Column(UUID, ForeignKey('student.id'))
+    student_id = Column(String, ForeignKey('student.id'))
     termin_id = Column(UUID, ForeignKey('termin.id'))
     datum_splneni = Column("datum_splneni", DateTime)
 
@@ -145,6 +145,26 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
     if newJmeno is not None:
         termin.jmeno = newJmeno
     session.commit()
+
+def odepsat_z_terminu(session, student_id, termin_id):
+    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first()
+    if termin:
+        session.delete(termin)
+        konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
+        konkretni_termin.aktualni_kapacita -= 1
+        session.commit()
+
+
+def zapsat_se_na_termin(session, student_id, termin_id):
+    session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
+    termin = session.query(Termin).filter(Termin.id == termin_id).first()
+    if termin.aktualni_kapacita >= termin.max_kapacita:
+        return False
+    else:
+        termin.aktualni_kapacita += 1
+        session.commit()
+        return True
+
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta).first()
