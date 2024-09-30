@@ -51,7 +51,7 @@ async def get_student_home(ticket: str | None = None):
 
 
 @app.post("/student")
-async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: int):
+async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně """
     #ticket = os.dotenv("TICKET")
     if ticket is None or ticket == "":
@@ -166,7 +166,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
 
 
 @app.patch("/ucitel/termin")
-async def ucitel_zmena_terminu(ticket: str, id_terminu: int | None, ucebna:str | None, datum: datetime | None, aktualni_kapacita:int | None, max_kapacita:int | None, vyucuje_id: str | None, kod_predmet: str | None, jmeno: str | None):
+async def ucitel_zmena_terminu(ticket: str, id_terminu: str | None, ucebna:str | None, datum: datetime | None, aktualni_kapacita:int | None, max_kapacita:int | None, vyucuje_id: str | None, kod_predmet: str | None, jmeno: str | None):
     """ Učitel změní parametry v již vypsaném termínu """
     if ticket is None or ticket == "":
         return unauthorized
@@ -176,7 +176,7 @@ async def ucitel_zmena_terminu(ticket: str, id_terminu: int | None, ucebna:str |
 
 
 @app.delete("/ucitel/termin")
-async def ucitel_smazani_terminu(ticket: str, id_terminu: int): 
+async def ucitel_smazani_terminu(ticket: str, id_terminu: str): 
     """ Učitel smáže vypsaný termín """
     if ticket is None or ticket == "":
         return unauthorized
@@ -187,7 +187,7 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: int):
 
 ## /UCITEL STUDENTI
 @app.get("/ucitel/studenti")
-async def get_vypis_studentu(ticket: str, id_terminu: int, katedra: str, zkratka_predmetu: str):
+async def get_vypis_studentu(ticket: str, id_terminu: str, katedra: str, zkratka_predmetu: str):
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
     ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
@@ -202,7 +202,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: int, katedra: str, zkratka
 
 
 @app.post("/ucitel/zapis")
-async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: int): #ticket: str | None = None, id_stud: str | None = None
+async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
     ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -215,7 +215,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: int
 	    
 
 @app.post("/ucitel/splneno")
-async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, zvolene_datum_splneni: datetime, id_terminu: int): #ticket: str | None = None, id_stud: str | None = None, date: date
+async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, zvolene_datum_splneni: datetime, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
     ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
