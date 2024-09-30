@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime, distinct, func
+from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime, distinct, func, and_
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
 import uuid
@@ -267,7 +267,7 @@ def list_probehle_terminy(session):
 
 def list_planovane_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.kod_predmet == kod_predmetu, Termin.datum >= dnesni_datum).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum >= dnesni_datum)).order_by(Termin.datum.asc())
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
@@ -275,7 +275,7 @@ def list_planovane_terminy_predmet(session, kod_predmetu):
 
 def list_probehle_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.kod_predmet == kod_predmetu, Termin.datum <= dnesni_datum).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum <= dnesni_datum)).order_by(Termin.datum.desc())
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
