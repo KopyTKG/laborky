@@ -236,7 +236,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
-    if uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni):
+    if uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni):
         return ok
     else:
         return not_found
