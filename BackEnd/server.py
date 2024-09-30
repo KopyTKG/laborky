@@ -37,7 +37,6 @@ async def kontrola_s_databazi(ticket: str | None = None): # prijima parametr tic
 @app.get("/student") #/student/{osobni_cislo}
 async def get_student_home(ticket: str | None = None): #prijima parametr ticket ticket: str | None = None
     """ Vrácení všech vypsaných laborek podle toho, na co se student může zapsat """
-    
     #ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
@@ -45,10 +44,8 @@ async def get_student_home(ticket: str | None = None): #prijima parametr ticket 
     # provede:predmety_pro_cviceni
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
-        # jake jsou laborky k dispozici na dany predmet (DB)=
-        
-        # vraci json vsech laborek, ktere jsou k dispozici
-        # student na nich neni zapsan!!
+        # vrací seznam laborek, které jsou studentovi k dispozici
+            # předmět nemá uznaný a studuje ho
 
     return list_terminu
 
@@ -89,6 +86,7 @@ async def get_student_moje(ticket: str | None = None): #prijima parametr ticket 
 
     return list_terminu
 
+
 ## PROFIL
 @app.get("/profil") # Profil pro studenta a ucitele
 async def get_student_profil(ticket: str | None = None): #prijima parametr ticket ticket : str | None = None
@@ -128,8 +126,6 @@ async def get_ucitel_board(ticket: str | None = None): #prijima ticket ticket: s
         return unauthorized
 
     list_terminu = list_terminy(session)
-    # provede:
-        # DB - všechny termíny sestupně podle data
 
     return list_terminu
 
@@ -159,7 +155,7 @@ async def get_terminy_by_predmet(ticket: str | None = None): #ticket: str | None
 
 
 @app.post("/ucitel/termin/")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, aktualni_kapacita:int, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str): 
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, aktualni_kapacita:int, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int): 
     """ Učitel vytvoří termín do databáze """
     if ticket is None or ticket =="":
         return unauthorized
@@ -195,7 +191,7 @@ async def ucitel_smazani_terminu(ticket: str | None = None):
 @app.get("/ucitel/studenti/{id_terminu}")
 async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticket: str | None = None
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    #ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
     list_studentu = list_studenti_z_terminu(session, id_terminu)
@@ -212,7 +208,7 @@ async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticke
 @app.post("/ucitel/zapis/{id_terminu}/")
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str): #ticket: str | None = None, id_stud: str | None = None
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
-    ticket = os.getenv("TICKET")
+    #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
@@ -220,19 +216,12 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str): #ticket: str |
         return ok
     else:
         return not_found
-    # ticket
-    # provede:
-        # DB - najde studenta podle id_studenta
-            # pokud nebude - vyhodi ALERT! - student se musí nejprve zaregistrovat
-            # return "kokot se musi nejdriv zaregistrovat >:("
-            # pokud bude - vytvor relaci mezi studentem a terminem
-            # ! pokud je room plna, nevadi to
-            # kapacita terminu +1		    
+	    
 
 @app.post("/ucitel/splneno/{id_terminu}/")
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, date: datetime): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
-    ticket = os.getenv("TICKET")
+    #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
@@ -241,9 +230,6 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, date: datetim
     else:
         return not_found
     
-    # provede:
-        # date = curr.date
-        # DB - marked as splněno (přidá se date do relace)
 
 @app.get("/ucitel/emaily/{id_terminu}") # prijima: katedra, zkratka_predmetu, id_terminu
 async def get_ucitel_emaily(ticket: str | None = None): #ticket: str | None = None
@@ -255,13 +241,9 @@ async def get_ucitel_emaily(ticket: str | None = None): #ticket: str | None = No
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+
     return emaily_studentu
-    # provede:
-        # DB - vsechny Fcisla, ktere maji relaci s terminem
-        # DB - predmet, ktereho se to tyka
-        # stag API: vyhledej vsechny uzivatele, kteri maji zapsany dany predmet /ws/services/rest2/student/getStudentInfo
-            # student - jmeno + prijmeni + mail
-        # vraci json
+        # vraci: {osobniCislo: {jemno: , prijmeni:, email: }}
 
 
 @app.get("/ucitel/uspesni_studenti/{zkratka_predmetu}") # prijima: katedra, zkratka_predmetu
