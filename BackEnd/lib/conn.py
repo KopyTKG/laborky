@@ -188,7 +188,7 @@ def list_uspesni_studenti(session, kod_predmetu):
 
 
 def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
-    uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None).all()
+    uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None)).all()
     uspesni_studenti_list = [student for student in uspesni_studenti]
     return uspesni_studenti_list
 
@@ -202,20 +202,22 @@ def smazat_termin(session, id_terminu):
     return True
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
-    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta).first()
+    termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta)).first()
     termin.datum_splneni = zvolene_datum_splneni or datetime.now()
     session.commit()
     return True
 
 def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
-    if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first() is not None:
-        return False
+    if session.query(Student).filter_by(id=student_id).first() is None:
+        return 1
+    elif session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id)).first() is not None:
+        return 2
     zapis_termin = HistorieTerminu(id=uuid.uuid4(),student_id=student_id,termin_id=termin_id,datum_splneni=datum_splneni)
     session.add(zapis_termin)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     termin.aktualni_kapacita += 1
     session.commit()
-    return True
+    return 0
 
 ### PREDMETY
 def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
@@ -311,7 +313,7 @@ def historie_studenta(session, id):
 def terminy_tyden_dopredu(session):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=7)
-    terminy = session.query(Termin).filter(Termin.datum >= start_date, Termin.datum <= end_date).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date)).order_by(Termin.datum.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
