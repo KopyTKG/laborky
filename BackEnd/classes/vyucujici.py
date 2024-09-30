@@ -8,7 +8,15 @@ def get_student_info(ticket, osobni_cislo):
     params = {
         "osCislo": osobni_cislo,
     }
-    response = get(ticket, url, params)
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://stag-demo.zcu.cz",
+    }
+    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentInfo"
+    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
+    #response = get(ticket, url, params)
 
     jmeno = response["jmeno"]
     prijmeni = response["prijmeni"]
@@ -60,8 +68,10 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
 
     hash_studenti_na_predmetu = []
     for student in studenti_na_predmetu:
+        student = "F" + student
         hash_studenti_na_predmetu.append(hashlib.sha1(student.encode()).hexdigest())
     
+
     matching = find_matching_hash_positions(hash_studenti_na_predmetu, hash_studentu_na_terminu)
 
     osobni_cisla = []
@@ -69,7 +79,7 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
         osobni_cisla.append(studenti_na_predmetu[match])
 
 # return osobni_cisla misto matching
-    return hash_studenti_na_predmetu
+    return osobni_cisla
 
 
 def find_matching_hash_positions(big_list, small_list):
