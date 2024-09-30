@@ -191,7 +191,7 @@ async def ucitel_smazani_terminu(ticket: str | None = None):
 @app.get("/ucitel/studenti/{id_terminu}")
 async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticket: str | None = None
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
-    #ticket = os.getenv('TICKET') # prozatimni reseni
+    ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
     list_studentu = list_studenti_z_terminu(session, id_terminu)
@@ -208,7 +208,7 @@ async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticke
 @app.post("/ucitel/zapis/{id_terminu}/")
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str): #ticket: str | None = None, id_stud: str | None = None
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
-    #ticket = os.getenv("TICKET")
+    ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
@@ -221,7 +221,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str): #ticket: str |
 @app.post("/ucitel/splneno/{id_terminu}/")
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, date: datetime): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
-    #ticket = os.getenv("TICKET")
+    ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
@@ -270,7 +270,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str,katedra: str,vy
     """Vytvoří předmět - testing only"""
     if ticket is None or ticket == "":
         return unauthorized
-    kod_predmetu = katedra + "/" + zkratka_predmetu
+    kod_predmetu = katedra + zkratka_predmetu
     vyucuje_id = encode_id(vyucuje_id)
     if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
         return ok
@@ -289,10 +289,12 @@ async def root(ticket: str | None = None):
         return {"error": "Ticket parameter is missing or None"}
 
     print(f"Received ticket: {ticket}")  # For debugging
+    
+    predmety = predmety_pro_cviceni()
     user = get_stag_user_info(ticket)
     prijmeni = user["prijmeni"]
     userid, role = get_userid_and_role(user)
-    return {"user": user, "userid": userid, "role": role}
+    return {"user": user, "role": role}
 
 
 if __name__ == "__main__":
