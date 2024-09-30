@@ -426,7 +426,7 @@ if __name__ == "__main__":
 
     #vypis = list(vypis.keys())
     #print(vypis)
-    print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
+    #print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
     pass
 
 
