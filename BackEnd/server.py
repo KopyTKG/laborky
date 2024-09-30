@@ -281,7 +281,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,v
     if ticket is None or ticket == "":
         return unauthorized
     kod_predmetu = katedra + zkratka_predmetu
-    vyucuje_id = encode_id(vyucuje_id)
+    #vyucuje_id = encode_id(vyucuje_id)
     if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
         return ok
     else:
@@ -300,7 +300,6 @@ async def root(ticket: str | None = None):
 
     print(f"Received ticket: {ticket}")  # For debugging
     
-    predmety = predmety_pro_cviceni()
     user = get_stag_user_info(ticket)
     prijmeni = user["prijmeni"]
     userid, role = get_userid_and_role(user)
