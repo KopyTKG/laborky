@@ -235,7 +235,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
-    id_stud = encode_id(id_stud)
+    #id_stud = encode_id(id_stud)
     if uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni):
         return ok
     else:
@@ -251,7 +251,7 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
     list_studentu = list_studenti_z_terminu(session, id_terminu)
     zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
+    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
 
     return emaily_studentu
