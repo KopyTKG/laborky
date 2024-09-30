@@ -69,7 +69,7 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
         osobni_cisla.append(studenti_na_predmetu[match])
 
 # return osobni_cisla misto matching
-    return matching
+    return hash_studenti_na_predmetu
 
 
 def find_matching_hash_positions(big_list, small_list):
