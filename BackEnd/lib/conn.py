@@ -161,13 +161,14 @@ def odepsat_z_terminu(session, student_id, termin_id):
         return False
 
 def zapsat_se_na_termin(session, student_id, termin_id):
-    session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
+    zapsat_na_termin = HistorieTerminu(uuid.uuid4(),student_id, termin_id)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     if termin.aktualni_kapacita >= termin.max_kapacita:
         print(f"Termin s ID {termin_id} je plny. Nebo na termin nejste prihlasen.")
         return False
     else:
         termin.aktualni_kapacita += 1
+        session.add(zapsat_na_termin)
         session.commit()
         return True
 
@@ -205,7 +206,8 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
 def pridat_studenta(session, student_id, termin_id):
     if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first() is not None:
         return False
-    session.query(HistorieTerminu).add(uuid.uuid4(),student_id, termin_id)
+    zapis_termin = HistorieTerminu(uuid.uuid4(),student_id, termin_id)
+    session.add(zapis_termin)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     termin.aktualni_kapacita += 1
     session.commit()
