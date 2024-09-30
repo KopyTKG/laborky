@@ -7,6 +7,7 @@ from lib.conn import *
 from lib.HTTP_messages import *
 from jose import jwt
 from datetime import datetime
+from typing import Optional
 import dotenv, os, requests, json, hashlib
 
 dotenv.load_dotenv()
@@ -166,11 +167,21 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
 
 
 @app.patch("/ucitel/termin")
-async def ucitel_zmena_terminu(ticket: str, id_terminu: str | None, ucebna:str | None, datum: datetime | None, aktualni_kapacita:int | None, max_kapacita:int | None, vyucuje_id: str | None, kod_predmet: str | None, jmeno: str | None):
+async def ucitel_zmena_terminu(
+    ticket: str,
+    id_terminu: str,
+    ucebna: Optional[str] = None,
+    datum: Optional[datetime] = None,
+    max_kapacita: Optional[int] = None,
+    vyucuje_id: Optional[str] = None,
+    kod_predmet: Optional[str] = None,
+    jmeno: Optional[str] = None,
+    cislo_cviceni: Optional[int] = None
+    ):
     """ Učitel změní parametry v již vypsaném termínu """
     if ticket is None or ticket == "":
         return unauthorized
-    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno):
+    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
         return ok
     return internal_server_error
 
@@ -205,7 +216,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
 @app.post("/ucitel/zapis")
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
-    ticket = os.getenv("TICKET")
+    # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
@@ -218,7 +229,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
 @app.post("/ucitel/splneno")
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, zvolene_datum_splneni: datetime, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
-    ticket = os.getenv("TICKET")
+    # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)

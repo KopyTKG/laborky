@@ -125,7 +125,7 @@ def zapis_predmet(session, kod_predmetu, student_id):
     session.commit()
     return True
 
-def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None):
+def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None, cislo_cviceni=None):
     termin = session.query(Termin).filter(Termin.id == id_terminu).first()
     if termin is None:
         print(f"Termin s ID {id_terminu} neexistuje.")
@@ -145,6 +145,10 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
 
     if newJmeno is not None:
         termin.jmeno = newJmeno
+        
+    if cislo_cviceni is not None:
+        termin.cislo_cviceni = cislo_cviceni
+
     session.commit()
     return True
 
