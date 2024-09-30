@@ -375,6 +375,13 @@ def vypis_vsechny_predmety(session):
     return [predmet.zkratka_predmetu for predmet in predmety]
 
 
+def get_katedra_predmet_by_idterminu(session, id_terminu):
+    termin = session.query(Termin).filter_by(id=id_terminu).first()
+    if termin:
+        predmet = termin.predmet
+        if predmet:
+            return predmet.zkratka_predmetu, predmet.katedra
+        
 
 if __name__ == "__main__":
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
@@ -412,7 +419,7 @@ if __name__ == "__main__":
 
     #vypis = list(vypis.keys())
     #print(vypis)
-
+    print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
     pass
 
 

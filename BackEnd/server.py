@@ -187,13 +187,14 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
 
 ## /UCITEL STUDENTI
 @app.get("/ucitel/studenti")
-async def get_vypis_studentu(ticket: str, id_terminu: str, katedra: str, zkratka_predmetu: str):
+async def get_vypis_studentu(ticket: str, id_terminu: str):
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
     ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
     list_studentu = list_studenti_z_terminu(session, id_terminu)
-    vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
+    zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
+    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
     
@@ -228,12 +229,13 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, zvolene_datum
     
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
-async def get_ucitel_emaily(ticket: str, zkratka_katedry: str, zkratka_predmetu: str): #ticket: str | None = None
+async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None = None
     """ Vrátí xslx soubor s emailama studentů přihlášených na daném termínu """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
     list_studentu = list_studenti_z_terminu(session, id_terminu)
+    zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
@@ -243,14 +245,12 @@ async def get_ucitel_emaily(ticket: str, zkratka_katedry: str, zkratka_predmetu:
 
 
 @app.get("/ucitel/uspesni_studenti")
-async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, katedra: str):
+async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str):
     """ Vrátí seznam studentů, kteří mají všechny cvičení splněné z daného předmětu"""
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
 
-    zkratka_predmetu = "CS101"
-    katedra = "Informatics"
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
     vypis_uspesnych_studentu = vypis_uspesnych_studentu(session, zkratka_predmetu)
 
@@ -262,7 +262,7 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, ka
     return info
 
 @app.post("/ucitel/pridat_predmet")
-async def post_pridat_predmet(ticket: str, zkratka_predmetu: str,katedra: str,vyucuje_id: str, pocet_cviceni: int):
+async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,vyucuje_id: str, pocet_cviceni: int):
     """Vytvoří předmět - testing only"""
     if ticket is None or ticket == "":
         return unauthorized
