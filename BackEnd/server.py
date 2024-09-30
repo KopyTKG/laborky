@@ -1,14 +1,13 @@
 import uvicorn
 from fastapi import FastAPI
 from classes.stag import *
-from classes.db import *
 from classes.vyucujici import *
 from classes.student import *
 from lib.conn import *
 from lib.HTTP_messages import *
 from jose import jwt
 from datetime import datetime
-import dotenv, os, requests, json
+import dotenv, os, requests, json, hashlib
 
 dotenv.load_dotenv()
 
@@ -43,15 +42,15 @@ async def get_student_home(ticket: str | None = None): #prijima parametr ticket 
     if ticket is None or ticket == "":
         return unauthorized
 
-    # provede:
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, predmety_pro_cviceni())
+    # provede:predmety_pro_cviceni
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
         # jake jsou laborky k dispozici na dany predmet (DB)=
         
         # vraci json vsech laborek, ktere jsou k dispozici
         # student na nich neni zapsan!!
 
-    return json.dump(list_terminu)
+    return list_terminu
 
 
 #post
@@ -76,6 +75,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str): # prijima argument id la
         else:
             return bad_request
 
+
 ## /STUDENT MOJE
 @app.get("/student/moje")
 async def get_student_moje(ticket: str | None = None): #prijima parametr ticket ticket : str | None = None 
@@ -87,7 +87,7 @@ async def get_student_moje(ticket: str | None = None): #prijima parametr ticket 
     userid = encode_id(userid)
     list_terminu = historie_studenta(session, userid)
 
-    return json.dump(list_terminu)
+    return list_terminu
 
 ## PROFIL
 @app.get("/profil") # Profil pro studenta a ucitele
@@ -117,7 +117,7 @@ async def get_ucitel_board_next_ones(ticket: str | None = None): # ticket: str |
     if ticket is None or ticket == "":
         return unauthorized
     list_terminy_tyden_dopredu = terminy_tyden_dopredu(session)
-    return json.dump(list_terminy_tyden_dopredu)
+    return list_terminy_tyden_dopredu
 
 #Všechny týdny
 @app.get("/ucitel/board")
@@ -131,7 +131,7 @@ async def get_ucitel_board(ticket: str | None = None): #prijima ticket ticket: s
     # provede:
         # DB - všechny termíny sestupně podle data
 
-    return json.dump(list_terminu)
+    return list_terminu
 
 
 @app.get("/ucitel/moje")
@@ -143,7 +143,7 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None): # ticket : str | N
     userid, role = get_userid_and_role(get_stag_user_info(ticket))
     userid = encode_id(userid)
     list_terminu = list_terminy_vyucujici(session, userid)
-    return json.dump(list_terminu)
+    return list_terminu
 
 
 @app.get("/ucitel/board/{predmet}")
@@ -155,7 +155,7 @@ async def get_terminy_by_predmet(ticket: str | None = None): #ticket: str | None
     terminy_dle_predmetu_old = list_probehle_terminy_predmet(session, predmet)
     terminy_dle_predmetu_new = list_planovane_terminy_predmet(session, predmet)
     list_terminu = terminy_dle_predmetu_new + terminy_dle_predmetu_old
-    return json.dump(list_terminu)
+    return list_terminu
 
 
 @app.post("/ucitel/termin/")
@@ -206,7 +206,7 @@ async def get_vypis_studentu(ticket: str | None = None): #prijima parametr ticke
         # nacist udaje o studentech : Jmeno, Prijmeni, mail
         # vraci jmena studentu
     
-    return json.dump(jmena_studentu)
+    return jmena_studentu
 
 
 @app.post("/ucitel/zapis/{id_terminu}/")
@@ -255,8 +255,7 @@ async def get_ucitel_emaily(ticket: str | None = None): #ticket: str | None = No
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-    json_emailu = json.dump(emaily_studentu)
-    return json_emailu
+    return emaily_studentu
     # provede:
         # DB - vsechny Fcisla, ktere maji relaci s terminem
         # DB - predmet, ktereho se to tyka
@@ -295,6 +294,12 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str,katedra: str,vy
     else:
         return 409
 
+
+def encode_id(id):
+    """ Sha1 pro hashování osobních čísel / ucitIdnu """
+    return hashlib.sha1(id.encode()).hexdigest()
+
+
 @app.get("/")
 async def root(ticket: str | None = None):
     if ticket is None:
@@ -307,8 +312,6 @@ async def root(ticket: str | None = None):
     prijmeni = user["prijmeni"]
     userid, role = get_userid_and_role(user)
     return {"user": user, "role": role}
-    
-
 
 
 if __name__ == "__main__":
@@ -330,5 +333,5 @@ ticket = 'a7fdf5c7e56ebdc48356eb0a3701ad5fa5524f8920d36f4c11ca4681aec209f4'
 response = Get(url=url,params=params,ticket=ticket)
 print(response)
 with open("dump.json", "w") as outfile:
-json.dump(response, outfile)
+(response, outfile)
 """

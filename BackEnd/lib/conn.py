@@ -369,6 +369,12 @@ def vypis_uspesnych_studentu(session, kod_predmetu):
     return vyhodnoceni_studentu
 
 
+def vypis_vsechny_predmety(session):
+    """ Vrátí zkratky předmětů všech různých předmětů """
+    predmety = session.query(Predmet.zkratka_predmetu).all()
+    return [predmet.zkratka_predmetu for predmet in predmety]
+
+
 
 if __name__ == "__main__":
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
