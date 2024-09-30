@@ -191,7 +191,8 @@ def smazat_termin(session, id_terminu):
     if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first() is None:
         print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
         return False
-    session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).delete()
+    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
+    session.delete(termin)
     session.commit()
     return True
 
@@ -381,7 +382,7 @@ def get_katedra_predmet_by_idterminu(session, id_terminu):
         predmet = termin.predmet
         if predmet:
             return predmet.zkratka_predmetu, predmet.katedra
-        
+
 
 if __name__ == "__main__":
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
