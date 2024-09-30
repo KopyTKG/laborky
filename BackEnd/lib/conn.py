@@ -210,7 +210,7 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
 def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
     if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first() is not None:
         return False
-    zapis_termin = HistorieTerminu(uuid.uuid4(),student_id, termin_id, datum_splneni)
+    zapis_termin = HistorieTerminu(id=uuid.uuid4(),student_id=student_id,termin_id=termin_id,datum_splneni=datum_splneni)
     session.add(zapis_termin)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     termin.aktualni_kapacita += 1

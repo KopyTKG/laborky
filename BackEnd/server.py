@@ -219,7 +219,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
     # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
-    id_stud = encode_id(id_stud)
+    # id_stud = encode_id(id_stud)
     if pridat_studenta(session, id_stud, id_terminu):
         return ok
     else:
