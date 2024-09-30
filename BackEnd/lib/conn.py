@@ -106,7 +106,7 @@ class HistorieTerminu(Base):
 ### TVORBA UZIVATEL
 def vytvor_student(session, id):
     if session.query(Student).filter_by(id=id).first() is None:
-        student = Student(id=id, datum_vytvoreni=DateTime.now())
+        student = Student(id=id, datum_vytvoreni=datetime.now())
         session.add(student)
         session.commit()
         return True
@@ -205,7 +205,7 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta)).first()
     if zvolene_datum_splneni is not None:
         termin.datum_splneni = zvolene_datum_splneni
-    else: 
+    else:
         termin.datum_splneni = datetime.now()
     session.commit()
     return True
