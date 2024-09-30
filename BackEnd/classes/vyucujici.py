@@ -66,17 +66,18 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
 
     osobni_cisla = []
     for match in matching:
-        osobni_cisla.append(studenti_na_predmetu[match[1]])
+        osobni_cisla.append(studenti_na_predmetu[match])
 
-    return osobni_cisla
+# return osobni_cisla misto matching
+    return matching
 
 
 def find_matching_hash_positions(big_list, small_list):
     matching_positions = []
     
-    for i, small_hash in enumerate(small_list):
+    for small_hash in small_list:
         if small_hash in big_list:
             big_list_index = big_list.index(small_hash)
-            matching_positions.append((i, big_list_index))
+            matching_positions.append(big_list_index)
     
     return matching_positions
