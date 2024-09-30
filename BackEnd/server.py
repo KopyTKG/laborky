@@ -15,7 +15,7 @@ app = FastAPI(debug=True)
 
 
 @app.get("/setup")
-async def kontrola_s_databazi(ticket: str | None = None): # prijima parametr ticket (ticket: str | None = None)
+async def kontrola_s_databazi(ticket: str | None = None):
     """ Kontrola přihlášeného uživatele s databází po loginu do systému """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -35,7 +35,7 @@ async def kontrola_s_databazi(ticket: str | None = None): # prijima parametr tic
 ### Student API
 ## /STUDENT HOME
 @app.get("/student") #/student/{osobni_cislo}
-async def get_student_home(ticket: str | None = None): #prijima parametr ticket ticket: str | None = None
+async def get_student_home(ticket: str | None = None):
     """ Vrácení všech vypsaných laborek podle toho, na co se student může zapsat """
     #ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
@@ -50,10 +50,8 @@ async def get_student_home(ticket: str | None = None): #prijima parametr ticket 
     return list_terminu
 
 
-#post
-# Change state v labu, jestli se tam přihlašuje nebo odhlašuje
-@post.get("/student") #osobni číslo gone again
-async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: int): # prijima argument id labu, na ktery se student registruje, ticket : str | None = None, typ:str
+@app.post("/student")
+async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: int):
     """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně """
     #ticket = os.dotenv("TICKET")
     if ticket is None or ticket == "":
@@ -75,7 +73,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: int): # priji
 
 ## /STUDENT MOJE
 @app.get("/student/moje")
-async def get_student_moje(ticket: str | None = None): #prijima parametr ticket ticket : str | None = None 
+async def get_student_moje(ticket: str | None = None):
     """ Vrátí cvičení, na kterých je student aktuálně zapsán"""
     #ticket = os.getenv('TICKET')
     if ticket is None or ticket == "":
@@ -88,8 +86,8 @@ async def get_student_moje(ticket: str | None = None): #prijima parametr ticket 
 
 
 ## PROFIL
-@app.get("/profil") # Profil pro studenta a ucitele
-async def get_student_profil(ticket: str | None = None): #prijima parametr ticket ticket : str | None = None
+@app.get("/profil")
+async def get_student_profil(ticket: str | None = None):
     """ Vraci zaznam o vsech typech cviceni na dany seznam predmetu, zda je student splnil ci nikoli"""
     #ticket = os.getenv("TICKET") # prozatimni reseni
     if ticket is None or ticket == "":
@@ -109,7 +107,7 @@ async def get_student_profil(ticket: str | None = None): #prijima parametr ticke
 #Cvičení příští týden
 # TOHLE DODĚLAT
 @app.get("/ucitel/nadchazejici")
-async def get_ucitel_board_next_ones(ticket: str | None = None): # ticket: str | None = None
+async def get_ucitel_board_next_ones(ticket: str | None = None):
     """Vrátí cvičení v dalším týdnu"""
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -119,7 +117,7 @@ async def get_ucitel_board_next_ones(ticket: str | None = None): # ticket: str |
 
 #Všechny týdny
 @app.get("/ucitel/board")
-async def get_ucitel_board(ticket: str | None = None): #prijima ticket ticket: str | None = None
+async def get_ucitel_board(ticket: str | None = None):
     """ Vrátí všechny vypsané cvičení """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -131,7 +129,7 @@ async def get_ucitel_board(ticket: str | None = None): #prijima ticket ticket: s
 
 
 @app.get("/ucitel/moje")
-async def get_ucitel_moje_vypsane(ticket: str | None = None): # ticket : str | None = None
+async def get_ucitel_moje_vypsane(ticket: str | None = None):
     """ Vrátí všechny cvičení, které vypsal uživatel """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -143,7 +141,7 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None): # ticket : str | N
 
 
 @app.get("/ucitel/board")
-async def get_terminy_by_predmet(ticket: str , predmet: str): #ticket: str | None = None
+async def get_terminy_by_predmet(ticket: str , predmet: str):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -168,7 +166,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
 
 
 @app.patch("/ucitel/termin")
-async def ucitel_zmena_terminu(ticket: str, id_terminu: int, ucebna:str, datum: datetime, aktualni_kapacita:int, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str):
+async def ucitel_zmena_terminu(ticket: str, id_terminu: int | None, ucebna:str | None, datum: datetime | None, aktualni_kapacita:int | None, max_kapacita:int | None, vyucuje_id: str | None, kod_predmet: str | None, jmeno: str | None):
     """ Učitel změní parametry v již vypsaném termínu """
     if ticket is None or ticket == "":
         return unauthorized
@@ -189,7 +187,7 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: int):
 
 ## /UCITEL STUDENTI
 @app.get("/ucitel/studenti")
-async def get_vypis_studentu(ticket: str, id_terminu: int, katedra: str, zkratka_predmetu: str): #prijima parametr ticket: str | None = None
+async def get_vypis_studentu(ticket: str, id_terminu: int, katedra: str, zkratka_predmetu: str):
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
     ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
@@ -198,11 +196,9 @@ async def get_vypis_studentu(ticket: str, id_terminu: int, katedra: str, zkratka
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-        # DB - vsechny studenty (Fcisla) s relaci pro id_terminu
-        # nacist udaje o studentech : Jmeno, Prijmeni, mail
-        # vraci jmena studentu
     
     return jmena_studentu
+        # vraci {osCislo: {jmeno: , prijmeni: , email: }}
 
 
 @app.post("/ucitel/zapis")
