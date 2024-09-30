@@ -285,10 +285,11 @@ async def get_uspesni_studenti_by_predmet(ticket: str | None = None):
     return info
 
 @app.post("/ucitel/pridat_predmet")
-async def post_pridat_predmet(ticket: str, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
-    """Vytvoří předmět"""
+async def post_pridat_predmet(ticket: str, zkratka_predmetu: str,katedra: str,vyucuje_id: str, pocet_cviceni: int):
+    """Vytvoří předmět - testing only"""
     if ticket is None or ticket == "":
         return unauthorized
+    kod_predmetu = katedra + zkratka_predmetu
     if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
         return ok
     else:
