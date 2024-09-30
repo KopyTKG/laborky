@@ -211,10 +211,10 @@ def pridat_studenta(session, student_id, termin_id):
     return True
 
 ### PREDMETY
-def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id):
+def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
     if session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first() is not None:
         return False
-    predmet=Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id)
+    predmet=Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id, pocet_cviceni=pocet_cviceni)
     session.add(predmet)
     session.commit()
     return True

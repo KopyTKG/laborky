@@ -16,7 +16,7 @@ app = FastAPI(debug=True)
 
 
 @app.get("/setup")
-async def setup(ticket: str | None = None): # prijima parametr ticket (ticket: str | None = None)
+async def kontrola_s_databazi(ticket: str | None = None): # prijima parametr ticket (ticket: str | None = None)
     """ Kontrola přihlášeného uživatele s databází po loginu do systému """
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -30,7 +30,7 @@ async def setup(ticket: str | None = None): # prijima parametr ticket (ticket: s
     else:
         userid = encode_id(userid) 
         vytvor_student(session, userid)
-    return "login do databaze", userid, role
+    return userid, role
 
 
 ### Student API
@@ -284,8 +284,15 @@ async def get_uspesni_studenti_by_predmet(ticket: str | None = None):
 
     return info
 
-
-
+@app.post("/ucitel/pridat_predmet")
+async def post_pridat_predmet(ticket: str, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
+    """Vytvoří předmět"""
+    if ticket is None or ticket == "":
+        return unauthorized
+    if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
+        return ok
+    else:
+        return 409
 
 @app.get("/")
 async def root(ticket: str | None = None):
