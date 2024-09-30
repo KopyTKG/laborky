@@ -220,14 +220,17 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
     if ticket is None or ticket == "":
         return unauthorized
     # id_stud = encode_id(id_stud)
-    if pridat_studenta(session, id_stud, id_terminu):
+    status_message = pridat_studenta(session, id_stud, id_terminu)
+    if status_message == 0:
         return ok
-    else:
+    elif status_message == 1 :
         return not_found
+    else:
+        return conflict
 	    
 
 @app.post("/ucitel/splneno")
-async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, zvolene_datum_splneni: datetime, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None, date: date
+async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str, zvolene_datum_splneni: Optional[datetime] = None): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
     # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
