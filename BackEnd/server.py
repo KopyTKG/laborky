@@ -301,8 +301,10 @@ async def root():
 
     print(f"Received ticket: {ticket}")  # For debugging
     
-    predmet = get_predmet_student_k_dispozici(ticket, ['MPS1'])
-    return predmet
+    predmet = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
+    list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
+    return list_terminu
 
 
 if __name__ == "__main__":

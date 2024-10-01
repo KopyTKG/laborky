@@ -240,7 +240,7 @@ def list_predmety(session):
     return predmet_list
 
 def list_dostupnych_terminu(session, predmety):
-    terminy = session.query(Termin).filter(Termin.kod_predmet.in_(predmety)).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).filter(Termin.kod_predmet.in_(predmety)).order_by(Termin.datum.desc()).all()
     terminy_list = [termin for termin in terminy]
     return terminy_list
 ### TERMINY
@@ -441,6 +441,8 @@ if __name__ == "__main__":
 
     #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1', 'KMP')
     #print(vypis_uspesnych)
+
+    print(vypis_vsechny_predmety(session))
 
     pass
 
