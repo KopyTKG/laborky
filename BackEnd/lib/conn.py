@@ -155,14 +155,18 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
 def odepsat_z_terminu(session, student_id, termin_id):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first()
     if termin:
-        session.delete(termin)
         konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
+        if konkretni_termin.start_time > (datetime.now() - timedelta(hours=24)):
+            return 1
+
         konkretni_termin.aktualni_kapacita -= 1
+
+        session.delete(termin)
         session.commit()
-        return True
+        return 0
     else:
         print(f"Termin s ID {termin_id} neexistuje. Nebo na termin nejste prihlasen.")
-        return False
+        return 2
 
 def zapsat_se_na_termin(session, student_id, termin_id):
     zapsat_na_termin = HistorieTerminu(id = uuid.uuid4(),student_id = student_id,termin_id = termin_id)
@@ -484,7 +488,7 @@ if __name__ == "__main__":
     #print(vypis_vsechny_predmety(session))
     #print(vyhodnoceni)
     #print(list_dostupnych_terminu(session, ['KMPMPS1', 'KPPPO2R'], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
-
+    #print(historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
 
     pass
 

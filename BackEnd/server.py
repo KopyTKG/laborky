@@ -58,7 +58,15 @@ async def get_student_home(ticket: str | None = None):
 
 @app.post("/student")
 async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
-    """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně """
+    """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně
+    Args:
+        ticket (str): Uživatelský autentizační token.
+        typ (str): Typ operace, buď 'zapsat' pro zapsání nebo 'odhlasit' pro odhlášení.
+        id_terminu (str): Identifikační kód termínu, na který se má akce vztahovat.
+
+    Returns:
+        HTTP code(str): 200 - OK, 401 - Unauthorized, 400 - Bad Request, 409 - Conflict"""
+    
     #ticket = os.dotenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
@@ -71,9 +79,12 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
         else:
             return conflict
     elif typ == "odhlasit":
-        if odepsat_z_terminu(session, userid, id_terminu):
+        message = odepsat_z_terminu(session, userid, id_terminu)
+        if message == 0:
             return ok
-        else:
+        elif message == 1: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
+            return conflict
+        else: 
             return bad_request
     else:
         return bad_request
@@ -82,7 +93,13 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
 ## /STUDENT MOJE
 @app.get("/student/moje")
 async def get_student_moje(ticket: str | None = None):
-    """ Vrátí cvičení, na kterých je student aktuálně zapsán"""
+    """ Vrátí cvičení, na kterých je student aktuálně zapsán
+    Args:
+        ticket (str): Uživatelský autentizační token.
+
+    Returns:
+        list_terminu (list): Seznam cvičení, na kterých je student aktuálně zapsán
+        """
     #ticket = os.getenv('TICKET')
     if ticket is None or ticket == "":
         return unauthorized
