@@ -187,8 +187,7 @@ def list_uspesni_studenti(session, kod_predmetu):
 """
 
 
-def uspesne_zakonceni_studenta(session, id_studenta, zkratka_predmetu, zkratka_katedry):
-    kod_predmetu = zkratka_katedry + zkratka_predmetu
+def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
 
     uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None)).all()
     uspesni_studenti_list = [student for student in uspesni_studenti]
@@ -239,10 +238,47 @@ def list_predmety(session):
     predmet_list = [predmet for predmet in predmety]
     return predmet_list
 
-def list_dostupnych_terminu(session, predmety):
-    terminy = session.query(Termin).filter(Termin.kod_predmet.in_(predmety)).order_by(Termin.datum.desc()).all()
-    terminy_list = [termin for termin in terminy]
+def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
+    current_date = datetime.now()
+
+    # Step 1: Query all available terms for the specified subjects (predmety)
+    terminy = session.query(Termin).filter(
+        and_(
+            Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
+            Termin.datum > current_date  # Terms that have not passed yet
+        )
+    ).order_by(Termin.datum.desc()).all()
+
+    # Step 2: Filter out terms that the student has already completed or attended
+    terminy_list = []
+
+    for termin in terminy:
+        kod_predmetu = termin.kod_predmet
+        cislo_cviceni = termin.cislo_cviceni
+
+        # Check if the term corresponds to a subject the student has history for
+        if kod_predmetu in historie_predmetu:
+            # If the exercise (cislo_cviceni) has been completed (1 in the list), skip this term
+            if historie_predmetu[kod_predmetu][cislo_cviceni - 1] == 1:
+                print(cislo_cviceni)
+                print("SPLNENE CVICENI")
+                continue  # Skip this term since the student already completed it
+
+        # Step 3: Check if the student has already attended the term (in HistorieTerminu)
+        attended = session.query(HistorieTerminu).filter(
+            and_(
+                HistorieTerminu.student_id == id_studenta,
+                HistorieTerminu.termin_id == termin.id
+            )
+        ).first()
+
+        if attended is None:
+            # The student has not attended this term, so it's available
+            terminy_list.append(termin)
+
     return terminy_list
+
+
 ### TERMINY
 def list_terminy(session):
     terminy = session.query(Termin).order_by(Termin.datum.desc())
@@ -323,12 +359,12 @@ def terminy_tyden_dopredu(session):
     return terminy_list
 
 def pocet_cviceni_pro_predmet(session):
-    predmety = session.query(distinct(Predmet.zkratka_predmetu)).all()
+    predmety = session.query(distinct(Predmet.kod_predmetu)).all()
     predmet_pocet_cviceni = {}
 
     for predmet in predmety:
         nazev = predmet[0]
-        predmet_obj = session.query(Predmet).filter_by(zkratka_predmetu=nazev).first()
+        predmet_obj = session.query(Predmet).filter_by(kod_predmetu=nazev).first()
 
         if predmet_obj:
             pocet_cviceni = predmet_obj.pocet_cviceni
@@ -340,25 +376,26 @@ def pocet_cviceni_pro_predmet(session):
     return predmet_pocet_cviceni
 
 
-def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet, katedra):
-    for predmet in list(pocet_pro_predmet.keys()):
-        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, predmet, katedra)
+# zde nesmi prichazet parametr katedra - musi si to brat z "Uspesne zakonceni studenta"
+def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
+    for kod_predmetu in list(pocet_pro_predmet.keys()):
+        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu)
 
         if uspesne_terminy:
             for termin in uspesne_terminy:
                 cisla_cviceni = session.query(Termin.cislo_cviceni)\
                        .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)\
-                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == katedra + predmet)\
+                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu)\
                        .all()
                 if cisla_cviceni:
                     for cislo in cisla_cviceni:
                         cislo = cislo[0] - 1
-                        pocet_pro_predmet[predmet][cislo] = 1
+                        pocet_pro_predmet[kod_predmetu][cislo] = 1
 
     return pocet_pro_predmet
 
 
-def vypis_uspesnych_studentu(session, zkratka_predmetu, zkratka_katedry):
+def vypis_uspesnych_studentu(session, zkratka_predmetu):
 
     studenti = ( # se vztahem k urcitemu predmetu
         session.query(Student)
@@ -368,13 +405,15 @@ def vypis_uspesnych_studentu(session, zkratka_predmetu, zkratka_katedry):
         .all()
     )
 
-    pocet_pro_predmet = {zkratka_predmetu: pocet_cviceni_pro_predmet(session)[zkratka_predmetu]}
+    kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
+
+    pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
 
     vyhodnoceni_studentu = {}
 
     for student in studenti:
-        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet, zkratka_katedry)
-        if 0 in vyhodnoceni[zkratka_predmetu]:
+        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
+        if 0 in vyhodnoceni[kod_predmetu]:
             continue
         else:
             vyhodnoceni_studentu[student.id] = vyhodnoceni
@@ -436,13 +475,16 @@ if __name__ == "__main__":
     #pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
     #print(pocet_cviceni_pro_p)
 
-    #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p, 'KMP')
+    #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
     #print(vyhodnoceni)
 
-    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1', 'KMP')
+    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
     #print(vypis_uspesnych)
 
-    print(vypis_vsechny_predmety(session))
+    #print(vypis_vsechny_predmety(session))
+    #print(vyhodnoceni)
+    #print(list_dostupnych_terminu(session, ['KMPMPS1', 'KPPPO2R'], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
+
 
     pass
 

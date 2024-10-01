@@ -42,9 +42,14 @@ async def get_student_home(ticket: str | None = None):
     if ticket is None or ticket == "":
         return unauthorized
 
-    # provede:predmety_pro_cviceni
+    userid, role = get_userid_and_role(get_stag_user_info(ticket))
+    userid = encode_id(userid)
+    
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
-    list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
+
+    vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_cviceni_pro_predmet(session))
+
+    list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici, vyhodnoceni, userid)
         # vrací seznam laborek, které jsou studentovi k dispozici
             # předmět nemá uznaný a studuje ho
 
@@ -202,13 +207,13 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
 @app.get("/ucitel/studenti")
 async def get_vypis_studentu(ticket: str, id_terminu: str):
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
-    ticket = os.getenv('TICKET') # prozatimni reseni
+    #ticket = os.getenv('TICKET') # prozatimni reseni
     if ticket is None or ticket == "":
         return unauthorized
     list_studentu = list_studenti_z_terminu(session, id_terminu)
     zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    dekodovane_cisla = compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu)
+    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
     
     return jmena_studentu
@@ -246,7 +251,8 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
 async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None = None
-    """ Vrátí xslx soubor s emailama studentů přihlášených na daném termínu """
+    """ Vrátí json s emailama studentů přihlášených na daném termínu 
+    ve formátu: {osobniCislo: {jemno: , prijmeni:, email: }}"""
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
@@ -268,7 +274,7 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zk
         return unauthorized
 
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu, zkratka_katedry)
+    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu)
 
     uspesni_studenti = list(vypis_uspesnych.keys())
 
