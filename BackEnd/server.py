@@ -66,10 +66,12 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
         else:
             return conflict
     elif typ == "odhlasit":
-        if odepsat_se_z_terminu(session, userid, id_terminu):
+        if odepsat_z_terminu(session, userid, id_terminu):
             return ok
         else:
             return bad_request
+    else:
+        return bad_request
 
 
 ## /STUDENT MOJE
@@ -88,7 +90,7 @@ async def get_student_moje(ticket: str | None = None):
 
 ## PROFIL
 @app.get("/profil")
-async def get_student_profil(ticket: str | None = None):
+async def get_student_profil(katedra, ticket: str | None = None):
     """ Vraci zaznam o vsech typech cviceni na dany seznam predmetu, zda je student splnil ci nikoli"""
     #ticket = os.getenv("TICKET") # prozatimni reseni
     if ticket is None or ticket == "":
@@ -98,10 +100,10 @@ async def get_student_profil(ticket: str | None = None):
     userid = encode_id(userid)
 
     pocet_pro_predmet = pocet_cviceni_pro_predmet(session) 
-    vyhodnoceni_studenta = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
+    vyhodnoceni = vyhodnoceni_studenta(session, userid,pocet_pro_predmet, katedra)
 
     # format: {"KodPred": [0, 1, 1]} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
-    return vyhodnoceni_studenta
+    return vyhodnoceni
 
 
 ### Ucitel API 

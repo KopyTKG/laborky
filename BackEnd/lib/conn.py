@@ -165,7 +165,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
         return False
 
 def zapsat_se_na_termin(session, student_id, termin_id):
-    zapsat_na_termin = HistorieTerminu(uuid.uuid4(),student_id, termin_id)
+    zapsat_na_termin = HistorieTerminu(id = uuid.uuid4(),student_id = student_id,termin_id = termin_id)
     termin = session.query(Termin).filter(Termin.id == termin_id).first()
     if termin.aktualni_kapacita >= termin.max_kapacita:
         print(f"Termin s ID {termin_id} je plny. Nebo na termin nejste prihlasen.")
