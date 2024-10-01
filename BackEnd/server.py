@@ -259,16 +259,16 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
 
 
 @app.get("/ucitel/uspesni_studenti")
-async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str):
+async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zkratka_katedry: str):
     """ Vrátí seznam studentů, kteří mají všechny cvičení splněné z daného předmětu"""
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
 
-    vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
-    vypis_uspesnych_studentu = vypis_uspesnych_studentu(session, zkratka_predmetu)
+    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
+    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu)
 
-    uspesni_studenti = list(vypis_uspesnych_studentu.keys())
+    uspesni_studenti = list(vypis_uspesnych.keys())
 
     dekodovane = compare_encoded(uspesni_studenti, vsichni_studenti)
     info = get_studenti_info(ticket, dekodovane)
@@ -294,16 +294,15 @@ def encode_id(id):
 
 
 @app.get("/")
-async def root(ticket: str | None = None):
+async def root():
+    ticket = os.getenv('TICKET')
     if ticket is None:
         return {"error": "Ticket parameter is missing or None"}
 
     print(f"Received ticket: {ticket}")  # For debugging
     
-    user = get_stag_user_info(ticket)
-    prijmeni = user["prijmeni"]
-    userid, role = get_userid_and_role(user)
-    return {"user": user, "role": role}
+    predmet = get_predmet_student_k_dispozici(ticket, ['MPS1'])
+    return predmet
 
 
 if __name__ == "__main__":

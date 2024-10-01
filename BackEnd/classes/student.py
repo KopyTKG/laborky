@@ -16,8 +16,16 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     """
     Vrati vsechny predmety, pro ktere existuje moznost seminare, ktere student jeste nema splneny, ale zapsany
     """
-    url = "/ws/services/rest2/student/getStudentPredmetyAbsolvoval"
-    response = get(ticket, url, params)
+    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentPredmetyAbsolvoval"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://stag-demo.zcu.cz",
+    }
+    response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
+    if not response.ok:
+        raise Exception(response.text)
     splneno = []
     aktivni_predmety = []
     predmety = response.json()

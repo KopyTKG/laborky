@@ -348,6 +348,7 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
                        .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)\
                        .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == predmet)\
                        .all()
+                print(cislo_cviceni)
                 if cisla_cviceni:
                     for cislo in cisla_cviceni:
                         cislo = cislo[0] - 1
@@ -356,30 +357,29 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
     return pocet_pro_predmet
 
 
-def vypis_uspesnych_studentu(session, kod_predmetu):
+def vypis_uspesnych_studentu(session, zkratka_predmetu):
     ticket = os.getenv("TICKET")
 
     studenti = ( # se vztahem k urcitemu predmetu
         session.query(Student)
         .join(ZapsanePredmety)
         .join(Predmet)
-        .filter(Predmet.kod_predmetu == kod_predmetu)
+        .filter(Predmet.zkratka_predmetu == zkratka_predmetu)
         .all()
     )
 
-    pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
+    pocet_pro_predmet = {zkratka_predmetu: pocet_cviceni_pro_predmet(session)[zkratka_predmetu]}
 
     vyhodnoceni_studentu = {}
 
     for student in studenti:
         vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
-        if 0 in vyhodnoceni[kod_predmetu]:
+        if 0 in vyhodnoceni[zkratka_predmetu]:
             continue
         else:
             vyhodnoceni_studentu[student.id] = vyhodnoceni
 
     return vyhodnoceni_studentu
-
 
 def vypis_vsechny_predmety(session):
     """ Vrátí zkratky předmětů všech různých předmětů """
@@ -432,6 +432,15 @@ if __name__ == "__main__":
     #vypis = list(vypis.keys())
     #print(vypis)
     #print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
+
+    pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
+    print(pocet_cviceni_pro_p)
+
+    vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
+    print(vyhodnoceni)
+
+    vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
+    print(vypis_uspesnych)
     pass
 
 
