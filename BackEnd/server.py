@@ -266,7 +266,7 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zk
         return unauthorized
 
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu)
+    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu, zkratka_katedry)
 
     uspesni_studenti = list(vypis_uspesnych.keys())
 

@@ -187,7 +187,9 @@ def list_uspesni_studenti(session, kod_predmetu):
 """
 
 
-def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
+def uspesne_zakonceni_studenta(session, id_studenta, zkratka_predmetu, zkratka_katedry):
+    kod_predmetu = zkratka_katedry + zkratka_predmetu
+
     uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None)).all()
     uspesni_studenti_list = [student for student in uspesni_studenti]
     return uspesni_studenti_list
@@ -338,17 +340,16 @@ def pocet_cviceni_pro_predmet(session):
     return predmet_pocet_cviceni
 
 
-def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
+def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet, katedra):
     for predmet in list(pocet_pro_predmet.keys()):
-        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, predmet)
+        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, predmet, katedra)
 
         if uspesne_terminy:
             for termin in uspesne_terminy:
                 cisla_cviceni = session.query(Termin.cislo_cviceni)\
                        .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)\
-                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == predmet)\
+                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == katedra + predmet)\
                        .all()
-                print(cislo_cviceni)
                 if cisla_cviceni:
                     for cislo in cisla_cviceni:
                         cislo = cislo[0] - 1
@@ -357,8 +358,7 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
     return pocet_pro_predmet
 
 
-def vypis_uspesnych_studentu(session, zkratka_predmetu):
-    ticket = os.getenv("TICKET")
+def vypis_uspesnych_studentu(session, zkratka_predmetu, zkratka_katedry):
 
     studenti = ( # se vztahem k urcitemu predmetu
         session.query(Student)
@@ -373,7 +373,7 @@ def vypis_uspesnych_studentu(session, zkratka_predmetu):
     vyhodnoceni_studentu = {}
 
     for student in studenti:
-        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
+        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet, zkratka_katedry)
         if 0 in vyhodnoceni[zkratka_predmetu]:
             continue
         else:
@@ -433,14 +433,15 @@ if __name__ == "__main__":
     #print(vypis)
     #print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
 
-    pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
-    print(pocet_cviceni_pro_p)
+    #pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
+    #print(pocet_cviceni_pro_p)
 
-    vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
-    print(vyhodnoceni)
+    #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p, 'KMP')
+    #print(vyhodnoceni)
 
-    vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
-    print(vypis_uspesnych)
+    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1', 'KMP')
+    #print(vypis_uspesnych)
+
     pass
 
 
