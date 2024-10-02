@@ -296,7 +296,11 @@ def list_studenti_z_terminu(session, termin_id):
     studenti_list = [student.student_id for student in student_list]
     return studenti_list
 
-def vypsat_termin(session, ucebna:Text, datum:datetime, max_kapacita:int, vypsal_id:UUID, vyucuje_id:UUID, kod_predmet:Text, jmeno:Text, cislo_cviceni:int,  aktualni_kapacita=0):
+def vypsat_termin(session, ucebna:Text, datum:datetime, max_kapacita:int, vypsal_id:Text, vyucuje_id:Text, kod_predmet:Text, jmeno:Text, cislo_cviceni:int,  aktualni_kapacita=0):
+    vyucujici = session.query(Vyucujici).filter_by(id=vyucuje_id).first()
+    if vyucujici is None:
+        print("Neplatne ID vyucujiciho! Zda se ze vyucujici neni zaregistrovan")
+        return False
     termin = Termin(id=uuid.uuid4(), ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno, cislo_cviceni=cislo_cviceni)
     session.add(termin)
     session.commit()
