@@ -32,7 +32,7 @@ async def kontrola_s_databazi(ticket: str | None = None):
     else:
         userid = encode_id(userid) 
         vytvor_student(session, userid)
-    return userid, role
+    return ok
 
 
 ### Student API
