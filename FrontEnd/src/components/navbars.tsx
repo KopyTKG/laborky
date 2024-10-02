@@ -44,7 +44,7 @@ export function NavbarTeacher({ id }: { id: string }) {
   },
   {
    label: 'Studenti',
-   href: `${url}/studenti`,
+   href: `${url}/hledat`,
    icon: 'users',
   },
  ]
