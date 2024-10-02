@@ -363,7 +363,7 @@ def historie_studenta(session, id):
     terminy_list = [termin for termin in student.historie_terminu]
     return terminy_list
 
-def terminy_tyden_dopredu(session):
+def terminy_dopredu(session):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
     terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date)).order_by(Termin.datum.asc())

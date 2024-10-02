@@ -30,7 +30,7 @@ async def kontrola_s_databazi(ticket: str | None = None):
         userid = encode_id(userid)
         pridej_vyucujici(session, userid, prijmeni)
     else:
-        userid = encode_id(userid) 
+        userid = encode_id(userid)
         vytvor_student(session, userid)
     return role
 
@@ -47,7 +47,7 @@ async def get_student_home(ticket: str | None = None):
 
     userid, role = get_userid_and_role(userinfo)
     userid = encode_id(userid)
-    
+
     if role != "ST":
         return unauthorized
 
@@ -72,7 +72,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
 
     Returns:
         HTTP code(str): 200 - OK, 401 - Unauthorized, 400 - Bad Request, 409 - Conflict"""
-    
+
     #ticket = os.dotenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -136,14 +136,14 @@ async def get_student_profil(ticket: str | None = None):
     if role != "ST":
         return unauthorized
 
-    pocet_pro_predmet = pocet_cviceni_pro_predmet(session) 
+    pocet_pro_predmet = pocet_cviceni_pro_predmet(session)
     vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
 
     # format: {"KodPred": [0, 1, 1]} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
     return vyhodnoceni
 
 
-### Ucitel API 
+### Ucitel API
 #Cvičení příští týden
 # TOHLE DODĚLAT
 @app.get("/ucitel/nadchazejici")
@@ -156,8 +156,8 @@ async def get_ucitel_board_next_ones(ticket: str | None = None):
     userid, role = get_userid_and_role(userinfo)
     if role == "ST":
         return unauthorized
-    list_terminy_tyden_dopredu = terminy_tyden_dopredu(session)
-    return list_terminy_tyden_dopredu
+    list_terminy_dopredu = terminy_dopredu(session)
+    return list_terminy_dopredu
 
 #Všechny týdny
 @app.get("/ucitel/board")
@@ -196,11 +196,11 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    
+
     predmet = get_kod_predmetu_by_zkratka(session, predmet)
     if predmet is None:
         return not_found
-    
+
     terminy_dle_predmetu_old = list_probehle_terminy_predmet(session, predmet)
     terminy_dle_predmetu_new = list_planovane_terminy_predmet(session, predmet)
     terminy_dle_predmetu = terminy_dle_predmetu_new + terminy_dle_predmetu_old
@@ -208,7 +208,7 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int): 
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int):
     """ Učitel vytvoří termín do databáze """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -220,7 +220,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
 
     if vypsat_termin(session, ucebna, datum, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
         return ok
-    else: 
+    else:
         return internal_server_error
 
 
@@ -245,7 +245,7 @@ async def ucitel_zmena_terminu(
 
 
 @app.delete("/ucitel/termin")
-async def ucitel_smazani_terminu(ticket: str, id_terminu: str): 
+async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
     """ Učitel smáže vypsaný termín """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -269,7 +269,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     userid, role = get_userid_and_role(userinfo)
     if role == "ST":
         return unauthorized
-    
+
     vsechny_terminy = vypis_vsechny_terminy(session)
     if id_terminu not in vsechny_terminy:
         return bad_request
@@ -279,7 +279,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-    
+
     return jmena_studentu
         # vraci {osCislo: {jmeno: , prijmeni: , email: }}
 
@@ -298,7 +298,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
         return not_found
     else:
         return conflict
-	    
+
 
 @app.post("/ucitel/splneno")
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str, zvolene_datum_splneni: Optional[datetime] = None): #ticket: str | None = None, id_stud: str | None = None, date: date
@@ -311,11 +311,11 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
         return ok
     else:
         return not_found
-    
+
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
 async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None = None
-    """ Vrátí json s emailama studentů přihlášených na daném termínu 
+    """ Vrátí json s emailama studentů přihlášených na daném termínu
     ve formátu: {osobniCislo: {jemno: , prijmeni:, email: }}"""
     #ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
@@ -368,7 +368,7 @@ def encode_id(id):
 def kontrola_ticketu(ticket):
     if ticket is None or ticket == "":
         return None
-    
+
     userinfo = get_stag_user_info(ticket)
 
     if userinfo is None:
@@ -384,7 +384,7 @@ async def root():
         return {"error": "Ticket parameter is missing or None"}
 
     print(f"Received ticket: {ticket}")  # For debugging
-    
+
     predmet = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
