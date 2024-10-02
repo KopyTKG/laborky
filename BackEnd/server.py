@@ -146,9 +146,9 @@ async def get_student_profil(ticket: str | None = None):
 ### Ucitel API
 #Cvičení příští týden
 # TOHLE DODĚLAT
-@app.get("/ucitel/nadchazejici")
-async def get_ucitel_board_next_ones(ticket: str | None = None):
-    """Vrátí cvičení v dalším týdnu"""
+@app.get("/admin/nadchazejici")
+async def get_admin_board_next_ones(ticket: str | None = None):
+    """Vrátí všechny cvičení v času dopředu dle readme"""
     #ticket = os.getenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -160,8 +160,8 @@ async def get_ucitel_board_next_ones(ticket: str | None = None):
     return list_terminy_dopredu
 
 #Všechny týdny
-@app.get("/ucitel/board")
-async def get_ucitel_board(ticket: str | None = None):
+@app.get("/admin")
+async def get_admin_board(ticket: str | None = None):
     """ Vrátí všechny vypsané cvičení """
     #ticket = os.getenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
@@ -177,7 +177,7 @@ async def get_ucitel_board(ticket: str | None = None):
 
 @app.get("/ucitel")
 async def get_ucitel_board_future_ones(ticket: str | None = None):
-    """Vrátí cvičení v dalším týdnu"""
+    """Vrátí cvičení jednoho učitele v času dopředu dle readme"""
     #ticket = os.getenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
