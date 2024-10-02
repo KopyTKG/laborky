@@ -1,4 +1,3 @@
-import { Terminy, Moje } from '@/data/terminy'
 import { Unauthorized, NotFound } from '@/lib/http'
 import { fastHeaders } from '@/lib/stag'
 import { tTermin } from '@/lib/types'
@@ -14,10 +13,25 @@ export async function GET(req: Request) {
   return Unauthorized
  }
 
+ const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
+ checkURL.searchParams.set('ticket', rTicket)
+ const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
+
+ if (!roleRes.ok) {
+  return Unauthorized
+ }
+
+ const role = await roleRes.json()
+
+ let apipoint = '/ucitel'
+ if (role === 'ST') {
+  apipoint = '/student'
+ }
+
  if (!rType || (rType != 'vypsane' && rType != 'zapsane')) {
   return NotFound
  } else if (rType === 'vypsane') {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/student`)
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}`)
   url.searchParams.set('set', rTicket)
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (!res.ok) {
@@ -29,7 +43,7 @@ export async function GET(req: Request) {
   )
   return Response.json({ data: sorted }, { status: 200 })
  } else {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/student/moje`)
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}/moje`)
   url.searchParams.set('set', rTicket)
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (!res.ok) {
