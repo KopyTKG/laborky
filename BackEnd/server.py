@@ -89,7 +89,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
         if message == 0:
             return ok
         elif message == 1: # uzivatel se chtel odepsat z termínu, který má splněný
-            return conflict
+            return unauthorized
         elif message == 2: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
             return conflict
         elif message == 3: # uzivatel se chtel přihlásit na termín který neexistuje
@@ -290,7 +290,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
     # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
-    # id_stud = encode_id(id_stud)
+    id_stud = encode_id(id_stud)
     status_message = pridat_studenta(session, id_stud, id_terminu)
     if status_message == 0:
         return ok
@@ -306,7 +306,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     # ticket = os.getenv("TICKET")
     if ticket is None or ticket == "":
         return unauthorized
-    #id_stud = encode_id(id_stud)
+    id_stud = encode_id(id_stud)
     if uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni):
         return ok
     else:
@@ -353,7 +353,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,v
     if ticket is None or ticket == "":
         return unauthorized
     kod_predmetu = katedra + zkratka_predmetu
-    #vyucuje_id = encode_id(vyucuje_id)
+    vyucuje_id = encode_id(vyucuje_id)
     if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
         return ok
     else:
