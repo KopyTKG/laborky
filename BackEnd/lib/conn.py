@@ -251,7 +251,7 @@ def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
     terminy = session.query(Termin).filter(
         and_(
             Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
-            Termin.datum > current_date  # Terms that have not passed yet
+            Termin.datum > current_date - timedelta(hours=1),  # Terms that have not passed yet and the ones that barely started (1 hour ago eg.)
         )
     ).order_by(Termin.datum.desc()).all()
 
