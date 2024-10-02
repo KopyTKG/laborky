@@ -370,6 +370,14 @@ def terminy_dopredu(session):
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
+
+def terminy_dopredu_pro_vyucujiho(session, id):
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=interval_vypisu_terminu)
+    terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum.asc())
+    terminy_list = [termin for termin in terminy]
+    return terminy_list
+
 def pocet_cviceni_pro_predmet(session):
     predmety = session.query(distinct(Predmet.kod_predmetu)).all()
     predmet_pocet_cviceni = {}
