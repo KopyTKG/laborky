@@ -430,6 +430,20 @@ def vypis_vsechny_predmety(session):
     return [predmet.zkratka_predmetu for predmet in predmety]
 
 
+def vypis_vsechny_terminy(session):
+    """ Vrátí všechny vypsané termíny """
+    terminy = session.query(Termin).all()
+    return [termin.id for termin in terminy]
+
+
+def get_kod_predmetu_by_zkratka(session, zkratka_predmetu):
+    predmet = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first()
+    if predmet:
+        return predmet.kod_predmetu
+    else:
+        return None
+
+
 def get_katedra_predmet_by_idterminu(session, id_terminu):
     termin = session.query(Termin).filter_by(id=id_terminu).first()
     if termin:
@@ -489,6 +503,12 @@ if __name__ == "__main__":
     #print(vyhodnoceni)
     #print(list_dostupnych_terminu(session, ['KMPMPS1', 'KPPPO2R'], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
     #print(historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
+
+    print(vypis_vsechny_predmety(session))
+    probehle = list_probehle_terminy_predmet(session, 'MATH202')
+    planovane = list_planovane_terminy_predmet(session, 'MATH202')
+
+    print(probehle + planovane)
 
     pass
 
