@@ -30,6 +30,7 @@ Windows / Linux:
 PORT=9999 # Pro testovani bylo pouzito 3010
 HOST=0.0.0.0 # neboli all
 DB_URL=postgresql://postgres:postgres@localhost:port # connection string pro připojení k databázi
+STAG_URL = "https://stag-demo.zcu.cz/"
 ```
 - `FrontEnd/.env`
 ```env
