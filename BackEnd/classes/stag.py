@@ -1,5 +1,5 @@
 import requests
-
+import os
 def get(ticket, url, params):
     headers = {
         "accept": "application/json",
@@ -7,7 +7,7 @@ def get(ticket, url, params):
         "Connection": "keep-alive", 
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
-    url = "https://stag-demo.zcu.cz" + url
+    url = os.getenv('STAG_URL') + url
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
     if not response.ok: 
         raise Exception(response.text)
@@ -16,7 +16,7 @@ def get(ticket, url, params):
 
 def get_stag_user_info(ticket):
     """ Vrátí jméno, příjmení, email, titul a stagUserInfo (username, role, nazev, ucitIdno/osCilo, email)"""
-    url = "https://stag-demo.zcu.cz/ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket 
+    url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket 
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
