@@ -155,10 +155,12 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
 def odepsat_z_terminu(session, student_id, termin_id):
     termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first()
     if termin:
-        konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
-        if konkretni_termin.start_time > (datetime.now() - timedelta(hours=24)):
+        if termin.datum_splneni is not None:
+            print(f"Termin s ID {termin_id} je splnen.")
             return 1
-
+        konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
+        if (konkretni_termin.start_time - datetime.now()) < timedelta(hours=24):
+            return 2
         konkretni_termin.aktualni_kapacita -= 1
 
         session.delete(termin)
@@ -166,7 +168,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
         return 0
     else:
         print(f"Termin s ID {termin_id} neexistuje. Nebo na termin nejste prihlasen.")
-        return 2
+        return 3
 
 def zapsat_se_na_termin(session, student_id, termin_id):
     zapsat_na_termin = HistorieTerminu(id = uuid.uuid4(),student_id = student_id,termin_id = termin_id)

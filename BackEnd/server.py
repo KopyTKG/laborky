@@ -88,9 +88,11 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
         message = odepsat_z_terminu(session, userid, id_terminu)
         if message == 0:
             return ok
-        elif message == 1: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
+        elif message == 1: # uzivatel se chtel odepsat z termínu, který má splněný
             return conflict
-        else: 
+        elif message == 2: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
+            return conflict
+        elif message == 3: # uzivatel se chtel přihlásit na termín který neexistuje
             return bad_request
     else:
         return bad_request
