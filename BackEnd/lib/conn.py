@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv('DB_URL')
 
+interval_vypisu_terminu = os.getenv('INTERVAL_VYPISU_DNY')
+
 # navazani pripojeni k DB
 engine = create_engine(DATABASE_URL)
 
@@ -363,7 +365,7 @@ def historie_studenta(session, id):
 
 def terminy_tyden_dopredu(session):
     start_date = datetime.now()
-    end_date = start_date + timedelta(days=7)
+    end_date = start_date + timedelta(days=interval_vypisu_terminu)
     terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date)).order_by(Termin.datum.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
