@@ -11,7 +11,7 @@ export async function setStag(params: any) {
 export async function Set(key: string, value: string) {
  const oneDay = Date.now() + 60 * 60 * 1000 * 1.15
 
- await cookies().set(key, value, { expires: oneDay })
+ cookies().set(key, value, { expires: oneDay })
  return value
 }
 
