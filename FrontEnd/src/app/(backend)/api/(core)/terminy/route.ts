@@ -33,7 +33,6 @@ export async function GET(req: Request) {
  } else if (rType === 'vypsane') {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}`)
   url.searchParams.set('ticket', rTicket)
-  console.log(url.toString())
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (!res.ok) {
    return NotFound
