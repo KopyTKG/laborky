@@ -2,7 +2,6 @@ export const fastHeaders = new Headers({
  accept: 'application/json',
  'Content-Type': 'application/json',
  Connection: 'keep-alive',
- Origin: process.env.NEXT_PUBLIC_API_URL || '',
 })
 
 export async function getStagUser(ticket: string): Promise<any> {

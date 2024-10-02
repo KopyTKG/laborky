@@ -8,7 +8,7 @@ export type tTermin = {
  predmet: string
  cislo: number
  kapacita: number
- zapsany: string[]
+ zapsany: number
  vypsal: string
 }
 

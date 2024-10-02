@@ -69,8 +69,6 @@ function Zapsat({
 }
 
 export default function Node(props: any) {
- const studenti = (props.zapsany as string[]).length
-
  function CheckDate(date: any) {
   let timeToCheck = new Date(date).setHours(new Date(date).getHours() - 24)
   if (new Date().getTime() < new Date(timeToCheck).getTime()) {
@@ -82,12 +80,12 @@ export default function Node(props: any) {
  const loc = 'cs-CZ'
 
  const VolnoRender: boolean = CheckDate(props.start)
-  ? studenti < props.kapacita
+  ? props.zapsany < props.kapacita
     ? false
     : true
   : true
  const CapRender: boolean = CheckDate(props.start)
-  ? studenti >= props.kapacita
+  ? props.zapsany >= props.kapacita
     ? true
     : false
   : true
@@ -120,7 +118,7 @@ export default function Node(props: any) {
    <CardFooter className="flex justify-between width-fultems-center">
     <div className="flex flex-col gap-1">
      <div className="flex self-start gap-2 items-center">
-      {`${studenti} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
+      {`${props.zapsany} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
      </div>
      <span className="text-sm">{`${props.vypsal}`}</span>
     </div>
@@ -132,7 +130,7 @@ export default function Node(props: any) {
        date={CheckDate(props.start)}
        VolnoRender={VolnoRender}
        CapRender={CapRender}
-       volno={studenti >= props.kapacita}
+       volno={props.zapsany >= props.kapacita}
       />
      ) : (
       <Zobrazit id={props.id} />
