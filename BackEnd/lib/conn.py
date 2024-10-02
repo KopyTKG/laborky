@@ -371,7 +371,7 @@ def terminy_dopredu(session):
     return terminy_list
 
 
-def terminy_dopredu_pro_vyucujiho(session, id):
+def terminy_dopredu_pro_vyucujiciho(session, id):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
     terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum.asc())
