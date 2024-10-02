@@ -175,6 +175,19 @@ async def get_ucitel_board(ticket: str | None = None):
 
     return list_terminu
 
+@app.get("/ucitel")
+async def get_ucitel_board_future_ones(ticket: str | None = None):
+    """Vrátí cvičení v dalším týdnu"""
+    #ticket = os.getenv("TICKET")
+    userinfo = kontrola_ticketu(ticket)
+    if userinfo is None:
+        return unauthorized
+    userid, role = get_userid_and_role(userinfo)
+    userid = encode_id(userid)
+    if role == "ST":
+        return unauthorized
+    list_terminy_dopredu = terminy_dopredu_pro_vyucujiciho(session, userid)
+    return list_terminy_dopredu
 
 @app.get("/ucitel/moje")
 async def get_ucitel_moje_vypsane(ticket: str | None = None):
