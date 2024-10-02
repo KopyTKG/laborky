@@ -25,9 +25,14 @@ def get_stag_user_info(ticket):
     }
     response = requests.get(url, headers=headers)
     if not response.ok:
-        raise Exception(response.text)
+        return None
 
-    return response.json()
+    try:
+        response = response.json()
+    except:
+        return None
+
+    return response
 
 
 def get_userid_and_role(json):

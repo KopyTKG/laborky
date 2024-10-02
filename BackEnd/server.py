@@ -22,6 +22,8 @@ async def kontrola_s_databazi(ticket: str | None = None):
     if ticket is None or ticket == "":
         return unauthorized
     userinfo = get_stag_user_info(ticket)
+    if userinfo is None:
+        return unauthorized
     userid, role = get_userid_and_role(userinfo)
     if role != "ST":
         prijmeni = userinfo["prijmeni"]
@@ -42,7 +44,12 @@ async def get_student_home(ticket: str | None = None):
     if ticket is None or ticket == "":
         return unauthorized
 
-    userid, role = get_userid_and_role(get_stag_user_info(ticket))
+    userinfo = get_stag_user_info(ticket)
+
+    if userinfo is None:
+        return unauthorized
+
+    userid, role = get_userid_and_role(userinfo)
     userid = encode_id(userid)
     
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
