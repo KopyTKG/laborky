@@ -1,4 +1,4 @@
-from conn import *
+from lib.conn import *
 
 def get_vyucujiciho_by_predmet(session, kod_predmetu):
     """ Vrátí zahashované id vyučujícího, který vyučuje daný předmět """

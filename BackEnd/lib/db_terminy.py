@@ -1,4 +1,4 @@
-from conn import *
+from lib.conn import *
 
 def list_terminy(session):
     """ Vrátí všechny vypsané termíny """
