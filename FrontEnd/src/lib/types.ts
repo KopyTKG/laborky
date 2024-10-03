@@ -1,3 +1,5 @@
+import React from 'react'
+
 export type tTermin = {
  _id: string
  location: string
@@ -9,6 +11,12 @@ export type tTermin = {
  zapsany: number
  vypsal: string
  owned?: boolean
+}
+
+export type tNode = tTermin & {
+ owned: boolean
+ typ: string
+ setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export type tLink = {

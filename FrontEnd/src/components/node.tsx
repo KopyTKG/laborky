@@ -4,6 +4,7 @@ import { Divider } from '@/components/ui/divider'
 import Icon from '@/components/icon'
 import { Get } from '@/app/actions'
 import { tNode } from '@/lib/types'
+import React from 'react'
 
 function Zobrazit({ id }: { id: string }) {
  function APIcall(id: string) {
@@ -23,6 +24,7 @@ function Zapsat({
  VolnoRender,
  CapRender,
  volno,
+ setReload,
 }: {
  id: string
  owned: boolean
@@ -30,8 +32,9 @@ function Zapsat({
  VolnoRender: boolean
  CapRender: boolean
  volno: boolean
+ setReload: React.Dispatch<React.SetStateAction<boolean>>
 }) {
- async function APIcall(id: string) {
+ async function APIcall(id: string, setReload: React.Dispatch<React.SetStateAction<boolean>>) {
   try {
    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/zapsat`)
    url.searchParams.set('id', id)
@@ -50,7 +53,7 @@ function Zapsat({
    if (res.status != 200 && res.status != 409) {
     window.location.href = '/logout'
    } else {
-    alert(res.statusText)
+    setReload(true)
    }
   } catch {
    window.location.href = '/logout'
@@ -61,7 +64,7 @@ function Zapsat({
    className="border border-black"
    variant={owned ? 'danger' : CapRender ? 'danger' : 'success'}
    disabled={!owned ? VolnoRender : date ? false : true}
-   onClick={() => APIcall(id)}>
+   onClick={() => APIcall(id, setReload)}>
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
    {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}
   </Button>
@@ -131,6 +134,7 @@ export default function Node(props: tNode) {
        VolnoRender={VolnoRender}
        CapRender={CapRender}
        volno={props.zapsany >= props.kapacita}
+       setReload={props.setReload}
       />
      ) : (
       <Zobrazit id={props._id} />

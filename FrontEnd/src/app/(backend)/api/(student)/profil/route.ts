@@ -2,8 +2,6 @@ import { NotFound, Unauthorized } from '@/lib/http'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmet } from '@/lib/types'
 
-export const dynamic = 'force-dynamic'
-
 export async function GET(req: Request) {
  const base = new URL(req.url)
  const rTicket = base.searchParams.get('ticket') || ''

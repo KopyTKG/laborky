@@ -6,6 +6,7 @@ import { Get } from '@/app/actions'
 
 export default function VypsaneTerminy() {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
+ const [reload, setReload] = useState<boolean>(false)
 
  useLayoutEffect(() => {
   const fetchTerminy = async () => {
@@ -28,24 +29,20 @@ export default function VypsaneTerminy() {
     } else if (res.status == 200) {
      let jsonParsed = await res.json()
      setTerminy(jsonParsed.data)
+     setReload(false)
     }
    } catch {
     window.location.href = '/logout'
    }
   }
   fetchTerminy()
- }, [])
+ }, [reload])
 
  return (
   <>
    <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
     {Terminy.map((termin: tTermin) => (
-     <Node
-      key={termin._id}
-      owned={termin.zapsany.includes(`1f3as45fefvae4`) ? true : false}
-      {...termin}
-      typ="student"
-     />
+     <Node key={termin._id} owned={true} setReload={setReload} {...termin} typ="student" />
     ))}
    </div>
   </>
