@@ -4,6 +4,8 @@ from classes.stag import *
 from classes.vyucujici import *
 from classes.student import *
 from lib.conn import *
+from lib.db_utils import *
+from lib.db_terminy import *
 from lib.HTTP_messages import *
 from jose import jwt
 from datetime import datetime
@@ -27,7 +29,7 @@ async def kontrola_s_databazi(ticket: str | None = None):
     userid, role = get_userid_and_role(userinfo)
     if role != "ST":
         userid = encode_id(userid)
-        pridej_vyucujici(session, userid)
+        vytvor_vyucujici(session, userid)
     else:
         userid = encode_id(userid)
         vytvor_student(session, userid)
@@ -50,7 +52,7 @@ async def get_student_home(ticket: str | None = None):
     if role != "ST":
         return unauthorized
 
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
 
     vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_cviceni_pro_predmet(session))
 
@@ -134,7 +136,7 @@ async def get_student_profil(ticket: str | None = None):
     if userinfo is None:
         return unauthorized
     userid, role = get_userid_and_role(userinfo)
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
 
 
     userid = encode_id(userid)
@@ -243,7 +245,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime,da
         return unauthorized
     vypsal_id = encode_id(userid)
 
-    zkratka_predmetu, katedra = get_predmet_info(session, kod_predmet)
+    zkratka_predmetu, katedra = get_katedra_predmet_by_idterminu(session, kod_predmet)
     if zkratka_predmetu is None and katedra is None:
         return internal_server_error
 
@@ -301,7 +303,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     if role == "ST":
         return unauthorized
 
-    vsechny_terminy = vypis_vsechny_terminy(session)
+    vsechny_terminy = get_vsechny_terminy(session)
     if id_terminu not in vsechny_terminy:
         return bad_request
 
