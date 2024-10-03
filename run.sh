@@ -27,5 +27,5 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 else
     echo "Windows"
     start powershell -Command 'cd FrontEnd; npm run dev'
-    start powershell -Command 'cd BackEnd; python -m venv venv; venv/Scripts/activate; uvicorn server:app --reload'
+    start powershell -Command 'cd BackEnd; python -m venv venv; venv/Scripts/activate; python server.py'
 fi
