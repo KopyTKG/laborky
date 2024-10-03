@@ -50,7 +50,6 @@ class Vyucujici(Base):
     __tablename__ = "vyucujici"
 
     id = Column("id", String, primary_key=True)
-    prijmeni = Column("prijmeni", Text)
 
     terminy_vyucuje = relationship("Termin", foreign_keys=[Termin.vyucuje_id], back_populates="vyucuje")
     terminy_vypsal = relationship("Termin", foreign_keys=[Termin.vypsal_id], back_populates="vypsal")
@@ -113,9 +112,9 @@ def vytvor_student(session, id):
         session.commit()
         return True
     return False
-def pridej_vyucujici(session, id, prijmeni):
+def pridej_vyucujici(session, id):
     if session.query(Vyucujici).filter_by(id=id).first() is None:
-        vyucujici = Vyucujici(id=id, prijmeni=prijmeni)
+        vyucujici = Vyucujici(id=id)
         session.add(vyucujici)
         session.commit()
         return True
@@ -241,8 +240,6 @@ def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, poc
     return True
 def list_predmety(session):
     predmety = session.query(Predmet).all()
-    for predmet in predmety:
-        print(f"Kod: {predmet.kod_predmetu}, Zkratka: {predmet.zkratka_predmetu}, Katedra: {predmet.katedra}, Vyucujici: {predmet.vyucuje.prijmeni}")
     predmet_list = [predmet for predmet in predmety]
     return predmet_list
 
@@ -329,16 +326,12 @@ def list_probehle_terminy(session):
 def list_planovane_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
     terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum >= dnesni_datum)).order_by(Termin.datum.asc())
-    for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 def list_probehle_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
     terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum <= dnesni_datum)).order_by(Termin.datum.desc())
-    for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Date: {termin.datum}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -509,8 +502,8 @@ if __name__ == "__main__":
     #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
     #print(vyhodnoceni)
 
-    vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
-    print(vypis_uspesnych)
+    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
+    #print(vypis_uspesnych)
 
     #print(vypis_vsechny_predmety(session))
     #print(vyhodnoceni)
