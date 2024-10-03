@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavbarStudent as Navbar } from '@/components/navbars'
+import { Toaster } from '@/components/ui/toaster'
 
 export default function RootLayout({
  children,
@@ -12,6 +13,7 @@ export default function RootLayout({
   <>
    <Navbar id={params.stID} />
    <main className="max-w-4xl mx-auto">{children}</main>
+   <Toaster />
   </>
  )
 }

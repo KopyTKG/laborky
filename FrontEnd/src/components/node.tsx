@@ -6,8 +6,10 @@ import { tNode } from '@/lib/types'
 import React from 'react'
 import { Button } from '@nextui-org/react'
 import { CalendarDays, Clock, MapPin, UsersRound } from 'lucide-react'
+import { toast, useToast } from '@/hooks/use-toast'
 
 function Zobrazit({ id }: { id: string }) {
+ const { toast } = useToast()
  function APIcall(id: string) {
   alert(id)
  }
@@ -55,16 +57,28 @@ function Zapsat({
     window.location.href = '/logout'
    } else {
     setReload(true)
+    if (res.status === 200) {
+     toast({
+      title: 'Akce provedena',
+      description: !owned ? 'Byl si zapsán na termín': 'Byl si odhlášen z termínu' ,
+     })
+    } else {
+     toast({
+      title: 'Něco se nepovedlo',
+      description: `Serveru se něco nelíbí`,
+     })
+    }
    }
-  } catch {
-   window.location.href = '/logout'
+  } catch (e) {
+   console.error(e)
   }
  }
  return (
   <Button
    color={owned ? 'danger' : CapRender ? 'danger' : 'success'}
    disabled={!owned ? VolnoRender : date ? false : true}
-   onClick={() => APIcall(id, setReload)}>
+   onClick={() => APIcall(id, setReload)}
+  >
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
    {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}
   </Button>
