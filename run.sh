@@ -14,6 +14,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 			tmux new-window -t $SESH -n "webserver"
 			tmux send-keys -t $SESH:webserver "cd FrontEnd && bun install && bun run dev" C-m
 
+			tmux new-window -t $SESH -n "db"
+			tmux send-keys -t $SESH:db "docker compose up" C-m
+
 			tmux new-window -t $SESH -n "term"
 		fi
 		tmux attach-session -t $SESH

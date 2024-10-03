@@ -1,0 +1,32 @@
+name: deska_search_engine
+
+services:
+ database:
+  image: postgres
+  container_name: laborky_db
+  restart: unless-stopped
+  ports:
+   - '56131:5432'
+  environment:
+   PGPASSWORD: postgres
+   POSTGRES_PASSWORD: postgres
+   PGDATABASE: railway
+   POSTGRES_DB: postgres
+   PGDATA: /var/lib/postgresql/new_data
+  volumes:
+   - ./database/db/pg_dump.sql:/docker-entrypoint-initdb.d/seed.sql
+   - ./database/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+   - ./database/data:/var/lib/postgresql/new_data
+  networks:
+   laborky_network:
+    ipv4_address: 172.254.5.4
+
+networks:
+ laborky_network:
+  name: laborky
+  attachable: true
+  ipam:
+   config:
+    - subnet: 172.254.0.0/16
+      ip_range: 172.254.5.0/24
+      gateway: 172.254.5.254

@@ -36,7 +36,7 @@ FrontEnd/package-lock.json
 
 # dummy data
 BackEnd/lib/dummyGen.py
-
+database/data
 
 # leaks
 **/.env
