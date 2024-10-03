@@ -60,7 +60,7 @@ function Zapsat({
     if (res.status === 200) {
      toast({
       title: 'Akce provedena',
-      description: !owned ? 'Byl si zapsán na termín': 'Byl si odhlášen z termínu' ,
+      description: !owned ? 'Byl si zapsán na termín' : 'Byl si odhlášen z termínu',
      })
     } else {
      toast({
