@@ -220,7 +220,7 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime,datum_konec:datetime, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int):
     """ Učitel vytvoří termín do databáze """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -230,7 +230,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
         return unauthorized
     vypsal_id = encode_id(userid)
 
-    if vypsat_termin(session, ucebna, datum, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
+    if vypsat_termin(session, ucebna, datum_start,datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
         return ok
     else:
         return internal_server_error
@@ -241,7 +241,8 @@ async def ucitel_zmena_terminu(
     ticket: str,
     id_terminu: str,
     ucebna: Optional[str] = None,
-    datum: Optional[datetime] = None,
+    datum_start: Optional[datetime] = None,
+    datum_konec: Optional[datetime] = None,
     max_kapacita: Optional[int] = None,
     vyucuje_id: Optional[str] = None,
     jmeno: Optional[str] = None,
@@ -251,7 +252,7 @@ async def ucitel_zmena_terminu(
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
+    if upravit_termin(session, id_terminu, newDatumStart=datum_start,newDatumKonec=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
         return ok
     return internal_server_error
 
