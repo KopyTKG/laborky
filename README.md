@@ -1,4 +1,4 @@
-# UJEP Laboratorní cvičení [![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
+# UJEP Laboratorní cvičení
 
 Práce na projektový seminář.
 
@@ -7,11 +7,12 @@ Popis: Vytvořete přihlašovací systém na laboratorní cvičení, kde vyučuj
 
 ## Tým
 
-**FrontEnd** - [Martin](https://github.com/kopytkg) , [Dan](https://github.com/DanielRiha8906)
+**FrontEnd** - [Martin](https://github.com/kopytkg)
 
 **BackEnd** -
-[Adam](https://github.com/Midiros) , [Alex](https://github.com/Bumross)
+[Alex](https://github.com/Bumross), [Dan](https://github.com/DanielRiha8906)
 
+**Database** - [Adam](https://github.com/Midiros) 
 
 
 ## Instalace
@@ -47,6 +48,5 @@ NEXT_PUBLIC_STAG_SERVER=`https://stag-demo.zcu.cz/ws/`
 2. Nainstalování všech balíčků viz [Instalace](#instalace)
 
 ### Spuštění
-```bash
-./run.sh
-```
+- windows / linux: `./run.sh`
+- linux(gnome) + tmux: `./run.sh -tmux`
