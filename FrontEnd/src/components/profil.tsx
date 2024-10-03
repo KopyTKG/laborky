@@ -48,11 +48,7 @@ export default function Profil() {
           <div key={datum.toLocaleString() + key} className="flex flex-row justify-between">
            <span>{`Laboratorní cvičení ${key + 1}`}</span>
            <Badge variant={datum ? 'success' : 'danger'}>
-            {
-             datum
-              ? 'splnil'
-              : 'nesplnil' /*datum ? new Date(datum).toLocaleDateString() : 'nesplnil'*/
-            }
+            {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
            </Badge>
           </div>
          )
