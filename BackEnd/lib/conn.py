@@ -264,9 +264,7 @@ def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
         # Check if the term corresponds to a subject the student has history for
         if kod_predmetu in historie_predmetu:
             # If the exercise (cislo_cviceni) has been completed (1 in the list), skip this term
-            if historie_predmetu[kod_predmetu][cislo_cviceni - 1] == 1:
-                print(cislo_cviceni)
-                print("SPLNENE CVICENI")
+            if historie_predmetu[kod_predmetu][cislo_cviceni - 1] != 0:
                 continue  # Skip this term since the student already completed it
 
         # Step 3: Check if the student has already attended the term (in HistorieTerminu)
