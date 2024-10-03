@@ -1,42 +1,64 @@
 'use client'
 import Node from '@/components/node'
-import { useLayoutEffect, useState } from 'react'
+import { useCallback, useLayoutEffect, useState } from 'react'
 import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
+import { fastHeaders } from '@/lib/stag'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export default function VypsaneTerminy() {
+const fetchTerminyData = async () => {
+ try {
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/terminy`)
+  url.searchParams.set('t', 'zapsane')
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
+  }
+  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+  if (res.status == 401) {
+   window.location.href = '/logout'
+  } else if (res.status == 200) {
+   return await res.json()
+  }
+ } catch (e) {
+  console.error(e)
+ }
+}
+
+export default function ZapsaneTerminy() {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
+
  const [reload, setReload] = useState<boolean>(false)
+ const [fetching, setFetching] = useState<boolean>(true)
+
+ const fetchTerminy = useCallback(async () => {
+  const data = await fetchTerminyData()
+  if (data) {
+   setTerminy(data.data)
+   setReload(false)
+  }
+
+  setFetching(false)
+ }, [reload])
 
  useLayoutEffect(() => {
-  const fetchTerminy = async () => {
-   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/terminy`)
-    url.searchParams.set('t', 'zapsane')
-    const cookie = await Get('stagUserTicket')
-    if (cookie) {
-     url.searchParams.set('ticket', cookie.value)
-    }
-    const headers = {
-     Accept: 'application/json',
-     'Content-Type': 'application/json',
-     Connection: 'keep-alive',
-     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
-    }
-    const res = await fetch(url.toString(), { method: 'GET', headers })
-    if (res.status != 200) {
-     window.location.href = '/logout'
-    } else if (res.status == 200) {
-     let jsonParsed = await res.json()
-     setTerminy(jsonParsed.data)
-     setReload(false)
-    }
-   } catch {
-    window.location.href = '/logout'
-   }
-  }
   fetchTerminy()
  }, [reload])
+
+ if (Terminy?.length === 0 && fetching) {
+  return (
+   <div className="w-max h-[10rem] grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+    {Array.from({ length: 3 }, (_, index) => (
+     <Skeleton
+      key={index}
+      className="w-[25rem] h-[18rem] rounded-xl border-1 border-gray-700 bg-gradient-to-tr from-black to-gray-800"
+     />
+    ))}
+   </div>
+  )
+ } else if (!fetching && Terminy?.length === 0) {
+  return <h2 className="text-xl text-white font-bold"> Nebyl nalezen žádný termín</h2>
+ }
 
  return (
   <>

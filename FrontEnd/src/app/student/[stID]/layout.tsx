@@ -11,7 +11,7 @@ export default function RootLayout({
  return (
   <>
    <Navbar id={params.stID} />
-   <>{children}</>
+   <main className="max-w-4xl mx-auto">{children}</main>
   </>
  )
 }

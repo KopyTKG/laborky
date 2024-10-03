@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font'
+import { GeistSans } from 'geist/font/sans'
 import '../sass/index.scss'
 
 import './globals.css'
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
  return (
   <html lang="en">
-   <body className={GeistSans.className}>
+   <body className={GeistSans.className} style={{ backgroundColor: 'black' }}>
     <Providers>
      <main id="main" className="min-h-screen h-max pb-3 dark text-foreground bg-background">
       {children}

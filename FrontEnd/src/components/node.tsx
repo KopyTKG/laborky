@@ -94,7 +94,7 @@ export default function Node(props: tNode) {
   : true
 
  return (
-  <Card className="w-[25rem] h-max bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
+  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.predmet} cvičení ${props.cislo}`}</div>
    </CardHeader>
