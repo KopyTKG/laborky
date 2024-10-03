@@ -261,7 +261,7 @@ async def ucitel_zmena_terminu(
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    if upravit_termin(session, id_terminu, newDatumStart=datum_start,newDatumKonec=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
+    if upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
         return ok
     return internal_server_error
 
