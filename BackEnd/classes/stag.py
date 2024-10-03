@@ -26,14 +26,32 @@ def get_stag_user_info(ticket):
     response = requests.get(url, headers=headers)
     if not response.ok:
         return None
-
     try:
         response = response.json()
     except:
         return None
-
     return response
 
+
+def get_predmet_info_stag(zkratka_predmetu, katedra):
+    """ Vrátí informace o predmetu"""
+    params = {
+        "katedra": katedra,
+        "zkratka": zkratka_predmetu
+    }
+    url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://stag-demo.zcu.cz",
+    }
+    response = requests.get(url, headers=headers, params=params)
+    if not response.ok:
+        return "chyba"
+    
+    response = response.json()
+    return response
 
 def get_userid_and_role(json):
     """ Vrací userId a roli uživatele

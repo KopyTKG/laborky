@@ -105,7 +105,7 @@ async def get_student_moje(ticket: str | None = None):
         ticket (str): Uživatelský autentizační token.
 
     Returns:
-        list_terminu (list): Seznam cvičení, na kterých je student aktuálně zapsán
+        list_terminu (list): Seznam cvičení, na kterých je student aktuálně zapsán a nemá je splněné
         """
     #ticket = os.getenv('TICKET')
     userinfo = kontrola_ticketu(ticket)
@@ -115,7 +115,11 @@ async def get_student_moje(ticket: str | None = None):
     if role != "ST":
         return unauthorized
     userid = encode_id(userid)
-    list_terminu = historie_studenta(session, userid)
+
+    historie = historie_studenta(session, userid)
+    splnene = uspesne_dokoncene_terminy(session, userid)
+
+    list_terminu = subtract_lists(historie, splnene)
 
     return list_terminu
 
@@ -220,8 +224,9 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kapacita:int,vyucuje_id: str, kod_predmet: str, jmeno: str, cislo_cviceni: int):
-    """ Učitel vytvoří termín do databáze """
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int):
+    """ Učitel vytvoří termín do databáze
+    Args: vyucuje_id: identifikační kód vyučujícího"""
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
@@ -230,6 +235,12 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum: datetime, max_kap
         return unauthorized
     vypsal_id = encode_id(userid)
 
+    zkratka_predmetu, katedra = get_predmet_info(session, kod_predmet)
+    if zkratka_predmetu is None and katedra is None:
+        return internal_server_error
+
+    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmet)
+    
     if vypsat_termin(session, ucebna, datum, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
         return ok
     else:
@@ -243,7 +254,6 @@ async def ucitel_zmena_terminu(
     ucebna: Optional[str] = None,
     datum: Optional[datetime] = None,
     max_kapacita: Optional[int] = None,
-    vyucuje_id: Optional[str] = None,
     jmeno: Optional[str] = None,
     cislo_cviceni: Optional[int] = None
     ):
@@ -251,7 +261,8 @@ async def ucitel_zmena_terminu(
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newVyucuje_id=vyucuje_id, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
+    
+    if upravit_termin(session, id_terminu, newDatum=datum, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
         return ok
     return internal_server_error
 
@@ -388,19 +399,6 @@ def kontrola_ticketu(ticket):
 
     return userinfo
 
-
-@app.get("/")
-async def root():
-    ticket = os.getenv('TICKET')
-    if ticket is None:
-        return {"error": "Ticket parameter is missing or None"}
-
-    print(f"Received ticket: {ticket}")  # For debugging
-
-    predmet = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
-    list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici)
-    return list_terminu
 
 
 if __name__ == "__main__":

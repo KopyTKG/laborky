@@ -126,7 +126,7 @@ def zapis_predmet(session, kod_predmetu, student_id):
     session.commit()
     return True
 
-def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newVyucuje_id=None, newJmeno=None, cislo_cviceni=None):
+def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None):
     termin = session.query(Termin).filter(Termin.id == id_terminu).first()
     if termin is None:
         print(f"Termin s ID {id_terminu} neexistuje.")
@@ -140,9 +140,6 @@ def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_ka
 
     if newMax_kapacita is not None:
         termin.max_kapacita = newMax_kapacita
-
-    if newVyucuje_id is not None:
-        termin.vyucuje_id = newVyucuje_id
 
     if newJmeno is not None:
         termin.jmeno = newJmeno
@@ -345,14 +342,25 @@ def list_terminy_vyucujici(session, id):
 
 def historie_studenta(session, id):
     student = session.query(Student).filter_by(id=id).first()
+    termins = []
     if student is None:
-        print("Neplatne ID studenta!")
         return False
     for history in student.historie_terminu:
         termin = history.termin
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
-    terminy_list = [termin for termin in student.historie_terminu]
-    return terminy_list
+        termins.append(termin)
+    return termins
+
+
+def uspesne_dokoncene_terminy(session, id):
+    student = session.query(Student).filter_by(id=id).first()
+    splnene_terminy = []
+    if student is None:
+        return False
+    for history in student.historie_terminu:
+        termin = history.termin
+        if history.datum_splneni is not None:
+            splnene_terminy.append(termin)
+    return splnene_terminy
 
 def terminy_dopredu(session):
     start_date = datetime.now()
@@ -456,6 +464,31 @@ def get_katedra_predmet_by_idterminu(session, id_terminu):
             return predmet.zkratka_predmetu, predmet.katedra
 
 
+def get_predmet_info(session, kod_predmetu):
+    """ vrátí zkratku předmětu a zkratku katedry"""
+    predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+    if predmet:
+        return predmet.zkratka_predmetu, predmet.katedra
+
+
+def get_predmet_by_id(session, id_predmetu):
+    """ Vrátí kód předmětu podle jeho identifikačního kódů """
+    predmet = session.query(Predmet).filter_by(id=id_predmetu).first()
+    if predmet:
+        return predmet.kod_predmetu
+
+
+def get_vyucujiciho_by_predmet(session, kod_predmetu):
+    predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+    if predmet:
+        return predmet.vyucuje_id
+
+def subtract_lists(list1, list2):
+    # Convert both lists to sets and subtract list2 from list1
+    result = list(set(list1) - set(list2))
+    return result
+
+
 if __name__ == "__main__":
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
     # list_probehle_terminy(session)
@@ -513,6 +546,12 @@ if __name__ == "__main__":
     #planovane = list_planovane_terminy_predmet(session, 'MATH202')
 
     #print(probehle + planovane)
+
+
+    #historie = historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
+    #splnene_terminy = uspesne_dokoncene_terminy(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
+
+    #print(subtract_lists(historie, splnene_terminy))
 
     pass
 
