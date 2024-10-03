@@ -29,7 +29,9 @@ class Termin(Base):
 
     id = Column("id", UUID, primary_key=True)
     ucebna = Column("ucebna", Text)
-    datum = Column("datum", DateTime)
+    datum_start = Column("datum_start", DateTime)
+    datum_konec = Column("datum_konec", DateTime)
+
     aktualni_kapacita = Column("aktualni_kapacita", Integer)
     max_kapacita = Column("max_kapacita", Integer)
     jmeno = Column("jmeno", Text)
@@ -126,14 +128,18 @@ def zapis_predmet(session, kod_predmetu, student_id):
     session.commit()
     return True
 
-def upravit_termin(session, id_terminu, newDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None):
+def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None):
     termin = session.query(Termin).filter(Termin.id == id_terminu).first()
     if termin is None:
         print(f"Termin s ID {id_terminu} neexistuje.")
         return False
 
-    if newDatum is not None:
-        termin.datum = newDatum
+    if newStartDatum is not None:
+        termin.datum_start = newStartDatum
+
+    if newKonecDatum is not None:
+        termin.datum_konec = newKonecDatum
+
 
     if newUcebna is not None:
         termin.ucebna = newUcebna
@@ -157,7 +163,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
             print(f"Termin s ID {termin_id} je splnen.")
             return 1
         konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
-        if (konkretni_termin.start_time - datetime.now()) < timedelta(hours=24):
+        if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=24):
             return 2
         konkretni_termin.aktualni_kapacita -= 1
 
@@ -247,9 +253,9 @@ def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
     terminy = session.query(Termin).filter(
         and_(
             Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
-            Termin.datum > current_date - timedelta(hours=1),  # Terms that have not passed yet and the ones that barely started (1 hour ago eg.)
+            Termin.datum_start > current_date - timedelta(hours=1),  # Terms that have not passed yet and the ones that barely started (1 hour ago eg.)
         )
-    ).order_by(Termin.datum.desc()).all()
+    ).order_by(Termin.datum_start.desc()).all()
 
     # Step 2: Filter out terms that the student has already completed or attended
     terminy_list = []
@@ -281,7 +287,7 @@ def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
 
 ### TERMINY
 def list_terminy(session):
-    terminy = session.query(Termin).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).order_by(Termin.datum_start.desc())
     # for termin in terminy:
     #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}, Vyucujici: {termin.vyucuje.prijmeni}, Vypsal: {termin.vypsal.prijmeni}, Aktualni kapacita: {termin.aktualni_kapacita}, Max kapacita: {termin.max_kapacita}")
     termin_list = [termin for termin in terminy]
@@ -292,51 +298,51 @@ def list_studenti_z_terminu(session, termin_id):
     studenti_list = [student.student_id for student in student_list]
     return studenti_list
 
-def vypsat_termin(session, ucebna:Text, datum:datetime, max_kapacita:int, vypsal_id:Text, vyucuje_id:Text, kod_predmet:Text, jmeno:Text, cislo_cviceni:int,  aktualni_kapacita=0):
+def vypsat_termin(session, ucebna:Text, datum_start:datetime,datum_konec:datetime, max_kapacita:int, vypsal_id:Text, vyucuje_id:Text, kod_predmet:Text, jmeno:Text, cislo_cviceni:int,  aktualni_kapacita=0):
     vyucujici = session.query(Vyucujici).filter_by(id=vyucuje_id).first()
     if vyucujici is None:
         print("Neplatne ID vyucujiciho! Zda se ze vyucujici neni zaregistrovan")
         return False
-    termin = Termin(id=uuid.uuid4(), ucebna=ucebna, datum=datum, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno, cislo_cviceni=cislo_cviceni)
+    termin = Termin(id=uuid.uuid4(), ucebna=ucebna, datum_start=datum_start,datum_konec=datum_konec, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno, cislo_cviceni=cislo_cviceni)
     session.add(termin)
     session.commit()
     return True
 
 def list_nadchazejici_terminy(session):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.datum >= dnesni_datum).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(Termin.datum_start >= dnesni_datum).order_by(Termin.datum_start.asc())
     for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 def list_probehle_terminy(session):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.datum <= dnesni_datum).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).filter(Termin.datum_start <= dnesni_datum).order_by(Termin.datum_start.desc())
     for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 def list_planovane_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum >= dnesni_datum)).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start >= dnesni_datum)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 def list_probehle_terminy_predmet(session, kod_predmetu):
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum <= dnesni_datum)).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start <= dnesni_datum)).order_by(Termin.datum_start.desc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 def list_terminy_vyucujici(session, id):
-    terminy = session.query(Termin).filter(Termin.vyucuje_id == id).order_by(Termin.datum.desc())
+    terminy = session.query(Termin).filter(Termin.vyucuje_id == id).order_by(Termin.datum_start.desc())
     if terminy is None:
         print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
         return False
     for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
+        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -365,7 +371,7 @@ def uspesne_dokoncene_terminy(session, id):
 def terminy_dopredu(session):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date)).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -373,7 +379,7 @@ def terminy_dopredu(session):
 def terminy_dopredu_pro_vyucujiciho(session, id):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum >= start_date, Termin.datum <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum.asc())
+    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
