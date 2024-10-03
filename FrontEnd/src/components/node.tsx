@@ -34,7 +34,7 @@ function Zapsat({
   try {
    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/zapsat`)
    url.searchParams.set('id', id)
-   console.log(id)
+   url.searchParams.set('type', !owned ? 'zapsat' : 'odhlasit')
    const cookie = await Get('stagUserTicket')
    if (cookie) {
     url.searchParams.set('ticket', cookie.value)
@@ -60,8 +60,7 @@ function Zapsat({
    className="border border-black"
    variant={owned ? 'danger' : CapRender ? 'danger' : 'success'}
    disabled={!owned ? VolnoRender : date ? false : true}
-   onClick={() => APIcall(id)}
-  >
+   onClick={() => APIcall(id)}>
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
    {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}
   </Button>
@@ -120,7 +119,7 @@ export default function Node(props: any) {
      <div className="flex self-start gap-2 items-center">
       {`${props.zapsany} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
      </div>
-     <span className="text-sm">{`${props.vypsal}`}</span>
+     <span className="text-sm">{`${/*props.vypsal*/ 'Jmeno to be added'}`}</span>
     </div>
     <div className=" flex self-end">
      {props.typ == 'student' ? (

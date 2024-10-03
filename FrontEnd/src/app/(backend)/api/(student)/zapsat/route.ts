@@ -5,25 +5,20 @@ import { tTermin } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
- const url = new URL(req.url)
- const rID = url.searchParams.get('id') || ''
- const rTicket = url.searchParams.get('ticket') || ''
+ const base = new URL(req.url)
+ const rID = base.searchParams.get('id') || ''
+ const rTicket = base.searchParams.get('ticket') || ''
+ const rType = base.searchParams.get('type') || ''
 
  if (!rTicket) {
   return Unauthorized
  }
- if (!rID) {
+ if (!rID || !rType) {
   return NotFound
  }
 
- // API fetch
- //
- // tmp
- const termin = Terminy.find((a: tTermin) => a._id === rID)
- console.log(termin)
- if (!termin) {
-  return NotFound
- } else {
-  return Success
- }
+ const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/student`)
+ url.searchParams.set('id_terminu', rID)
+ url.searchParams.set('typ', rType)
+ url.searchParams.set('ticket', rTicket)
 }
