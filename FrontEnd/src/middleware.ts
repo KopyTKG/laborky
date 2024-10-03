@@ -19,7 +19,6 @@ export async function middleware(request: NextRequest) {
   }
 
   if (request.url.includes('student') || request.url.includes('ucitel')) {
-   console.log(request.url.toString())
    const STmatch = request.url.match(/([A-Za-z])[1-9]\w+/)
    if (STmatch && request.url.includes('student')) {
     const urlID = [...STmatch][0]

@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import Icon from '@/components/icon'
 import { Get } from '@/app/actions'
+import { tNode } from '@/lib/types'
 
 function Zobrazit({ id }: { id: string }) {
  function APIcall(id: string) {
@@ -46,8 +47,8 @@ function Zapsat({
     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
    }
    const res = await fetch(url.toString(), { method: 'GET', headers })
-   if (res.status != 200) {
-    alert(res.statusText)
+   if (res.status != 200 && res.status != 409) {
+    window.location.href = '/logout'
    } else {
     alert(res.statusText)
    }
@@ -67,7 +68,7 @@ function Zapsat({
  )
 }
 
-export default function Node(props: any) {
+export default function Node(props: tNode) {
  function CheckDate(date: any) {
   let timeToCheck = new Date(date).setHours(new Date(date).getHours() - 24)
   if (new Date().getTime() < new Date(timeToCheck).getTime()) {
@@ -124,15 +125,15 @@ export default function Node(props: any) {
     <div className=" flex self-end">
      {props.typ == 'student' ? (
       <Zapsat
-       id={props.id}
-       owned={props.owned}
+       id={props._id}
+       owned={props.owned || false}
        date={CheckDate(props.start)}
        VolnoRender={VolnoRender}
        CapRender={CapRender}
        volno={props.zapsany >= props.kapacita}
       />
      ) : (
-      <Zobrazit id={props.id} />
+      <Zobrazit id={props._id} />
      )}
     </div>
    </CardFooter>

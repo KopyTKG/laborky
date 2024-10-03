@@ -8,6 +8,7 @@ export type tTermin = {
  kapacita: number
  zapsany: number
  vypsal: string
+ owned?: boolean
 }
 
 export type tLink = {
