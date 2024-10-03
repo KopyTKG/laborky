@@ -533,11 +533,11 @@ if __name__ == "__main__":
     #print(vypis)
     #print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
 
-    #pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
-    #print(pocet_cviceni_pro_p)
+    pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
+    print(pocet_cviceni_pro_p)
 
-    #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
-    #print(vyhodnoceni)
+    vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
+    print(list(vyhodnoceni.keys()))
 
     #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
     #print(vypis_uspesnych)

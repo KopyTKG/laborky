@@ -134,13 +134,22 @@ async def get_student_profil(ticket: str | None = None):
     if userinfo is None:
         return unauthorized
     userid, role = get_userid_and_role(userinfo)
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vypis_vsechny_predmety(session))
+
+
     userid = encode_id(userid)
 
     if role != "ST":
         return unauthorized
 
     pocet_pro_predmet = pocet_cviceni_pro_predmet(session)
-    vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
+    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
+
+    vyhodnoceni = {}
+
+    for predmet in predmety_k_dispozici:
+        if predmet in list(vyhodnoceni_vsech_predmetu.keys()):
+            vyhodnoceni[predmet] = vyhodnoceni_vsech_predmetu[predmet]
 
     # format: {"KodPred": [0, 1, 1]} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
     return vyhodnoceni
