@@ -1,6 +1,7 @@
 import requests
 import os
 from classes.stag import *
+import json
 
 def get_predmet_by_student(ticket, semestr, userid):
     """ Vrátí všechny zapsané předměty studentem v daném semestru (ZS / LS)"""
@@ -34,3 +35,18 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
             aktivni_predmety.append(predmet["katedra"] + predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
     predmety = [item for item in aktivni_predmety if item not in splneno]
     return predmety
+
+
+def pridat_vyucujici_k_terminu(terminy, vyucujici_list):
+    """ Prida vyucujici do terminu """
+    try: 
+        for i, termin in enumerate(terminy):
+            termin_dict = vars(termin)
+            kod = termin_dict["kod_predmet"]
+            vyucujici = vyucujici_list[kod]
+            termin_dict["vyucujici"] = vyucujici
+
+            terminy[i] = termin_dict
+    except:
+        return terminy
+    return terminy

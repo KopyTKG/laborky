@@ -59,6 +59,9 @@ async def get_student_home(ticket: str | None = None):
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici, vyhodnoceni, userid)
         # vrací seznam laborek, které jsou studentovi k dispozici
             # předmět nemá uznaný a studuje ho
+    
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
     return list_terminu
 
@@ -122,6 +125,9 @@ async def get_student_moje(ticket: str | None = None):
     splnene = uspesne_dokoncene_terminy(session, userid)
 
     list_terminu = subtract_lists(historie, splnene)
+    
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
     return list_terminu
 
@@ -171,7 +177,10 @@ async def get_admin_board_next_ones(ticket: str | None = None):
     if role == "ST":
         return unauthorized
     list_terminy_dopredu = terminy_dopredu(session)
-    return list_terminy_dopredu
+
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
+    return list_terminu
 
 #Všechny týdny
 @app.get("/admin")
@@ -186,6 +195,8 @@ async def get_admin_board(ticket: str | None = None):
         return unauthorized
 
     list_terminu = list_terminy(session)
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
     return list_terminu
 
@@ -201,7 +212,9 @@ async def get_ucitel_board_future_ones(ticket: str | None = None):
     if role == "ST":
         return unauthorized
     list_terminy_dopredu = terminy_dopredu_pro_vyucujiciho(session, userid)
-    return list_terminy_dopredu
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
+    return list_terminu
 
 @app.get("/ucitel/moje")
 async def get_ucitel_moje_vypsane(ticket: str | None = None):
@@ -213,6 +226,8 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
     userid, role = get_userid_and_role(userinfo)
     userid = encode_id(userid)
     list_terminu = list_terminy_vyucujici(session, userid)
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
     return list_terminu
 
 
@@ -231,25 +246,29 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
     terminy_dle_predmetu_old = list_probehle_terminy_predmet(session, predmet)
     terminy_dle_predmetu_new = list_planovane_terminy_predmet(session, predmet)
     terminy_dle_predmetu = terminy_dle_predmetu_new + terminy_dle_predmetu_old
-    return terminy_dle_predmetu
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(terminy_dle_predmetu, vyucujici_list)
+    return list_terminu
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime,datum_konec:datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int, vyucuje_id: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
+    
     userid, role = get_userid_and_role(userinfo)
     if role == "ST":
         return unauthorized
+    
     vypsal_id = encode_id(userid)
 
-    zkratka_predmetu, katedra = get_katedra_predmet_by_idterminu(session, kod_predmet)
-    if zkratka_predmetu is None and katedra is None:
-        return internal_server_error
+    kod_predmetu = get_kod_predmetu_by_zkratka(session, kod_predmet)
+    if kod_predmetu is None:
+        return not_found
 
-    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmet)
+    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
     
     if vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
         return ok
@@ -388,6 +407,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,v
     kod_predmetu = katedra + zkratka_predmetu
     vyucuje_id = encode_id(vyucuje_id)
     if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
+        vyucujici_k_predmetum_to_txt(session)
         return ok
     else:
         return 409
@@ -406,14 +426,43 @@ def kontrola_ticketu(ticket):
 
     if userinfo is None:
         return None
-
     return userinfo
 
+
+def vyucujici_k_predmetum_to_txt(session):
+    temp_file = ".temp_vyucujici.txt"
+
+    predmety_kod_katedra = get_vsechny_predmety_kod_katedra(session)
+    vyucujici = {}
+    for predmet in predmety_kod_katedra:
+        vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
+        vyucujici[predmet[1]+predmet[0]] = vyucujici_predmetu if vyucujici_predmetu else []
+
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+    with open(temp_file, "w", encoding="utf-8") as outfile:
+        json.dump(vyucujici, outfile, ensure_ascii=False, indent=4)
+
+
+def read_file():
+    temp_file = ".temp_vyucujici.txt"
+    
+    with open(temp_file, "r", encoding="utf-8") as infile:
+        vyucujici_list = json.load(infile)
+    return vyucujici_list
 
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
+
+    if session:
+        print("Session successfully created!")
+    else:
+        raise Exception("Session creation failed!")
+    vyucujici_k_predmetum_to_txt(session)
+
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')))
+
 
 
 

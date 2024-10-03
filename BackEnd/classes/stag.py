@@ -11,7 +11,11 @@ def get(ticket, url, params):
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
     if not response.ok: 
         raise Exception(response.text)
-    return response.json()
+    try:
+        response = response.json()
+    except:
+        return None
+    return response
 
 
 def get_stag_user_info(ticket):
@@ -33,7 +37,7 @@ def get_stag_user_info(ticket):
     return response
 
 
-def get_predmet_info_stag(zkratka_predmetu, katedra):
+def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
     """ Vrátí informace o predmetu"""
     params = {
         "katedra": katedra,
@@ -50,8 +54,12 @@ def get_predmet_info_stag(zkratka_predmetu, katedra):
     if not response.ok:
         return "chyba"
     
-    response = response.json()
-    return response
+    try:
+        response = response.json()
+    except:
+        return None
+    return response["cvicici"]
+
 
 def get_userid_and_role(json):
     """ Vrací userId a roli uživatele
