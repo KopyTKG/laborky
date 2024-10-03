@@ -26,9 +26,8 @@ async def kontrola_s_databazi(ticket: str | None = None):
         return unauthorized
     userid, role = get_userid_and_role(userinfo)
     if role != "ST":
-        prijmeni = userinfo["prijmeni"]
         userid = encode_id(userid)
-        pridej_vyucujici(session, userid, prijmeni)
+        pridej_vyucujici(session, userid)
     else:
         userid = encode_id(userid)
         vytvor_student(session, userid)
