@@ -402,15 +402,12 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
         uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu)
 
         if uspesne_terminy:
-            for termin in uspesne_terminy:
-                cisla_cviceni = session.query(Termin.cislo_cviceni)\
-                       .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)\
-                       .filter(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu)\
-                       .all()
-                if cisla_cviceni:
-                    for cislo in cisla_cviceni:
-                        cislo = cislo[0] - 1
-                        pocet_pro_predmet[kod_predmetu][cislo] = 1
+            for historie_terminu in uspesne_terminy:
+                termin = session.query(Termin).filter(Termin.id == historie_terminu.termin_id).first()
+                if termin:
+                    cislo_cviceni = termin.cislo_cviceni - 1
+
+                    pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
 
     return pocet_pro_predmet
 
@@ -512,19 +509,19 @@ if __name__ == "__main__":
     #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
     #print(vyhodnoceni)
 
-    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
-    #print(vypis_uspesnych)
+    vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
+    print(vypis_uspesnych)
 
     #print(vypis_vsechny_predmety(session))
     #print(vyhodnoceni)
     #print(list_dostupnych_terminu(session, ['KMPMPS1', 'KPPPO2R'], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
     #print(historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
 
-    print(vypis_vsechny_predmety(session))
-    probehle = list_probehle_terminy_predmet(session, 'MATH202')
-    planovane = list_planovane_terminy_predmet(session, 'MATH202')
+    #print(vypis_vsechny_predmety(session))
+    #probehle = list_probehle_terminy_predmet(session, 'MATH202')
+    #planovane = list_planovane_terminy_predmet(session, 'MATH202')
 
-    print(probehle + planovane)
+    #print(probehle + planovane)
 
     pass
 
