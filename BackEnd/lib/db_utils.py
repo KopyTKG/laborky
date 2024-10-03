@@ -42,3 +42,10 @@ def get_vsechny_predmety(session):
     """ Vrátí zkratky předmětů všech různých předmětů """
     predmety = session.query(Predmet.zkratka_predmetu).all()
     return [predmet.zkratka_predmetu for predmet in predmety]
+
+
+def subtract_lists(list1, list2):
+    """ Odečítání listů (vrátí první list ochuzený o prvky z prvního listu)"""
+    result = list(set(list1) - set(list2))
+    return result
+

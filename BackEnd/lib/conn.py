@@ -237,53 +237,6 @@ def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, poc
     session.add(predmet)
     session.commit()
     return True
-def list_predmety(session):
-    predmety = session.query(Predmet).all()
-    predmet_list = [predmet for predmet in predmety]
-    return predmet_list
-
-def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
-    current_date = datetime.now()
-
-    terminy = session.query(Termin).filter(
-        and_(
-            Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
-            Termin.datum_start > current_date - timedelta(hours=1),  # Terms that have not passed yet and the ones that barely started (1 hour ago eg.)
-        )
-    ).order_by(Termin.datum_start.desc()).all()
-
-    terminy_list = []
-
-    for termin in terminy:
-        kod_predmetu = termin.kod_predmet
-        cislo_cviceni = termin.cislo_cviceni
-
-        if kod_predmetu in historie_predmetu:
-            if historie_predmetu[kod_predmetu][cislo_cviceni - 1] != 0:
-                continue  # Skip this term since the student already completed it
-
-        already_registered = session.query(HistorieTerminu).join(Termin).filter(
-            and_(
-                HistorieTerminu.student_id == id_studenta,
-                Termin.kod_predmet == kod_predmetu,
-                Termin.cislo_cviceni == cislo_cviceni
-            )
-        ).first()
-
-        if already_registered:
-            continue
-
-        attended = session.query(HistorieTerminu).filter(
-            and_(
-                HistorieTerminu.student_id == id_studenta,
-                HistorieTerminu.termin_id == termin.id
-            )
-        ).first()
-
-        if attended is None:
-            terminy_list.append(termin)
-
-    return terminy_list
 
 
 ### TERMINY
@@ -297,16 +250,6 @@ def vypsat_termin(session, ucebna:Text, datum_start:datetime,datum_konec:datetim
     session.commit()
     return True
 
-
-def list_terminy_vyucujici(session, id):
-    terminy = session.query(Termin).filter(Termin.vyucuje_id == id).order_by(Termin.datum_start.desc())
-    if terminy is None:
-        print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
-        return False
-    for termin in terminy:
-        print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
-    terminy_list = [termin for termin in terminy]
-    return terminy_list
 
 def historie_studenta(session, id):
     student = session.query(Student).filter_by(id=id).first()
@@ -330,20 +273,6 @@ def uspesne_dokoncene_terminy(session, id):
             splnene_terminy.append(termin)
     return splnene_terminy
 
-def terminy_dopredu(session):
-    start_date = datetime.now()
-    end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date)).order_by(Termin.datum_start.asc())
-    terminy_list = [termin for termin in terminy]
-    return terminy_list
-
-
-def terminy_dopredu_pro_vyucujiciho(session, id):
-    start_date = datetime.now()
-    end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum_start.asc())
-    terminy_list = [termin for termin in terminy]
-    return terminy_list
 
 def pocet_cviceni_pro_predmet(session):
     predmety = session.query(distinct(Predmet.kod_predmetu)).all()
@@ -403,12 +332,6 @@ def vypis_uspesnych_studentu(session, zkratka_predmetu):
             vyhodnoceni_studentu[student.id] = vyhodnoceni
 
     return vyhodnoceni_studentu
-
-
-def subtract_lists(list1, list2):
-    # Convert both lists to sets and subtract list2 from list1
-    result = list(set(list1) - set(list2))
-    return result
 
 
 if __name__ == "__main__":
