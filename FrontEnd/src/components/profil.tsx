@@ -1,39 +1,34 @@
-'use client'
 import { Get } from '@/app/actions'
 import { Badge } from '@/components/ui/badge'
 import { Divider } from '@/components/ui/divider'
 import { tPredmet } from '@/lib/types'
-import { useLayoutEffect, useState } from 'react'
+import { Chip } from '@nextui-org/react'
+import { redirect } from 'next/navigation'
 
-export default function Profil() {
- const [predmety, setPredmety] = useState<tPredmet[]>([] as tPredmet[])
- useLayoutEffect(() => {
-  const fetchPredmety = async () => {
-   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/profil`)
-    const cookie = await Get('stagUserTicket')
-    if (cookie) {
-     url.searchParams.set('ticket', cookie.value)
-    }
-    const headers = {
-     Accept: 'application/json',
-     'Content-Type': 'application/json',
-     Connection: 'keep-alive',
-     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
-    }
-    const res = await fetch(url.toString(), { method: 'GET', headers })
-    if (res.status != 200) {
-     window.location.href = '/logout'
-    } else if (res.status == 200) {
-     let jsonParsed = await res.json()
-     setPredmety(jsonParsed.data as tPredmet[])
-    }
-   } catch {
-    window.location.href = '/logout'
-   }
+export default async function Profil() {
+ let predmety: tPredmet[] = []
+ try {
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/profil`)
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
   }
-  fetchPredmety()
- }, [])
+  const headers = {
+   Accept: 'application/json',
+   'Content-Type': 'application/json',
+   Connection: 'keep-alive',
+   'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
+  }
+  const res = await fetch(url.toString(), { method: 'GET', headers })
+  if (res.status != 200) {
+   redirect('/logout')
+  } else if (res.status == 200) {
+   let jsonParsed = await res.json()
+   predmety = jsonParsed.data as tPredmet[]
+  }
+ } catch {
+  redirect('/logout')
+ }
 
  return (
   <>
@@ -45,16 +40,19 @@ export default function Profil() {
        <div className="w-full h-max p-2 bg-zinc-800 rounded flex flex-col gap-1">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
-          <div key={datum.toLocaleString() + key} className="flex flex-row justify-between">
-           <span>{`Laboratorní cvičení ${key + 1}`}</span>
-           <Badge variant={datum ? 'success' : 'danger'}>
-            {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
-           </Badge>
-          </div>
+          <>
+           <div key={datum.toLocaleString() + key} className="flex flex-row justify-between">
+            <span>{`Laboratorní cvičení ${key + 1}`}</span>
+            <Chip color={datum ? 'success' : 'danger'}>
+             {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
+            </Chip>
+           </div>
+           <Divider />
+          </>
          )
         })}
        </div>
-       <Divider />
+       <Divider margin="my4" variant="ghost" />
       </div>
      )
     })}

@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     cislo: item.cislo_cviceni,
     kapacita: item.max_kapacita,
     zapsany: item.aktualni_kapacita,
-    vypsal: item.vyucuje_id,
+    vypsal: ['Ucitel 1', 'Ucitel 2'] as string[],
    }
    terminy.push(tmp)
   })
@@ -74,7 +74,7 @@ export async function GET(req: Request) {
     cislo: item.cislo_cviceni,
     kapacita: item.max_kapacita,
     zapsany: item.aktualni_kapacita,
-    vypsal: item.vyucuje_id,
+    vypsal: ['Ucitel 1', 'Ucitel 2'] as string[],
    }
    terminy.push(tmp)
   })

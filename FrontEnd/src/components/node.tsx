@@ -1,17 +1,18 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import Icon from '@/components/icon'
 import { Get } from '@/app/actions'
 import { tNode } from '@/lib/types'
 import React from 'react'
+import { Button } from '@nextui-org/react'
+import { CalendarDays, Clock, MapPin, UsersRound } from 'lucide-react'
 
 function Zobrazit({ id }: { id: string }) {
  function APIcall(id: string) {
   alert(id)
  }
  return (
-  <Button onClick={() => APIcall(id)} variant="secondary">
+  <Button onClick={() => APIcall(id)} color="default">
    Zobrazit
   </Button>
  )
@@ -61,8 +62,7 @@ function Zapsat({
  }
  return (
   <Button
-   className="border border-black"
-   variant={owned ? 'danger' : CapRender ? 'danger' : 'success'}
+   color={owned ? 'danger' : CapRender ? 'danger' : 'success'}
    disabled={!owned ? VolnoRender : date ? false : true}
    onClick={() => APIcall(id, setReload)}>
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
@@ -96,49 +96,55 @@ export default function Node(props: tNode) {
  return (
   <Card className="w-[25rem] h-max bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
    <CardHeader>
-    <div className="text-2xl font-bold">{`${props.predmet} Laboratorní cvičení ${props.cislo}`}</div>
+    <div className="text-2xl font-bold">{`${props.predmet} cvičení ${props.cislo}`}</div>
    </CardHeader>
    <Divider />
    <CardContent>
-    <div className="text-md flex flex-col">
+    <div className="text-md flex flex-col my-2">
      <div className="flex flex-row justify-start gap-1 ">
-      <Icon name="clock" className="w-6" />
+      <Clock className="w-6" />
       <div className="pt-1">
        {new Date(props.start).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })} -
        {new Date(props.end).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}
       </div>
      </div>
      <div className="flex flex-row justify-start gap-1">
-      <Icon name="calendar-days" className="w-6" />
+      <CalendarDays className="w-6" />
       <div className="pt-1">{new Date(props.end).toLocaleDateString()}</div>
      </div>
      <div className="flex flex-row justify-start gap-1">
-      <Icon name="map-pin" className="w-6" />
+      <MapPin className="w-6" />
       <div className="pt-1">{props.location}</div>
      </div>
     </div>
    </CardContent>
    <CardFooter className="flex justify-between width-fultems-center">
-    <div className="flex flex-col gap-1">
-     <div className="flex self-start gap-2 items-center">
-      {`${props.zapsany} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
+    <div className="flex flex-col gap-1 w-full">
+     <div className="self-end">
+      <div className="flex self-start gap-2 items-center">
+       {`${props.zapsany} / ${props.kapacita}`} <UsersRound className="w-7" />
+      </div>
      </div>
-     <span className="text-sm">{`${/*props.vypsal*/ 'Jmeno to be added'}`}</span>
-    </div>
-    <div className=" flex self-end">
-     {props.typ == 'student' ? (
-      <Zapsat
-       id={props._id}
-       owned={props.owned || false}
-       date={CheckDate(props.start)}
-       VolnoRender={VolnoRender}
-       CapRender={CapRender}
-       volno={props.zapsany >= props.kapacita}
-       setReload={props.setReload}
-      />
-     ) : (
-      <Zobrazit id={props._id} />
-     )}
+     <div className="flex flex-row justify-between">
+      <div className="flex flex-col gap-1">
+       {props.vypsal.map((item: string, key: number) => (
+        <span key={item + key} className="text-xs">{`${item}`}</span>
+       ))}
+      </div>
+      {props.typ == 'student' ? (
+       <Zapsat
+        id={props._id}
+        owned={props.owned || false}
+        date={CheckDate(props.start)}
+        VolnoRender={VolnoRender}
+        CapRender={CapRender}
+        volno={props.zapsany >= props.kapacita}
+        setReload={props.setReload}
+       />
+      ) : (
+       <Zobrazit id={props._id} />
+      )}
+     </div>
     </div>
    </CardFooter>
   </Card>

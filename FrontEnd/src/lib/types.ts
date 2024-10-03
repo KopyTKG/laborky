@@ -9,7 +9,7 @@ export type tTermin = {
  cislo: number
  kapacita: number
  zapsany: number
- vypsal: string
+ vypsal: string[]
  owned?: boolean
 }
 
@@ -27,7 +27,7 @@ export type tLink = {
 
 export type tPredmet = {
  nazev: string
- cviceni: number[] //Date[] | undefined
+ cviceni: number[]
 }
 
 export type tPredmetInfo = {
