@@ -1,14 +1,33 @@
-import { User } from '@/data/categorie'
-import { Unauthorized } from '@/lib/http'
+import { NotFound, Unauthorized } from '@/lib/http'
+import { fastHeaders } from '@/lib/stag'
+import { tPredmet } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
- const url = new URL(req.url)
- const rTicket = url.searchParams.get('ticket') || ''
+ const base = new URL(req.url)
+ const rTicket = base.searchParams.get('ticket') || ''
 
  if (!rTicket) {
   return Unauthorized
  }
- return Response.json({ data: User }, { status: 200 })
+ const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/profil`)
+ url.searchParams.set('ticket', rTicket)
+
+ const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+ if (!res.ok) {
+  return NotFound
+ }
+ const data = (await res.json()) as { [key: string]: number[] }
+ const keys = Object.keys(data)
+ const parsed: tPredmet[] = []
+ keys.forEach((item: string) => {
+  let tmp: tPredmet = {
+   nazev: item,
+   cviceni: data[item],
+  }
+  parsed.push(tmp)
+ })
+
+ return Response.json({ data: parsed }, { status: 200 })
 }

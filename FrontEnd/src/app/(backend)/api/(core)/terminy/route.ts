@@ -23,10 +23,12 @@ export async function GET(req: Request) {
 
  const role = await roleRes.json()
 
- //let apipoint = '/ucitel'
- //if (role === 'ST') {
- let apipoint = '/student'
- //}
+ let apipoint = '/ucitel'
+ if (role === 'ST') {
+  apipoint = '/student'
+ } else if (role === 'RE') {
+  apipoint = '/admin'
+ }
 
  if (!rType || (rType != 'vypsane' && rType != 'zapsane')) {
   return NotFound
@@ -57,7 +59,7 @@ export async function GET(req: Request) {
   return Response.json({ data: sorted }, { status: 200 })
  } else {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}/moje`)
-  url.searchParams.set('set', rTicket)
+  url.searchParams.set('ticket', rTicket)
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (!res.ok) {
    return NotFound

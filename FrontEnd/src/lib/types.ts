@@ -1,5 +1,3 @@
-import internal from 'stream'
-
 export type tTermin = {
  _id: string
  location: string
@@ -20,7 +18,7 @@ export type tLink = {
 
 export type tPredmet = {
  nazev: string
- cviceni: Date[]
+ cviceni: number[] //Date[] | undefined
 }
 
 export type tPredmetInfo = {
