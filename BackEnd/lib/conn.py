@@ -166,7 +166,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
             print(f"Termin s ID {termin_id} je splnen.")
             return 1
         konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
-        if (konkretni_termin.start_time - datetime.now()) < timedelta(hours=24):
+        if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=24):
             return 2
         konkretni_termin.aktualni_kapacita -= 1
 
