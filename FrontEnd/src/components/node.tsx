@@ -53,7 +53,7 @@ export default function Node(props: tNode) {
    </CardContent>
    <CardFooter className="flex justify-between width-fultems-center">
     <div className="grid grid-cols-[70%_30%] gap-1 w-full">
-     <div className="flex flex-col gap-1">
+     <div className="flex flex-col gap-1 justify-end">
       {props.vypsal.map((item: string, key: number) => (
        <span key={item + key} className="text-xs">{`${item}`}</span>
       ))}
