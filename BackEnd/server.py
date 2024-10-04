@@ -256,14 +256,15 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
 
 
 @app.get("/ucitel/board_by_predmet")
-async def get_terminy_by_predmet(ticket: str , predmety: str):
+async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     #ticket = os.getenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
     if predmety is None:
-        return not_found
+        pomocny_list = await get_predmety(ticket)
+        predmety = ";".join(pomocny_list)
     list_predmetu = predmety.split(";")
     list_terminu = []
     vyucujici_list = read_file()
@@ -271,7 +272,7 @@ async def get_terminy_by_predmet(ticket: str , predmety: str):
         predmet = get_kod_predmetu_by_zkratka(session, predmet)
         list_terminu.extend(list_probehle_terminy_predmet(session, predmet))
         list_terminu.extend(list_planovane_terminy_predmet(session, predmet))
-    list_terminu = pridat_vyucujici_k_terminu(terminy_dle_predmetu, vyucujici_list)
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
     return list_terminu
 
 
