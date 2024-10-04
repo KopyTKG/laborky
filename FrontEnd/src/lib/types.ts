@@ -14,6 +14,10 @@ export type tTermin = {
  owned?: boolean
 }
 
+export type tSelected = {
+ s: string | undefined
+}
+
 export type tNode = tTermin & {
  owned: boolean
  typ: string

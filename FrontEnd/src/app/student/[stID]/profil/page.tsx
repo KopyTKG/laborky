@@ -1,13 +1,9 @@
-import { headers as h } from 'next/headers'
 import Profil from '@/components/profil'
 export default function ProfilePage() {
- const headers = h()
- const url = headers.get('referer')
- const user = url?.split('/').reverse()[1]
  return (
   <>
    <div className="flex flex-col w-full mx-auto">
-    <div className="text-4xl font-bold underline py-5">{user}</div>
+    <div className="text-4xl font-bold underline py-5">Student</div>
     <Profil />
    </div>
   </>
