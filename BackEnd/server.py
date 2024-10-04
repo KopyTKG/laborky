@@ -436,7 +436,17 @@ def vyucujici_k_predmetum_to_txt(session):
     vyucujici = {}
     for predmet in predmety_kod_katedra:
         vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
-        vyucujici[predmet[1]+predmet[0]] = vyucujici_predmetu if vyucujici_predmetu else []
+        if vyucujici_predmetu is None:
+            vyucujici_seznam = []
+        
+        elif isinstance(vyucujici_predmetu, str):
+            vyucujici_seznam = [name.strip() for name in vyucujici_predmetu.split(',')] if vyucujici_predmetu.strip() else []
+        else:
+            vyucujici_seznam = []
+
+        # Combine department and course code to form a unique key
+        vyucujici[predmet[1] + predmet[0]] = vyucujici_seznam
+
 
     if os.path.exists(temp_file):
         os.remove(temp_file)
