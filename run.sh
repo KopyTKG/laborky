@@ -9,7 +9,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		tmux has-session -t $SESH 2>/dev/null
 		if [ $? != 0 ]; then
 			tmux new-session -d -s $SESH -n "api"
-			tmux send-keys -t $SESH:api "cd Backend	&& python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python server.py" C-m
+			tmux send-keys -t $SESH:api "cd Backend	&& python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && sleep 5 && python server.py" C-m
 
 			tmux new-window -t $SESH -n "webserver"
 			tmux send-keys -t $SESH:webserver "cd FrontEnd && bun install && bun run dev" C-m
