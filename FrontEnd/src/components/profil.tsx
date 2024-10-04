@@ -36,7 +36,7 @@ export default async function Profil() {
     {predmety.map((predmet: tPredmet, key: number) => {
      return (
       <div className="mb-3" key={predmet.nazev}>
-       <h3 className="font-bold text-2xl">{predmet.nazev}</h3>
+       <h3 className="font-bold text-2xl ">{predmet.nazev}</h3>
        <div className="w-full h-max p-3  bg-stone-900 rounded-2xl flex flex-col gap-1">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
