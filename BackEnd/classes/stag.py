@@ -65,6 +65,8 @@ def get_userid_and_role(json):
     """ Vrací userId a roli uživatele
     json: json, který vrací funkce "get_stag_user_info"""
     role = json["stagUserInfo"][0]["role"]
+    if role == "":
+        return internal_server_error, internal_server_error
     if role != "ST":
         userid = "VY" + str(json["stagUserInfo"][0]["ucitIdno"])
     else:

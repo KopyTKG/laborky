@@ -28,12 +28,18 @@ async def kontrola_s_databazi(ticket: str | None = None):
     if userinfo is None:
         return unauthorized
     userid, role = get_userid_and_role(userinfo)
+    if role == internal_server_error:
+        return internal_server_error
     if role != "ST":
         userid = encode_id(userid)
-        vytvor_vyucujici(session, userid)
+        message = vytvor_vyucujici(session, userid)
+        if message == internal_server_error:
+            return internal_server_error
     else:
         userid = encode_id(userid)
-        vytvor_student(session, userid)
+        message = vytvor_student(session, userid)
+        if message == internal_server_error:
+            return internal_server_error
     return role
 
 
@@ -48,6 +54,9 @@ async def get_student_home(ticket: str | None = None):
         return unauthorized
 
     userid, role = get_userid_and_role(userinfo)
+    if role == internal_server_error:
+        return internal_server_error
+    
     userid = encode_id(userid)
 
     if role != "ST":
@@ -85,20 +94,27 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     userid, role = get_userid_and_role(userinfo)
     userid = encode_id(userid)
     if typ == "zapsat":
-        if zapsat_se_na_termin(session, userid, id_terminu):
-            return ok
-        else:
+        message = zapsat_se_na_termin(session, userid, id_terminu) 
+        if message == not_found:
+            return not_found
+        elif message == conflict:
             return conflict
+        elif message == internal_server_error:
+            return internal_server_error
+        else:
+            return ok
     elif typ == "odhlasit":
         message = odepsat_z_terminu(session, userid, id_terminu)
-        if message == 0:
+        if message == ok:
             return ok
-        elif message == 1: # uzivatel se chtel odepsat z termínu, který má splněný
+        elif message == unauthorized: # uzivatel se chtel odepsat z termínu, který má splněný
             return unauthorized
-        elif message == 2: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
+        elif message == conflict: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
             return conflict
-        elif message == 3: # uzivatel se chtel přihlásit na termín který neexistuje
+        elif message == bad_request: # uzivatel se chtel přihlásit na termín který neexistuje
             return bad_request
+        else:
+            return internal_server_error
     else:
         return bad_request
 
@@ -123,8 +139,17 @@ async def get_student_moje(ticket: str | None = None):
     userid = encode_id(userid)
 
     historie = historie_studenta(session, userid)
-    splnene = uspesne_dokoncene_terminy(session, userid)
+    if historie == not_found:
+        return not_found
+    elif historie == internal_server_error:
+        return internal_server_error
 
+    splnene = uspesne_dokoncene_terminy(session, userid)
+    if splnene == internal_server_error:
+        return internal_server_error
+    if splnene == not_found:
+        return not_found
+    
     list_terminu = subtract_lists(historie, splnene)
     
     vyucujici_list = read_file()
@@ -270,8 +295,10 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
         return not_found
 
     vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
-    
-    if vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni):
+    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni)
+    if message == not_found:
+        return not_found
+    elif message == ok:
         return ok
     else:
         return internal_server_error
@@ -292,9 +319,13 @@ async def ucitel_zmena_terminu(
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    if upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni):
+        message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni)
+    if message == ok:
         return ok
-    return internal_server_error
+    if message == not_found:
+        return not_found
+    else:
+        return internal_server_error
 
 
 @app.delete("/ucitel/termin")
@@ -306,7 +337,9 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
     userid, role = get_userid_and_role(userinfo)
     if role == "ST":
         return unauthorized
-    if smazat_termin(session, id_terminu):
+    if smazat_termin(session, id_terminu) == not_found:
+        return not_found
+    if smazat_termin(session, id_terminu) == ok:
         return ok
     return internal_server_error
 
@@ -345,12 +378,14 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
         return unauthorized
     id_stud = encode_id(id_stud)
     status_message = pridat_studenta(session, id_stud, id_terminu)
-    if status_message == 0:
+    if message == ok:
         return ok
-    elif status_message == 1 :
+    elif status_message == not_found :
         return not_found
-    else:
+    elif status_message == conflict:
         return conflict
+    else: 
+        return internal_server_error
 
 
 @app.post("/ucitel/splneno")
@@ -360,10 +395,13 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     if ticket is None or ticket == "":
         return unauthorized
     id_stud = encode_id(id_stud)
-    if uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni):
-        return ok
-    else:
+    message = uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni)
+    if message == 404:
         return not_found
+    elif message == 500:
+        return internal_server_error
+    else:
+        return ok 
 
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
@@ -407,11 +445,15 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,v
         return unauthorized
     kod_predmetu = katedra + zkratka_predmetu
     vyucuje_id = encode_id(vyucuje_id)
-    if vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
+    message = vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni)
+
+    if message == ok:
         vyucujici_k_predmetum_to_txt(session)
         return ok
+    elif message == conflict:
+        return conflict
     else:
-        return 409
+        return internal_server_error
 
 
 def encode_id(id):

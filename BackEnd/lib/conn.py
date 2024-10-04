@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
 import uuid
 from datetime import datetime, timedelta
-
+from sqlalchemy.exc import SQLAlchemyError
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -108,188 +108,271 @@ class HistorieTerminu(Base):
 
 ### TVORBA UZIVATEL
 def vytvor_student(session, id):
-    if session.query(Student).filter_by(id=id).first() is None:
-        student = Student(id=id, datum_vytvoreni=datetime.now())
-        session.add(student)
-        session.commit()
-        return True
-    return False
+    try:
+        if session.query(Student).filter_by(id=id).first() is None:
+            student = Student(id=id, datum_vytvoreni=datetime.now())
+            session.add(student)
+            session.commit()
+            return ok
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
 
 
 def vytvor_vyucujici(session, id):
-    if session.query(Vyucujici).filter_by(id=id).first() is None:
-        vyucujici = Vyucujici(id=id)
-        session.add(vyucujici)
-        session.commit()
-        return True
-    return False
+    try:
+        if session.query(Vyucujici).filter_by(id=id).first() is None:
+            vyucujici = Vyucujici(id=id)
+            session.add(vyucujici)
+            session.commit()
+            return ok
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
 
 
 ### USER ACTIONS
-def zapis_predmet(session, kod_predmetu, student_id):
-    zapsane_predmety = ZapsanePredmety(uuid=uuid.uuid4(),zapsano=datetime.now(), student_id=student_id, kod_predmet=kod_predmetu)
-    session.add(zapsane_predmety)
-    session.commit()
-    return True
-
-
 def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None):
-    termin = session.query(Termin).filter(Termin.id == id_terminu).first()
-    if termin is None:
-        print(f"Termin s ID {id_terminu} neexistuje.")
-        return False
+    try:
+        termin = session.query(Termin).filter(Termin.id == id_terminu).first()
+        
+        if termin is None:
+            return not_found
 
-    if newStartDatum is not None:
-        termin.datum_start = newStartDatum
+        if newStartDatum is not None:
+            termin.datum_start = newStartDatum
 
-    if newKonecDatum is not None:
-        termin.datum_konec = newKonecDatum
+        if newKonecDatum is not None:
+            termin.datum_konec = newKonecDatum
 
-    if newUcebna is not None:
-        termin.ucebna = newUcebna
+        if newUcebna is not None:
+            termin.ucebna = newUcebna
 
-    if newMax_kapacita is not None:
-        termin.max_kapacita = newMax_kapacita
+        if newMax_kapacita is not None:
+            termin.max_kapacita = newMax_kapacita
 
-    if newJmeno is not None:
-        termin.jmeno = newJmeno
+        if newJmeno is not None:
+            termin.jmeno = newJmeno
 
-    if cislo_cviceni is not None:
-        termin.cislo_cviceni = cislo_cviceni
+        if cislo_cviceni is not None:
+            termin.cislo_cviceni = cislo_cviceni
 
-    session.commit()
-    return True
-
+        session.commit()
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
 
 def odepsat_z_terminu(session, student_id, termin_id):
-    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id).first()
-    if termin:
-        if termin.datum_splneni is not None:
-            print(f"Termin s ID {termin_id} je splnen.")
-            return 1
-        konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
-        if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=24):
-            return 2
-        konkretni_termin.aktualni_kapacita -= 1
+    try:
+        termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id,HistorieTerminu.student_id == student_id).first()
 
-        session.delete(termin)
-        session.commit()
-        return 0
-    else:
-        print(f"Termin s ID {termin_id} neexistuje. Nebo na termin nejste prihlasen.")
-        return 3
+        if termin:
+            if termin.datum_splneni is not None:
+                return unauthorized
 
+            konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
+
+            if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=24):
+                return conflict
+
+            konkretni_termin.aktualni_kapacita -= 1
+
+            session.delete(termin)
+            session.commit()
+            return ok
+        else:
+            return bad_request
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 def zapsat_se_na_termin(session, student_id, termin_id):
-    zapsat_na_termin = HistorieTerminu(id = uuid.uuid4(),student_id = student_id,termin_id = termin_id)
-    termin = session.query(Termin).filter(Termin.id == termin_id).first()
-    if termin.aktualni_kapacita >= termin.max_kapacita:
-        print(f"Termin s ID {termin_id} je plny. Nebo na termin nejste prihlasen.")
-        return False
-    else:
+    try:
+        zapsat_na_termin = HistorieTerminu(id=uuid.uuid4(), student_id=student_id, termin_id=termin_id)
+
+        termin = session.query(Termin).filter(Termin.id == termin_id).first()
+        
+        if termin is None:
+            return not_found
+        
+        if termin.aktualni_kapacita >= termin.max_kapacita:
+            return conflict
+        
         termin.aktualni_kapacita += 1
         session.add(zapsat_na_termin)
         session.commit()
-        return True
+        
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 
 def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
+    try:
+        uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta,Termin.kod_predmet == kod_predmetu,HistorieTerminu.datum_splneni != None)).all()
+        uspesni_studenti_list = [student for student in uspesni_studenti]
+        return uspesni_studenti_list
 
-    uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta, Termin.kod_predmet == kod_predmetu, HistorieTerminu.datum_splneni != None)).all()
-    uspesni_studenti_list = [student for student in uspesni_studenti]
-    return uspesni_studenti_list
+    except:
+        return False
 
 def smazat_termin(session, id_terminu):
-    if session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first() is None:
-        print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
-        return False
-    termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
-    session.delete(termin)
-    session.commit()
-    return True
+    try:
+        termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
+        
+        if termin is None:
+            print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
+            return 404
+        
+        session.delete(termin)
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error 
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
-    termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_terminu, HistorieTerminu.student_id == id_studenta)).first()
-    if zvolene_datum_splneni is not None:
-        termin.datum_splneni = zvolene_datum_splneni
-    else:
-        termin.datum_splneni = datetime.now()
-    session.commit()
-    return True
+    try:
+        termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_terminu,HistorieTerminu.student_id == id_studenta)).first()
+
+        if termin is None:
+            return 404
+
+        if zvolene_datum_splneni is not None:
+            termin.datum_splneni = zvolene_datum_splneni
+
+        else:
+            termin.datum_splneni = datetime.now()
+        
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
-    if session.query(Student).filter_by(id=student_id).first() is None:
-        return 1
-    elif session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id)).first() is not None:
-        return 2
-    zapis_termin = HistorieTerminu(id=uuid.uuid4(),student_id=student_id,termin_id=termin_id,datum_splneni=datum_splneni)
-    session.add(zapis_termin)
-    termin = session.query(Termin).filter(Termin.id == termin_id).first()
-    termin.aktualni_kapacita += 1
-    session.commit()
-    return 0
+    try:
+        if session.query(Student).filter_by(id=student_id).first() is None:
+            return not_found
+
+        elif session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id,HistorieTerminu.student_id == student_id)).first() is not None:
+            return conflict
+
+        zapis_termin = HistorieTerminu(id=uuid.uuid4(),student_id=student_id,termin_id=termin_id,datum_splneni=datum_splneni)
+
+        session.add(zapis_termin)
+
+        termin = session.query(Termin).filter(Termin.id == termin_id).first()
+        termin.aktualni_kapacita += 1
+
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 ### PREDMETY
-def vytvor_predmet(session,kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni):
-    if session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first() is not None:
-        return False
-    predmet=Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id, pocet_cviceni=pocet_cviceni)
-    session.add(predmet)
-    session.commit()
-    return True
+def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id, pocet_cviceni):
+    try:
+        if session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first() is not None:
+            return conflict
 
+        predmet = Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id,pocet_cviceni=pocet_cviceni)
+
+        session.add(predmet)
+
+        session.commit()
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
 
 ### TERMINY
-def vypsat_termin(session, ucebna:Text, datum_start:datetime,datum_konec:datetime, max_kapacita:int, vypsal_id:Text, vyucuje_id:Text, kod_predmet:Text, jmeno:Text, cislo_cviceni:int,  aktualni_kapacita=0):
-    vyucujici = session.query(Vyucujici).filter_by(id=vyucuje_id).first()
-    if vyucujici is None:
-        print("Neplatne ID vyucujiciho! Zda se ze vyucujici neni zaregistrovan")
-        return False
-    termin = Termin(id=uuid.uuid4(), ucebna=ucebna, datum_start=datum_start,datum_konec=datum_konec, aktualni_kapacita=aktualni_kapacita, max_kapacita=max_kapacita, vypsal_id=vypsal_id, vyucuje_id=vyucuje_id, kod_predmet=kod_predmet, jmeno=jmeno, cislo_cviceni=cislo_cviceni)
-    session.add(termin)
-    session.commit()
-    return True
+def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: datetime, max_kapacita: int, vypsal_id: Text, vyucuje_id: Text, kod_predmet: Text, jmeno: Text, cislo_cviceni: int, aktualni_kapacita=0):
+    try:
+        vyucujici = session.query(Vyucujici).filter_by(id=vyucuje_id).first()
+        if vyucujici is None:
+            return not_found
+
+        termin = Termin(id=uuid.uuid4(),ucebna=ucebna,datum_start=datum_start,datum_konec=datum_konec,aktualni_kapacita=aktualni_kapacita,max_kapacita=max_kapacita,vypsal_id=vypsal_id,vyucuje_id=vyucuje_id,kod_predmet=kod_predmet,jmeno=jmeno,cislo_cviceni=cislo_cviceni)
+
+        session.add(termin)
+
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 
 def historie_studenta(session, id):
-    student = session.query(Student).filter_by(id=id).first()
-    termins = []
-    if student is None:
-        return False
-    for history in student.historie_terminu:
-        termin = history.termin
-        termins.append(termin)
-    return termins
+    try:
+        student = session.query(Student).filter_by(id=id).first()
+        
+        if student is None:
+            return not_found
 
+        termins = []
+        for history in student.historie_terminu:
+            termin = history.termin
+            termins.append(termin)
+
+        return termins
+
+    except:
+        return internal_server_error
 
 def uspesne_dokoncene_terminy(session, id):
-    student = session.query(Student).filter_by(id=id).first()
-    splnene_terminy = []
-    if student is None:
-        return False
-    for history in student.historie_terminu:
-        termin = history.termin
-        if history.datum_splneni is not None:
-            splnene_terminy.append(termin)
-    return splnene_terminy
+    try:
+        student = session.query(Student).filter_by(id=id).first()
+        
+        if student is None:
+            return not_found
+        
+        splnene_terminy = []
+        for history in student.historie_terminu:
+            termin = history.termin
+            if history.datum_splneni is not None:
+                splnene_terminy.append(termin)
 
+        return splnene_terminy
+
+    except:
+        return internal_server_error
 
 def pocet_cviceni_pro_predmet(session):
-    predmety = session.query(distinct(Predmet.kod_predmetu)).all()
-    predmet_pocet_cviceni = {}
+    try:
+        predmety = session.query(distinct(Predmet.kod_predmetu)).all()
+        predmet_pocet_cviceni = {}
 
-    for predmet in predmety:
-        nazev = predmet[0]
-        predmet_obj = session.query(Predmet).filter_by(kod_predmetu=nazev).first()
+        if not predmety:
+            return {}
 
-        if predmet_obj:
-            pocet_cviceni = predmet_obj.pocet_cviceni
-            if pocet_cviceni:
-                predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
-            else:
-                predmet_pocet_cviceni[nazev] = []
+        for predmet in predmety:
+            nazev = predmet[0]
+            predmet_obj = session.query(Predmet).filter_by(kod_predmetu=nazev).first()
 
-    return predmet_pocet_cviceni
+            if predmet_obj:
+                pocet_cviceni = predmet_obj.pocet_cviceni
+                if pocet_cviceni:
+                    predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
+                else:
+                    predmet_pocet_cviceni[nazev] = []
+
+        return predmet_pocet_cviceni
+
+    except:
+        return internal_server_error
 
 
 # zde nesmi prichazet parametr katedra - musi si to brat z "Uspesne zakonceni studenta"
@@ -319,7 +402,8 @@ def vypis_uspesnych_studentu(session, zkratka_predmetu):
     )
 
     kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
-
+    if kod_predmetu is None:
+        return not_found
     pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
 
     vyhodnoceni_studentu = {}
