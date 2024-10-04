@@ -6,6 +6,7 @@ export type tTermin = {
  start: Date
  end: Date
  predmet: string
+ poznamka?: string
  cislo: number
  kapacita: number
  zapsany: number
