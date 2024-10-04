@@ -33,7 +33,7 @@ export default async function Profil() {
  return (
   <>
    <div className="w-full">
-    {predmety.map((predmet: tPredmet) => {
+    {predmety.map((predmet: tPredmet, key: number) => {
      return (
       <div className="mb-3" key={predmet.nazev}>
        <h3 className="font-bold text-2xl">{predmet.nazev}</h3>
@@ -47,12 +47,12 @@ export default async function Profil() {
              {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
             </Chip>
            </div>
-           <Divider />
+           {key < predmet.cviceni.length - 1 && <Divider />}
           </>
          )
         })}
        </div>
-       <Divider margin="my4" variant="ghost" />
+       {key < predmety.length - 1 && <Divider margin="my4" variant="ghost" />}
       </div>
      )
     })}

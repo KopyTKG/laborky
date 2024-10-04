@@ -36,6 +36,7 @@ FrontEnd/package-lock.json
 
 # dummy data
 BackEnd/lib/dummyGen.py
+BackEnd/.temp_vyucujici.txt
 database/data
 
 # leaks
