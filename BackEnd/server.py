@@ -439,6 +439,8 @@ def vyucujici_k_predmetum_to_txt(session):
         vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
         if vyucujici_predmetu is None:
             vyucujici_seznam = []
+        elif vyucujici_predmetu == "":
+            vyucujici_seznam = []
         else:
             vyucujici_seznam = vyucujici_predmetu.split("', '")
         
