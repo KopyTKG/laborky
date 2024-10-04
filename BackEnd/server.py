@@ -75,7 +75,7 @@ async def get_student_home(ticket: str | None = None):
 
     return list_terminu
 
-
+ 
 @app.post("/student")
 async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně
@@ -175,7 +175,21 @@ async def get_student_profil(ticket: str | None = None):
 
 ### Ucitel API
 #Cvičení příští týden
-# TOHLE DODĚLAT
+
+@app.get("/predmety")
+async def get_predmety(ticket: str | None = None):
+    """ Vrátí všechny predmety"""
+    #ticket = os.getenv("TICKET")
+    userinfo = kontrola_ticketu(ticket)
+    if userinfo is None:
+        return unauthorized
+    userid, role = get_userid_and_role(userinfo)
+    if role == "ST":
+        return unauthorized
+    return get_vsechny_predmety(session)
+
+
+
 @app.get("/admin/nadchazejici")
 async def get_admin_board_next_ones(ticket: str | None = None):
     """Vrátí všechny cvičení v času dopředu dle readme"""
@@ -242,21 +256,21 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
 
 
 @app.get("/ucitel/board_by_predmet")
-async def get_terminy_by_predmet(ticket: str , predmet: str):
+async def get_terminy_by_predmet(ticket: str , predmety: str):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     #ticket = os.getenv("TICKET")
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-
-    predmet = get_kod_predmetu_by_zkratka(session, predmet)
-    if predmet is None:
+    if predmety is None:
         return not_found
-
-    terminy_dle_predmetu_old = list_probehle_terminy_predmet(session, predmet)
-    terminy_dle_predmetu_new = list_planovane_terminy_predmet(session, predmet)
-    terminy_dle_predmetu = terminy_dle_predmetu_new + terminy_dle_predmetu_old
+    list_predmetu = predmety.split(";")
+    list_terminu = []
     vyucujici_list = read_file()
+    for predmet in list_predmetu:
+        predmet = get_kod_predmetu_by_zkratka(session, predmet)
+        list_terminu.extend(list_probehle_terminy_predmet(session, predmet))
+        list_terminu.extend(list_planovane_terminy_predmet(session, predmet))
     list_terminu = pridat_vyucujici_k_terminu(terminy_dle_predmetu, vyucujici_list)
     return list_terminu
 
