@@ -52,18 +52,17 @@ export default function Node(props: tNode) {
     </div>
    </CardContent>
    <CardFooter className="flex justify-between width-fultems-center">
-    <div className="flex flex-col gap-1 w-full">
-     <div className="self-end">
-      <div className="flex self-start gap-2 items-center">
+    <div className="grid grid-cols-[70%_30%] gap-1 w-full">
+     <div className="flex flex-col gap-1">
+      {props.vypsal.map((item: string, key: number) => (
+       <span key={item + key} className="text-xs">{`${item}`}</span>
+      ))}
+     </div>
+     <div className="flex flex-col items-center justify-end">
+      <div className="flex gap-2 items-center">
        {`${props.zapsany} / ${props.kapacita}`} <UsersRound className="w-7" />
       </div>
-     </div>
-     <div className="flex flex-row justify-between">
-      <div className="flex flex-col gap-1">
-       {props.vypsal.map((item: string, key: number) => (
-        <span key={item + key} className="text-xs">{`${item}`}</span>
-       ))}
-      </div>
+
       {props.typ == 'student' ? (
        <Zapsat
         id={props._id}
