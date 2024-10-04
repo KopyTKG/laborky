@@ -40,6 +40,7 @@ class Termin(Base):
     vyucuje_id = Column(String, ForeignKey('vyucujici.id'))
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
     cislo_cviceni = Column("cislo_cviceni", Integer)
+    popis = Column("popis", Text)
 
     predmet = relationship('Predmet', back_populates="termin")
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
@@ -135,10 +136,10 @@ def vytvor_vyucujici(session, id):
 
 
 ### USER ACTIONS
-def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None):
+def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None, newPopis=None):
     try:
         termin = session.query(Termin).filter(Termin.id == id_terminu).first()
-        
+
         if termin is None:
             return not_found
 
@@ -159,6 +160,9 @@ def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, 
 
         if cislo_cviceni is not None:
             termin.cislo_cviceni = cislo_cviceni
+
+        if newPopis is not None:
+            termin.popis = newPopis
 
         session.commit()
         return ok
@@ -196,17 +200,17 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         zapsat_na_termin = HistorieTerminu(id=uuid.uuid4(), student_id=student_id, termin_id=termin_id)
 
         termin = session.query(Termin).filter(Termin.id == termin_id).first()
-        
+
         if termin is None:
             return not_found
-        
+
         if termin.aktualni_kapacita >= termin.max_kapacita:
             return conflict
-        
+
         termin.aktualni_kapacita += 1
         session.add(zapsat_na_termin)
         session.commit()
-        
+
         return ok
 
     except:
@@ -226,18 +230,18 @@ def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
 def smazat_termin(session, id_terminu):
     try:
         termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
-        
+
         if termin is None:
             print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
             return 404
-        
+
         session.delete(termin)
         session.commit()
         return ok
 
     except:
         session.rollback()
-        return internal_server_error 
+        return internal_server_error
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     try:
@@ -251,7 +255,7 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
 
         else:
             termin.datum_splneni = datetime.now()
-        
+
         session.commit()
         return ok
 
@@ -298,13 +302,13 @@ def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id,
         return internal_server_error
 
 ### TERMINY
-def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: datetime, max_kapacita: int, vypsal_id: Text, vyucuje_id: Text, kod_predmet: Text, jmeno: Text, cislo_cviceni: int, aktualni_kapacita=0):
+def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: datetime, max_kapacita: int, vypsal_id: Text, vyucuje_id: Text, kod_predmet: Text, jmeno: Text, cislo_cviceni: int,popis: Text, aktualni_kapacita=0):
     try:
         vyucujici = session.query(Vyucujici).filter_by(id=vyucuje_id).first()
         if vyucujici is None:
             return not_found
 
-        termin = Termin(id=uuid.uuid4(),ucebna=ucebna,datum_start=datum_start,datum_konec=datum_konec,aktualni_kapacita=aktualni_kapacita,max_kapacita=max_kapacita,vypsal_id=vypsal_id,vyucuje_id=vyucuje_id,kod_predmet=kod_predmet,jmeno=jmeno,cislo_cviceni=cislo_cviceni)
+        termin = Termin(id=uuid.uuid4(),ucebna=ucebna,datum_start=datum_start,datum_konec=datum_konec,aktualni_kapacita=aktualni_kapacita,max_kapacita=max_kapacita,vypsal_id=vypsal_id,vyucuje_id=vyucuje_id,kod_predmet=kod_predmet,jmeno=jmeno,cislo_cviceni=cislo_cviceni, popis=popis)
 
         session.add(termin)
 
@@ -319,7 +323,7 @@ def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: dat
 def historie_studenta(session, id):
     try:
         student = session.query(Student).filter_by(id=id).first()
-        
+
         if student is None:
             return not_found
 
@@ -336,10 +340,10 @@ def historie_studenta(session, id):
 def uspesne_dokoncene_terminy(session, id):
     try:
         student = session.query(Student).filter_by(id=id).first()
-        
+
         if student is None:
             return not_found
-        
+
         splnene_terminy = []
         for history in student.historie_terminu:
             termin = history.termin
