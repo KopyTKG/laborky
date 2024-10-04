@@ -30,7 +30,7 @@ export async function GET(req: Request) {
 
  if (!rType || (rType != 'vypsane' && rType != 'zapsane')) {
   return NotFound
- } else if (rType === 'vypsane') {
+} else if (rType === 'vypsane') {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}`)
   url.searchParams.set('ticket', rTicket)
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })

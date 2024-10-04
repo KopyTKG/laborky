@@ -25,7 +25,7 @@ export function NavbarStudent({ id }: { id: string }) {
    icon: 'menu',
   },
  ]
- return <NavbarComponent id={id} links={links} url={url} />
+ return <NavbarComponent id={id} links={links} url={url} st={false} />
 }
 
 export function NavbarTeacher({ id }: { id: string }) {
@@ -49,10 +49,20 @@ export function NavbarTeacher({ id }: { id: string }) {
   },
  ]
 
- return <NavbarComponent id={id} links={links} url={url} />
+ return <NavbarComponent id={id} links={links} url={url} st={true} />
 }
 
-function NavbarComponent({ id, links, url }: { id: string; links: tLink[]; url: string }) {
+function NavbarComponent({
+ id,
+ links,
+ url,
+ st,
+}: {
+ id: string
+ links: tLink[]
+ url: string
+ st: boolean
+}) {
  return (
   <Navbar className="w-full flex" isBordered isBlurred>
    <NavbarContent>
@@ -80,10 +90,17 @@ function NavbarComponent({ id, links, url }: { id: string; links: tLink[]; url: 
      </Button>
     </NavbarItem>
     <NavbarItem>
-     <Link href={`${url}/profil`} className="flex gap-2">
-      <Avatar size="sm" color="default" />
-      {id}
-     </Link>
+     {st ? (
+      <div className="flex gap-2 text-blue-500">
+       <Avatar size="sm" color="default" />
+       {id}
+      </div>
+     ) : (
+      <Link href={`${url}/profil`} className="flex gap-2">
+       <Avatar size="sm" color="default" />
+       {id}
+      </Link>
+     )}
     </NavbarItem>
    </NavbarBrand>
   </Navbar>
