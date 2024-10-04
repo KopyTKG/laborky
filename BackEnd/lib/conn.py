@@ -244,7 +244,7 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
         termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_terminu,HistorieTerminu.student_id == id_studenta)).first()
 
         if termin is None:
-            return 404
+            return not_found
 
         if zvolene_datum_splneni is not None:
             termin.datum_splneni = zvolene_datum_splneni

@@ -95,26 +95,10 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     userid = encode_id(userid)
     if typ == "zapsat":
         message = zapsat_se_na_termin(session, userid, id_terminu) 
-        if message == not_found:
-            return not_found
-        elif message == conflict:
-            return conflict
-        elif message == internal_server_error:
-            return internal_server_error
-        else:
-            return ok
+        return message
     elif typ == "odhlasit":
         message = odepsat_z_terminu(session, userid, id_terminu)
-        if message == ok:
-            return ok
-        elif message == unauthorized: # uzivatel se chtel odepsat z termínu, který má splněný
-            return unauthorized
-        elif message == conflict: # uzivatel se chtel odepsat mene nez 24 hodin pred zacatkem cviceni
-            return conflict
-        elif message == bad_request: # uzivatel se chtel přihlásit na termín který neexistuje
-            return bad_request
-        else:
-            return internal_server_error
+        return message
     else:
         return bad_request
 
@@ -296,12 +280,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
 
     vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
     message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni)
-    if message == not_found:
-        return not_found
-    elif message == ok:
-        return ok
-    else:
-        return internal_server_error
+    return message
 
 
 @app.patch("/ucitel/termin")
@@ -384,12 +363,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
         return unauthorized
     id_stud = encode_id(id_stud)
     message = uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni)
-    if message == 404:
-        return not_found
-    elif message == 500:
-        return internal_server_error
-    else:
-        return ok 
+    return message
 
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
@@ -438,10 +412,8 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,v
     if message == ok:
         vyucujici_k_predmetum_to_txt(session)
         return ok
-    elif message == conflict:
-        return conflict
     else:
-        return internal_server_error
+        return message
 
 @app.get("/invalidate")
 def invalidate(ticket: str):
