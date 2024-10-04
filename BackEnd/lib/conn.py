@@ -43,7 +43,7 @@ class Termin(Base):
     popis = Column("popis", Text)
 
     predmet = relationship('Predmet', back_populates="termin")
-    vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_dle_predmetu_vypsal")
+    vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
     historie_terminu = relationship('HistorieTerminu', back_populates="termin")
 
