@@ -30,10 +30,13 @@ export default function Node(props: tNode) {
   <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.predmet} cvičení ${props.cislo}`}</div>
+    <p className="text-sm text-justify">
+     Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Morbi scelerisque luctus velit.
+    </p>
    </CardHeader>
    <Divider />
    <CardContent>
-    <div className="text-md flex flex-col my-2">
+    <div className="text-md flex flex-col my-2 gap-1">
      <div className="flex flex-row justify-start gap-1 ">
       <Clock className="w-6" />
       <div className="pt-1">
@@ -58,7 +61,7 @@ export default function Node(props: tNode) {
        <span key={item + key} className="text-xs">{`${item}`}</span>
       ))}
      </div>
-     <div className="flex flex-col items-center justify-end">
+     <div className="flex flex-col items-center justify-end gap-1">
       <div className="flex gap-2 items-center">
        {`${props.zapsany} / ${props.kapacita}`} <UsersRound className="w-7" />
       </div>
