@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from lib.HTTP_messages import *
 
+
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv('DB_URL')
@@ -412,33 +413,53 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
 
 
 def vypis_uspesnych_studentu(session, zkratka_predmetu):
-
-    studenti = ( # se vztahem k urcitemu predmetu
-        session.query(Student)
-        .join(ZapsanePredmety)
-        .join(Predmet)
-        .filter(Predmet.zkratka_predmetu == zkratka_predmetu)
-        .all()
-    )
-
     kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
     if kod_predmetu is None:
         return not_found
+
+    studenti = (
+        session.query(Student)
+        .join(HistorieTerminu, HistorieTerminu.student_id == Student.id)  # Join HistorieTerminu with Student
+        .join(Termin, HistorieTerminu.termin_id == Termin.id)             # Join HistorieTerminu with Termin
+        .filter(Termin.kod_predmet == kod_predmetu)                       # Filter by the given kod_predmetu
+        .all()  # Return all matching students
+    )
+
     pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
 
     vyhodnoceni_studentu = {}
-
     for student in studenti:
-        vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
-        if 0 in vyhodnoceni[kod_predmetu]:
-            continue
+        if get_uznani_predmetu_by_student(session, student.id, kod_predmetu):
+            vyhodnoceni_studentu[student.id] = 1
         else:
-            vyhodnoceni_studentu[student.id] = vyhodnoceni
+            vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
+            if 0 in vyhodnoceni[kod_predmetu]:
+                continue
+            else:
+                vyhodnoceni_studentu[student.id] = vyhodnoceni
 
     return vyhodnoceni_studentu
 
+def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
+    """ Vrátí, zda má student předmět celý uznán """
+    result = (
+        session.query(Termin)
+        .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)
+        .join(Student, Student.id == HistorieTerminu.student_id)
+        .filter(
+            Termin.cislo_cviceni == -1,    # Check if it's the specific exercise (-1)
+            Student.id == id_studenta,     # Match the student ID
+            Termin.kod_predmet == kod_predmetu  # Match the subject code
+        )
+        .first()  # Use first() to return one result or None
+    )
+
+    return result is not None 
+
 
 if __name__ == "__main__":
+
+    print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
     # list_probehle_terminy(session)
     # list_probehle_terminy_predmet(session, 'CS101')
