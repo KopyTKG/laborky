@@ -3,7 +3,7 @@ import { Checkbox, CheckboxGroup } from '@nextui-org/react'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
-export default function Filtr({ predmety }: { predmety: string[] }) {
+export default function Filtr({ predmety, list }: { predmety: string[]; list: string[] }) {
  const [selected, setSelected] = useState<string[]>(predmety)
 
  const router = useRouter()
@@ -29,9 +29,11 @@ export default function Filtr({ predmety }: { predmety: string[] }) {
    value={selected}
    onValueChange={setSelected}
   >
-   <Checkbox value="a">A</Checkbox>
-   <Checkbox value="b">B</Checkbox>
-   <Checkbox value="c">C</Checkbox>
+   {list.map((item, key) => (
+    <Checkbox value={item} key={item + key}>
+     {item}
+    </Checkbox>
+   ))}
   </CheckboxGroup>
  )
 }
