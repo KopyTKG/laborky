@@ -319,13 +319,8 @@ async def ucitel_zmena_terminu(
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-        message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni)
-    if message == ok:
-        return ok
-    if message == not_found:
-        return not_found
-    else:
-        return internal_server_error
+    message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni)
+    return message
 
 
 @app.delete("/ucitel/termin")
@@ -378,14 +373,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
         return unauthorized
     id_stud = encode_id(id_stud)
     status_message = pridat_studenta(session, id_stud, id_terminu)
-    if message == ok:
-        return ok
-    elif status_message == not_found :
-        return not_found
-    elif status_message == conflict:
-        return conflict
-    else: 
-        return internal_server_error
+    return status_message
 
 
 @app.post("/ucitel/splneno")
