@@ -10,6 +10,7 @@ from lib.HTTP_messages import *
 from jose import jwt
 from datetime import datetime
 from typing import Optional
+import re
 import dotenv, os, requests, json, hashlib
 
 dotenv.load_dotenv()
@@ -438,13 +439,13 @@ def vyucujici_k_predmetum_to_txt(session):
         vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
         if vyucujici_predmetu is None:
             vyucujici_seznam = []
-        
-        elif isinstance(vyucujici_predmetu, str):
-            vyucujici_seznam = [name.strip() for name in vyucujici_predmetu.split(',')] if vyucujici_predmetu.strip() else []
         else:
-            vyucujici_seznam = []
+            vyucujici_seznam = vyucujici_predmetu.split("', '")
+        
+            if vyucujici:
+                vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
+                vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
 
-        # Combine department and course code to form a unique key
         vyucujici[predmet[1] + predmet[0]] = vyucujici_seznam
 
 

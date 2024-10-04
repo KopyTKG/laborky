@@ -399,7 +399,6 @@ if __name__ == "__main__":
     #print(subtract_lists(historie, splnene_terminy))
     #print(list_dostupnych_terminu(session, ["KMPMPS1", "KPPPO2R"], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
 
-    session.rollback()
     pass
 
 
