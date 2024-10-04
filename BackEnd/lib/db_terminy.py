@@ -17,7 +17,7 @@ def list_studenti_z_terminu(session, termin_id):
 def list_nadchazejici_terminy(session):
     """ Vrátí všechny nadcházející termíny """
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.datum_start >= dnesni_datum).order_by(Termin.datum_start.asc())
+    terminy = session.query(Termin).filter(Termin.datum_start >= dnesni_datum).filter(Termin.cislo_cviceni != -1).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -25,7 +25,7 @@ def list_nadchazejici_terminy(session):
 def list_probehle_terminy(session):
     """ Vrátí všechny proběhle termíny """
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(Termin.datum_start <= dnesni_datum).order_by(Termin.datum_start.desc())
+    terminy = session.query(Termin).filter(and_(Termin.datum_start <= dnesni_datum, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.desc())
     for termin in terminy:
         print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
     terminy_list = [termin for termin in terminy]
@@ -35,7 +35,7 @@ def list_probehle_terminy(session):
 def list_planovane_terminy_predmet(session, kod_predmetu):
     """ Vrátí všechny plánované termíny dle předmětu"""
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start >= dnesni_datum)).order_by(Termin.datum_start.asc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start >= dnesni_datum, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -43,7 +43,7 @@ def list_planovane_terminy_predmet(session, kod_predmetu):
 def list_probehle_terminy_predmet(session, kod_predmetu):
     """ Vrátí všechny proběhlé termíny dle předmětu """
     dnesni_datum = datetime.now()
-    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start <= dnesni_datum)).order_by(Termin.datum_start.desc())
+    terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_start <= dnesni_datum, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.desc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -52,7 +52,7 @@ def terminy_dopredu_pro_vyucujiciho(session, id):
     """ Vrátí všechny termíny, které bude vyucujíčí dle ID"""
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date, Termin.vyucuje_id == id)).order_by(Termin.datum_start.asc())
+    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date, Termin.vyucuje_id == id, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
@@ -60,13 +60,13 @@ def terminy_dopredu_pro_vyucujiciho(session, id):
 def terminy_dopredu(session):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=interval_vypisu_terminu)
-    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date)).order_by(Termin.datum_start.asc())
+    terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_start <= end_date, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
     terminy_list = [termin for termin in terminy]
     return terminy_list
 
 
 def list_terminy_vyucujici(session, id):
-    terminy = session.query(Termin).filter(Termin.vyucuje_id == id).order_by(Termin.datum_start.desc())
+    terminy = session.query(Termin).filter(Termin.vyucuje_id == id, Termin.cislo_cviceni != -1).order_by(Termin.datum_start.desc())
     if terminy is None:
         print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
         return False
@@ -82,7 +82,8 @@ def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
     terminy = session.query(Termin).filter(
         and_(
             Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
-            Termin.datum_start > current_date - timedelta(hours=1),  # Terms that have not passed yet and the ones that barely started (1 hour ago eg.)
+            Termin.datum_start > current_date - timedelta(hours=1),
+            Termin.cislo_cviceni != -1  
         )
     ).order_by(Termin.datum_start.desc()).all()
 

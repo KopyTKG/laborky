@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Optional
 import re
 import dotenv, os, requests, json, hashlib
+import time
 
 dotenv.load_dotenv()
 
@@ -262,7 +263,7 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int,popis:str, vyucuje_id: Optional[str] = None):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str, vyucuje_id: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
@@ -274,12 +275,12 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
 
     vypsal_id = encode_id(userid)
 
-    kod_predmetu = get_kod_predmetu_by_zkratka(session, kod_predmet)
+    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
     if kod_predmetu is None:
         return not_found
 
     vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
-    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni)
+    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis)
     return message
 
 
@@ -332,6 +333,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
         return unauthorized
 
     vsechny_terminy = get_vsechny_terminy(session)
+
     if id_terminu not in vsechny_terminy:
         return bad_request
 
@@ -364,6 +366,20 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
         return unauthorized
     id_stud = encode_id(id_stud)
     message = uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni)
+    return message
+
+
+@app.post("/ucitel/uznat")
+async def post_ucitel_uznat_studentovi(ticket: str, id_stud: str, zkratka_predmetu: str):
+    """ Uznat studentovi všechna cvičení dle zkratky předmětu """
+    user_info = kontrola_ticketu(ticket)
+    if user_info is None:
+        return unauthorized
+    id_stud = encode_id(id_stud)
+    id_terminu = get_uznavaci_termin_by_zkratka(session, zkratka_predmetu)
+    if id_terminu is None:
+        return not_found
+    message = uznat_termin(session, id_terminu, id_stud)
     return message
 
 
@@ -402,17 +418,37 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zk
     return info
 
 @app.post("/ucitel/pridat_predmet")
-async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str,vyucuje_id: str, pocet_cviceni: int):
-    """Vytvoří předmět - testing only"""
-    if ticket is None or ticket == "":
+async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, pocet_cviceni: int, vyucuje_id: Optional[str] = None):
+    """Vytvoří předmět - admin akce
+    Args:
+        ticket,
+        zkratka predmetu,
+        zkratka katedry,
+        pocet_cviceni,
+        vyucuje_id : id vyučujícího začínající "VY"... když se nechá prázný, bude bráno ID admina,
+    """
+    user_info = kontrola_ticketu(ticket)
+    if user_info is None:
         return unauthorized
+    userid, role = get_userid_and_role(user_info)
+    id_vypsal = encode_id(userid)
     kod_predmetu = katedra + zkratka_predmetu
-    vyucuje_id = encode_id(vyucuje_id)
+    if vyucuje_id is None:
+        vyucuje_id = id_vypsal
+    else:
+        vyucuje_id = encode_id(vyucuje_id)
+
     message = vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni)
 
     if message == ok:
         vyucujici_k_predmetum_to_txt(session)
-        return ok
+        session.commit()
+        datum_start = datetime.now()
+        datum_konec = datetime.now() + timedelta(hours=2)
+        message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu")
+
+        return message
+    
     else:
         return message
 
@@ -473,6 +509,11 @@ def read_file():
     return vyucujici_list
 
 
+@app.get("/")
+def index():
+    print(get_vsechny_terminy(session))
+
+
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
@@ -480,7 +521,7 @@ if __name__ == "__main__":
         print("Session successfully created!")
     else:
         raise Exception("Session creation failed!")
-    vyucujici_k_predmetum_to_txt(session)
+    #vyucujici_k_predmetum_to_txt(session)
 
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')))
 

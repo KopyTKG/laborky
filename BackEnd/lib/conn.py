@@ -73,6 +73,7 @@ class Predmet(Base):
     termin = relationship('Termin', back_populates="predmet")
     zapsane_predmety = relationship('ZapsanePredmety', back_populates="predmet")
 
+
 class Student(Base):
     __tablename__ = "student"
 
@@ -170,6 +171,7 @@ def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, 
         session.rollback()
         return internal_server_error
 
+
 def odepsat_z_terminu(session, student_id, termin_id):
     try:
         termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == termin_id,HistorieTerminu.student_id == student_id).first()
@@ -195,6 +197,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
         session.rollback()
         return internal_server_error
 
+
 def zapsat_se_na_termin(session, student_id, termin_id):
     try:
         zapsat_na_termin = HistorieTerminu(id=uuid.uuid4(), student_id=student_id, termin_id=termin_id)
@@ -207,6 +210,9 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         if termin.aktualni_kapacita >= termin.max_kapacita:
             return conflict
 
+        if termin.cislo_cviceni == -1:
+            return conflict
+
         termin.aktualni_kapacita += 1
         session.add(zapsat_na_termin)
         session.commit()
@@ -217,15 +223,6 @@ def zapsat_se_na_termin(session, student_id, termin_id):
         session.rollback()
         return internal_server_error
 
-
-def uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu):
-    try:
-        uspesni_studenti = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta,Termin.kod_predmet == kod_predmetu,HistorieTerminu.datum_splneni != None)).all()
-        uspesni_studenti_list = [student for student in uspesni_studenti]
-        return uspesni_studenti_list
-
-    except:
-        return False
 
 def smazat_termin(session, id_terminu):
     try:
@@ -242,6 +239,7 @@ def smazat_termin(session, id_terminu):
     except:
         session.rollback()
         return internal_server_error
+
 
 def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     try:
@@ -262,6 +260,7 @@ def uznat_termin(session, id_terminu, id_studenta, zvolene_datum_splneni=None):
     except:
         session.rollback()
         return internal_server_error
+
 
 def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
     try:
@@ -315,9 +314,9 @@ def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: dat
         session.commit()
         return ok
 
-    except:
+    except Exception as e:
         session.rollback()
-        return internal_server_error
+        return e
 
 
 def historie_studenta(session, id):
@@ -337,6 +336,18 @@ def historie_studenta(session, id):
     except:
         return internal_server_error
 
+
+def uspesne_zakonceni_studenta_terminy(session, id_studenta, kod_predmetu):
+    """ Vrátí všechny úspěsné zakončené termíny (HistorieTerminu) v předmětu """
+    try:
+        uspesne_terminy = session.query(HistorieTerminu).join(Termin, HistorieTerminu.termin_id == Termin.id).filter(and_(HistorieTerminu.student_id == id_studenta,Termin.kod_predmet == kod_predmetu,HistorieTerminu.datum_splneni != None)).all()
+        uspesne_terminy_list = [student for student in uspesne_terminy]
+        return uspesne_terminy_list
+
+    except:
+        return False
+
+
 def uspesne_dokoncene_terminy(session, id):
     try:
         student = session.query(Student).filter_by(id=id).first()
@@ -346,7 +357,8 @@ def uspesne_dokoncene_terminy(session, id):
 
         splnene_terminy = []
         for history in student.historie_terminu:
-            termin = history.termin
+            termin = history.termin  
+
             if history.datum_splneni is not None:
                 splnene_terminy.append(termin)
 
@@ -383,15 +395,18 @@ def pocet_cviceni_pro_predmet(session):
 # zde nesmi prichazet parametr katedra - musi si to brat z "Uspesne zakonceni studenta"
 def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
     for kod_predmetu in list(pocet_pro_predmet.keys()):
-        uspesne_terminy = uspesne_zakonceni_studenta(session, id_studenta, kod_predmetu)
+        uspesne_terminy = uspesne_zakonceni_studenta_terminy(session, id_studenta, kod_predmetu)
 
         if uspesne_terminy:
             for historie_terminu in uspesne_terminy:
                 termin = session.query(Termin).filter(Termin.id == historie_terminu.termin_id).first()
                 if termin:
-                    cislo_cviceni = termin.cislo_cviceni - 1
-
-                    pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
+                    if termin.cislo_cviceni == -1:
+                        for i in range(len(pocet_pro_predmet[kod_predmetu])):
+                            pocet_pro_predmet[kod_predmetu][i] = historie_terminu.datum_splneni
+                    else:
+                        cislo_cviceni = termin.cislo_cviceni - 1
+                        pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
 
     return pocet_pro_predmet
 
@@ -467,6 +482,7 @@ if __name__ == "__main__":
     #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
     #print(list(vyhodnoceni.keys()))
 
+
     #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
     #print(vypis_uspesnych)
 
@@ -480,7 +496,6 @@ if __name__ == "__main__":
     #planovane = list_planovane_terminy_predmet(session, 'MATH202')
 
     #print(probehle + planovane)
-
 
     #historie = historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
     #splnene_terminy = uspesne_dokoncene_terminy(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")

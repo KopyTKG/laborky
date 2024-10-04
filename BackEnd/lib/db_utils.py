@@ -6,7 +6,7 @@ def get_vyucujiciho_by_predmet(session, kod_predmetu):
     if predmet:
         return predmet.vyucuje_id
     return None
-    
+
 
 def get_predmet_by_id(session, id_predmetu):
     """ Vrátí kód předmětu podle jeho identifikačního kódů """
@@ -45,7 +45,7 @@ def get_kod_predmetu_by_id(session, id_predmetu):
 def get_vsechny_terminy(session):
     """ Vrátí všechny vypsané termíny """
     terminy = session.query(Termin).all()
-    return [termin.id for termin in terminy]
+    return [str(termin.id) for termin in terminy]
 
 
 def get_vsechny_predmety(session):
@@ -64,3 +64,12 @@ def subtract_lists(list1, list2):
     """ Odečítání listů (vrátí první list ochuzený o prvky z prvního listu)"""
     result = list(set(list1) - set(list2))
     return result
+
+
+def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu):
+    """ Vrátí id uznačovacího terminu podle zkratky předmětu """
+    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
+    termin = session.query(Termin).filter(and_(Termin.kod_predmet==kod_predmetu, Termin.cislo_cviceni==-1)).first()
+    if termin is not None:
+        return termin.id
+    return None
