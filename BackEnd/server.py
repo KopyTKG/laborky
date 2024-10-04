@@ -56,7 +56,7 @@ async def get_student_home(ticket: str | None = None):
     userid, role = get_userid_and_role(userinfo)
     if role == internal_server_error:
         return internal_server_error
-    
+
     userid = encode_id(userid)
 
     if role != "ST":
@@ -69,7 +69,7 @@ async def get_student_home(ticket: str | None = None):
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici, vyhodnoceni, userid)
         # vrací seznam laborek, které jsou studentovi k dispozici
             # předmět nemá uznaný a studuje ho
-    
+
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
@@ -94,7 +94,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     userid, role = get_userid_and_role(userinfo)
     userid = encode_id(userid)
     if typ == "zapsat":
-        message = zapsat_se_na_termin(session, userid, id_terminu) 
+        message = zapsat_se_na_termin(session, userid, id_terminu)
         if message == not_found:
             return not_found
         elif message == conflict:
@@ -149,9 +149,9 @@ async def get_student_moje(ticket: str | None = None):
         return internal_server_error
     if splnene == not_found:
         return not_found
-    
+
     list_terminu = subtract_lists(historie, splnene)
-    
+
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
@@ -278,16 +278,16 @@ async def get_terminy_by_predmet(ticket: str , predmet: str):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int, vyucuje_id: Optional[str] = None):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, kod_predmet: str, jmeno: str, cislo_cviceni: int,popis:str, vyucuje_id: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-    
+
     userid, role = get_userid_and_role(userinfo)
     if role == "ST":
         return unauthorized
-    
+
     vypsal_id = encode_id(userid)
 
     kod_predmetu = get_kod_predmetu_by_zkratka(session, kod_predmet)
@@ -295,7 +295,7 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
         return not_found
 
     vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
-    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni)
+    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmet, jmeno, cislo_cviceni,popis)
     if message == not_found:
         return not_found
     elif message == ok:
@@ -313,13 +313,14 @@ async def ucitel_zmena_terminu(
     datum_konec: Optional[datetime] = None,
     max_kapacita: Optional[int] = None,
     jmeno: Optional[str] = None,
-    cislo_cviceni: Optional[int] = None
+    cislo_cviceni: Optional[int] = None,
+    popis: Optional[str] = None
     ):
     """ Učitel změní parametry v již vypsaném termínu """
     userinfo = kontrola_ticketu(ticket)
     if userinfo is None:
         return unauthorized
-        message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni)
+        message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni,newPopis=popis)
     if message == ok:
         return ok
     if message == not_found:
@@ -384,7 +385,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
         return not_found
     elif status_message == conflict:
         return conflict
-    else: 
+    else:
         return internal_server_error
 
 
@@ -401,7 +402,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     elif message == 500:
         return internal_server_error
     else:
-        return ok 
+        return ok
 
 
 @app.get("/ucitel/emaily") # prijima: katedra, zkratka_predmetu, id_terminu
@@ -492,7 +493,7 @@ def vyucujici_k_predmetum_to_txt(session):
             vyucujici_seznam = []
         else:
             vyucujici_seznam = vyucujici_predmetu.split("', '")
-        
+
             if vyucujici:
                 vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
                 vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
@@ -508,7 +509,7 @@ def vyucujici_k_predmetum_to_txt(session):
 
 def read_file():
     temp_file = ".temp_vyucujici.txt"
-    
+
     with open(temp_file, "r", encoding="utf-8") as infile:
         vyucujici_list = json.load(infile)
     return vyucujici_list
