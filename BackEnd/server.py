@@ -175,7 +175,7 @@ async def get_predmety(ticket: str | None = None):
 
     vsechny_predmety = get_vsechny_predmety(session)
     # dekan#_ujp což je náš ekvivalent Škvora
-    if userid == "VY49712":
+    if info[0] == "VY49712":
         jmena_vsech_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
         return jmena_vsech_predmetu
     if role == "VY":
