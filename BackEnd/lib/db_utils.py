@@ -1,13 +1,18 @@
 from lib.conn import *
 
 def get_vyucujiciho_by_predmet(session, kod_predmetu):
-    """ Vrátí zahashované id vyučujícího, který vyučuje daný předmět """
-    predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
-    if predmet:
-        return predmet.vyucuje_id
+    """ Vrátí zahashované id vyučujících, kteří vyučují daný předmět"""
+    vyucujici_list = []
+    predmet = session.query(VyucujiciPredmety).filter_by(kod_predmetu=kod_predmetu).all()
+    for vyucujici in predmet:
+        vyucujici_list.append(vyucujici.vyucujici_id)
+    if vyucujici_list:
+        return vyucujici_list
     return None
 
 
+
+# tohle je obsolete imho
 def get_predmet_by_id(session, id_predmetu):
     """ Vrátí kód předmětu podle jeho identifikačního kódů """
     predmet = session.query(Predmet).filter_by(id=id_predmetu).first()
@@ -47,7 +52,7 @@ def get_kod_predmetu_by_zkratka(session, zkratka_predmetu):
     if predmet:
         return predmet.kod_predmetu
     return None
-    
+
 
 def get_kod_predmetu_by_id(session, id_predmetu):
     """ Vrátí kód předmětu podle id """
@@ -55,7 +60,7 @@ def get_kod_predmetu_by_id(session, id_predmetu):
     if predmet:
         return predmet.kod_predmetu
     return None
-    
+
 
 def get_vsechny_terminy(session):
     """ Vrátí všechny vypsané termíny """
