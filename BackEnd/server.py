@@ -181,7 +181,7 @@ async def get_predmety(ticket: str | None = None):
 
     elif role == "ST":
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
-
+        return predmety_k_dispozici
 
     return get_vsechny_predmety(session)
 
