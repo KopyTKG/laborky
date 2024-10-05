@@ -5,7 +5,7 @@
 -- Dumped from database version 16.3 (Debian 16.3-1.pgdg120+1)
 -- Dumped by pg_dump version 16.3
 
--- Started on 2024-10-05 11:58:08 CEST
+-- Started on 2024-10-05 13:28:48 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -169,6 +169,8 @@ ALTER TABLE public.zapsane_predmety OWNER TO postgres;
 -- Data for Name: predmet; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.predmet VALUES ('ROOT', 'Aktivita', 'Volná', '577c9662b393f96deddfd02dfc50650e0916926b', 0);
+INSERT INTO public.predmet VALUES (' KFIPRHN ', 'PRHN', 'KFI', '1f92a11172f3109d2529461a19e49dbace23fb32', 2);
 
 
 --
@@ -177,15 +179,6 @@ ALTER TABLE public.zapsane_predmety OWNER TO postgres;
 -- Data for Name: student; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.student VALUES ('5554da30-325d-4da0-b43c-079d56f990c7    ', '2024-09-28 20:27:57.093952');
-INSERT INTO public.student VALUES ('d423e661-e43e-4fee-913c-8218394fa545    ', '2024-09-28 20:32:49.683885');
-INSERT INTO public.student VALUES ('0d162f64-61dd-446d-a3e2-404a994e9a9f    ', '2024-09-28 20:32:49.683885');
-INSERT INTO public.student VALUES ('4a71df77a1acbbe459be5cca49038fece4f49a6f', '2024-09-30 23:12:40.426546');
-INSERT INTO public.student VALUES ('e2fe775cb0c5578b2ed64dfd73be9acb5ad2e123', '2024-10-02 14:45:00.013458');
-INSERT INTO public.student VALUES ('72d93dcb44c56fc46f98921ee8e8299eeb112443', '2024-10-03 17:05:58.522309');
-INSERT INTO public.student VALUES ('60755d0b951b482d35100bebdf9185c7cdbdc772', '2024-10-03 17:07:41.461032');
-INSERT INTO public.student VALUES ('cfb3a9b4dbbcf26aa874dcf64709eb41eaa97217', '2024-10-03 18:14:17.13704');
-INSERT INTO public.student VALUES ('2ef1dbfa3c6e2084cc34313bb50a40853f82bdfc', '2024-10-04 15:48:11.879294');
 
 
 --
@@ -203,6 +196,7 @@ INSERT INTO public.student VALUES ('2ef1dbfa3c6e2084cc34313bb50a40853f82bdfc', '
 --
 
 INSERT INTO public.vyucujici VALUES ('577c9662b393f96deddfd02dfc50650e0916926b');
+INSERT INTO public.vyucujici VALUES ('1f92a11172f3109d2529461a19e49dbace23fb32');
 
 
 --
@@ -339,7 +333,7 @@ ALTER TABLE ONLY public.termin
     ADD CONSTRAINT fk_vyucuje FOREIGN KEY (vyucuje_id) REFERENCES public.vyucujici(id) ON DELETE CASCADE;
 
 
--- Completed on 2024-10-05 11:58:08 CEST
+-- Completed on 2024-10-05 13:28:48 CEST
 
 --
 -- PostgreSQL database dump complete
