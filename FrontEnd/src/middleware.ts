@@ -4,12 +4,6 @@ import { fastHeaders } from '@/lib/stag'
 
 export async function middleware(request: NextRequest) {
  if (BaseAuth(request) && Validate(request.cookies.get('stagUserInfo')?.value || '')) {
-  let userInfo = request.cookies.get('stagUserInfo')?.value || ''
-  let decoded = base64ToText(userInfo) || { stagUserInfo: [{}] }
-  let user = decoded?.stagUserInfo[0]
-  const stid = decoded?.stagUserInfo[0].osCislo
-  const vyid = 'vy' + decoded?.stagUserInfo[0].ucitIdno
-
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
   const ticket = request.cookies.get('stagUserTicket')?.value || ''
   if (!ticket) {
@@ -22,13 +16,17 @@ export async function middleware(request: NextRequest) {
    return
   }
   const data = await res.json()
-  console.log(data)
+  const info = {
+   id: data[0],
+   role: data[1],
+   hash: data[2],
+  }
 
   if (request.url.endsWith('/')) {
-   if (data == 'ST') {
-    request.nextUrl.pathname = '/student/' + stid
+   if (info.role == 'ST') {
+    request.nextUrl.pathname = '/student/' + info.id
    } else {
-    request.nextUrl.pathname = '/ucitel/' + vyid
+    request.nextUrl.pathname = '/ucitel/' + info.id
    }
    return NextResponse.redirect(new URL(request.nextUrl))
   }
@@ -37,8 +35,8 @@ export async function middleware(request: NextRequest) {
    const STmatch = request.url.match(/([A-Za-z])[1-9]\w+/)
    if (STmatch && request.url.includes('student')) {
     const urlID = [...STmatch][0]
-    if (urlID != stid) {
-     request.nextUrl.pathname = `/student/${stid}`
+    if (urlID != info.id) {
+     request.nextUrl.pathname = `/student/${info.id}`
      return NextResponse.redirect(request.nextUrl)
     }
    }
@@ -46,8 +44,8 @@ export async function middleware(request: NextRequest) {
    const VYmatch = request.url.match(/(vy)[1-9]\w+/)
    if (VYmatch && request.url.includes('ucitel')) {
     const urlID = [...VYmatch][0]
-    if (urlID != vyid) {
-     request.nextUrl.pathname = `/ucitel/${vyid}`
+    if (urlID != info.id) {
+     request.nextUrl.pathname = `/ucitel/${info.id}`
      return NextResponse.redirect(request.nextUrl)
     }
    }
