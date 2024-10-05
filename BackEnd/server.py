@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from classes.stag import *
 from classes.vyucujici import *
 from classes.student import *
+from classes.server_utils import *
 from lib.conn import *
 from lib.db_utils import *
 from lib.db_terminy import *
@@ -23,21 +24,15 @@ app = FastAPI(debug=True)
 async def kontrola_s_databazi(ticket: str | None = None):
     """ Kontrola přihlášeného uživatele s databází po loginu do systému """
     #ticket = os.getenv("TICKET")
-    if ticket is None or ticket == "":
-        return unauthorized
-    userinfo = get_stag_user_info(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == internal_server_error:
-        return internal_server_error
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
     if role != "ST":
-        userid = encode_id(userid)
         message = vytvor_vyucujici(session, userid)
         if message == internal_server_error:
             return internal_server_error
     else:
-        userid = encode_id(userid)
         message = vytvor_student(session, userid)
         if message == internal_server_error:
             return internal_server_error
@@ -49,19 +44,10 @@ async def kontrola_s_databazi(ticket: str | None = None):
 @app.get("/student") #/student/{osobni_cislo}
 async def get_student_home(ticket: str | None = None):
     """ Vrácení všech vypsaných laborek podle toho, na co se student může zapsat """
-    #ticket = os.getenv('TICKET') # prozatimni reseni
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-
-    userid, role = get_userid_and_role(userinfo)
-    if role == internal_server_error:
-        return internal_server_error
-
-    userid = encode_id(userid)
-
-    if role != "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
 
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
 
@@ -89,11 +75,11 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
         HTTP code(str): 200 - OK, 401 - Unauthorized, 400 - Bad Request, 409 - Conflict"""
 
     #ticket = os.dotenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    userid = encode_id(userid)
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
     if typ == "zapsat":
         message = zapsat_se_na_termin(session, userid, id_terminu) 
         return message
@@ -115,13 +101,10 @@ async def get_student_moje(ticket: str | None = None):
         list_terminu (list): Seznam cvičení, na kterých je student aktuálně zapsán a nemá je splněné
         """
     #ticket = os.getenv('TICKET')
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role != "ST":
-        return unauthorized
-    userid = encode_id(userid)
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
 
     historie = historie_studenta(session, userid)
     if historie == not_found:
@@ -149,14 +132,12 @@ async def get_student_profil(ticket: str | None = None):
     """ Vraci zaznam o vsech typech cviceni na vsechny predmety, ktere ma student
     zapsane na portalu STAG a jsou zaroven v Databazi, zda je student splnil ci nikoli"""
     #ticket = os.getenv("TICKET") # prozatimni reseni
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
-
-
-    userid = encode_id(userid)
 
     if role != "ST":
         return unauthorized
@@ -181,12 +162,27 @@ async def get_student_profil(ticket: str | None = None):
 async def get_predmety(ticket: str | None = None):
     """ Vrátí všechny predmety"""
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
+
+    # nyní logika:
+        # studentovi vrací předměty, pouze které studuje
+        # učitelovi vrací předměty, kterých je cvičící
+        # škvorovi vrací všechno - neimplementováno
+
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
+    vsechny_predmety = get_vsechny_predmety(session)
+
+    if userid == "VY49712":
+        jmena_vsech_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
+        return jmena_vsech_predmetu
+
+    elif role == "ST":
+        predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
+
+
     return get_vsechny_predmety(session)
 
 
@@ -195,12 +191,11 @@ async def get_predmety(ticket: str | None = None):
 async def get_admin_board_next_ones(ticket: str | None = None):
     """Vrátí všechny cvičení v času dopředu dle readme"""
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
     list_terminy_dopredu = terminy_dopredu(session)
 
     vyucujici_list = read_file()
@@ -212,12 +207,10 @@ async def get_admin_board_next_ones(ticket: str | None = None):
 async def get_admin_board(ticket: str | None = None):
     """ Vrátí všechny vypsané cvičení """
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
 
     list_terminu = list_terminy(session)
     vyucujici_list = read_file()
@@ -229,13 +222,11 @@ async def get_admin_board(ticket: str | None = None):
 async def get_ucitel_board_future_ones(ticket: str | None = None):
     """Vrátí cvičení jednoho učitele v času dopředu dle readme"""
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    userid = encode_id(userid)
-    if role == "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
     list_terminy_dopredu = terminy_dopredu_pro_vyucujiciho(session, userid)
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
@@ -245,11 +236,11 @@ async def get_ucitel_board_future_ones(ticket: str | None = None):
 async def get_ucitel_moje_vypsane(ticket: str | None = None):
     """ Vrátí všechny cvičení, které vypsal uživatel """
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    userid = encode_id(userid)
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+    
     list_terminu = list_terminy_vyucujici(session, userid)
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
@@ -260,9 +251,11 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
 async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     #ticket = os.getenv("TICKET")
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+    
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
         predmety = ";".join(pomocny_list)
@@ -280,15 +273,10 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
 @app.post("/ucitel/termin")
 async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str, vyucuje_id: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
-
-    vypsal_id = encode_id(userid)
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    vypsal_id, role = encode_id(info[0]), info[1]
 
     kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
     if kod_predmetu is None:
@@ -312,9 +300,9 @@ async def ucitel_zmena_terminu(
     popis: Optional[str] = None
     ):
     """ Učitel změní parametry v již vypsaném termínu """
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
     message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni,newPopis=popis)
     return message
 
@@ -322,12 +310,10 @@ async def ucitel_zmena_terminu(
 @app.delete("/ucitel/termin")
 async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
     """ Učitel smáže vypsaný termín """
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+
     if smazat_termin(session, id_terminu) == not_found:
         return not_found
     if smazat_termin(session, id_terminu) == ok:
@@ -340,12 +326,10 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
 async def get_vypis_studentu(ticket: str, id_terminu: str):
     """ Vrácení všech studentů, kteří se zapsali na daný seminář"""
     #ticket = os.getenv('TICKET') # prozatimni reseni
-    userinfo = kontrola_ticketu(ticket)
-    if userinfo is None:
-        return unauthorized
-    userid, role = get_userid_and_role(userinfo)
-    if role == "ST":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
 
     vsechny_terminy = get_vsechny_terminy(session)
 
@@ -366,8 +350,10 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None
     """ Ručně přihlásí studenta do vypsaného termínu cvičení """
     # ticket = os.getenv("TICKET")
-    if ticket is None or ticket == "":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+
     id_stud = encode_id(id_stud)
     message = pridat_studenta(session, id_stud, id_terminu)
     return message
@@ -377,8 +363,10 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str, zvolene_datum_splneni: Optional[datetime] = None): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
     # ticket = os.getenv("TICKET")
-    if ticket is None or ticket == "":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+
     id_stud = encode_id(id_stud)
     message = uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni)
     return message
@@ -387,9 +375,10 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
 @app.post("/ucitel/uznat")
 async def post_ucitel_uznat_studentovi(ticket: str, id_stud: str, zkratka_predmetu: str):
     """ Uznat studentovi všechna cvičení dle zkratky předmětu """
-    user_info = kontrola_ticketu(ticket)
-    if user_info is None:
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+
     id_stud = encode_id(id_stud)
     id_terminu = get_uznavaci_termin_by_zkratka(session, zkratka_predmetu)
     if id_terminu is None:
@@ -402,9 +391,10 @@ async def post_ucitel_uznat_studentovi(ticket: str, id_stud: str, zkratka_predme
 async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None = None
     """ Vrátí json s emailama studentů přihlášených na daném termínu
     ve formátu: {osobniCislo: {jemno: , prijmeni:, email: }}"""
-    #ticket = os.getenv("TICKET")
-    if ticket is None or ticket == "":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    
     list_studentu = list_studenti_z_terminu(session, id_terminu)
     zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
@@ -418,9 +408,9 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
 @app.get("/ucitel/uspesni_studenti")
 async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zkratka_katedry: str):
     """ Vrátí seznam studentů, kteří mají všechny cvičení splněné z daného předmětu"""
-    #ticket = os.getenv("TICKET")
-    if ticket is None or ticket == "":
-        return unauthorized
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
 
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu)
@@ -442,11 +432,11 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         pocet_cviceni,
         vyucuje_id : id vyučujícího začínající "VY"... když se nechá prázný, bude bráno ID admina,
     """
-    user_info = kontrola_ticketu(ticket)
-    if user_info is None:
-        return unauthorized
-    userid, role = get_userid_and_role(user_info)
-    id_vypsal = encode_id(userid)
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    id_vypsal, role = encode_id(info[0]), info[1]
+
     kod_predmetu = katedra + zkratka_predmetu
     if vyucuje_id is None:
         vyucuje_id = id_vypsal
@@ -475,58 +465,12 @@ def invalidate(ticket: str):
     print(response)
     return 200
 
-def encode_id(id):
-    """ Sha1 pro hashování osobních čísel / ucitIdnu """
-    return hashlib.sha1(id.encode()).hexdigest()
-
-
-def kontrola_ticketu(ticket):
-    if ticket is None or ticket == "":
-        return None
-
-    userinfo = get_stag_user_info(ticket)
-
-    return userinfo
-
-
-def vyucujici_k_predmetum_to_txt(session):
-    temp_file = ".temp_vyucujici.txt"
-
-    predmety_kod_katedra = get_vsechny_predmety_kod_katedra(session)
-    vyucujici = {}
-    for predmet in predmety_kod_katedra:
-        vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
-        if vyucujici_predmetu is None:
-            vyucujici_seznam = []
-        elif vyucujici_predmetu == "":
-            vyucujici_seznam = []
-        else:
-            vyucujici_seznam = vyucujici_predmetu.split("', '")
-
-            if vyucujici:
-                vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
-                vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
-
-        vyucujici[predmet[1] + predmet[0]] = vyucujici_seznam
-
-
-    if os.path.exists(temp_file):
-        os.remove(temp_file)
-    with open(temp_file, "w", encoding="utf-8") as outfile:
-        json.dump(vyucujici, outfile, ensure_ascii=False, indent=4)
-
-
-def read_file():
-    temp_file = ".temp_vyucujici.txt"
-
-    with open(temp_file, "r", encoding="utf-8") as infile:
-        vyucujici_list = json.load(infile)
-    return vyucujici_list
-
 
 @app.get("/")
-def index():
-    print(get_vsechny_terminy(session))
+def root():
+    vsechny_predmety = get_vsechny_predmety(session)
+    jmena_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
+    return jmena_predmetu
 
 
 if __name__ == "__main__":

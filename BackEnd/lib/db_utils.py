@@ -26,6 +26,21 @@ def get_katedra_predmet_by_idterminu(session, id_terminu):
     return None
 
 
+def get_katedra_predmet_by_kod(session, kod_predmetu):
+    """ vrátí zkratku katedry a zkratku predmetu podle kodu predmetu """
+    predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+    if predmet:
+        return [str(predmet.katedra), str(predmet.zkratka_predmetu)]
+    return None
+
+
+def get_katedra_by_predmet(session, zkratka_predmetu):
+    predmet = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first()
+    if predmet:
+        return str(predmet.katedra)
+    return None
+
+
 def get_kod_predmetu_by_zkratka(session, zkratka_predmetu):
     """ Vrátí kód předmětu podle zkratky předmětu """
     predmet = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first()
