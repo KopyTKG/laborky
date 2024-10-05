@@ -48,17 +48,29 @@ class Termin(Base):
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
     historie_terminu = relationship('HistorieTerminu', back_populates="termin")
 
+class VyucujiciPredmety(Base):
+    __tablename__ = "vyucujici_predmety"
 
+    kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu'), primary_key=True)
+    vyucujici_id = Column(String, ForeignKey('vyucujici.id'), primary_key=True)
+
+    vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje")
+    predmet = relationship('Predmet', back_populates="vyucujici_predmety")
 
 
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
 
-    id = Column("id", String, primary_key=True)
+    id = Column(String, primary_key=True)
 
+    # Many-to-many relationship via VyucujiciPredmety
+    predmet_vyucuje = relationship("VyucujiciPredmety", back_populates="vyucujici")
+
+    # Relationships to Termin
     terminy_vyucuje = relationship("Termin", foreign_keys=[Termin.vyucuje_id], back_populates="vyucuje")
     terminy_vypsal = relationship("Termin", foreign_keys=[Termin.vypsal_id], back_populates="vypsal")
-    predmet = relationship("Predmet", back_populates="vyucuje")
+
+    #! je mozne ze bude chybet / predmet = relationship("Predmet", back_populates="vyucuje")
 
 
 class Predmet(Base):
@@ -67,10 +79,12 @@ class Predmet(Base):
     kod_predmetu = Column("kod_predmetu", Text, primary_key=True)
     zkratka_predmetu = Column("zkratka_predmetu", Text)
     katedra = Column("katedra", Text)
-    vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
     pocet_cviceni = Column("pocet_cviceni", Integer)
-
-    vyucuje = relationship('Vyucujici', back_populates="predmet")
+    #! JE MOZNE ZE BUDE CHYBET vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
+    # Many-to-many relationship via VyucujiciPredmety
+    vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet")
+    #! je mozne ze bude chybet / vyucuje = relationship('Vyucujici', back_populates="predmet")
+    # Other relationships
     termin = relationship('Termin', back_populates="predmet")
     zapsane_predmety = relationship('ZapsanePredmety', back_populates="predmet")
 
@@ -358,7 +372,7 @@ def uspesne_dokoncene_terminy(session, id):
 
         splnene_terminy = []
         for history in student.historie_terminu:
-            termin = history.termin  
+            termin = history.termin
 
             if history.datum_splneni is not None:
                 splnene_terminy.append(termin)
@@ -454,16 +468,21 @@ def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
         .first()  # Use first() to return one result or None
     )
 
-    return result is not None 
-from sqlalchemy.orm import Session
+    return result is not None
 
-def get_predmety_by_vyucujici(session: Session, vyucujici_id: str):
-    """ Vrátí všechny predmety, které vyucují daný vyucující """
-    try: 
-        list_predmetu = session.query(Predmet).filter_by(vyucuje_id=vyucujici_id).all()
-        zkratka_predmetu_list = [item.zkratka_predmetu for item in list_predmetu]
-        if zkratka_predmetu_list:
-            return zkratka_predmetu_list
+
+
+
+def get_predmety_by_vyucujici(session, vyucujici_id: str):
+    """ Vrátí všechny předměty, které daný vyučíjící učí """
+    try:
+        vsechny_predmety = []
+        predmety = session.query(VyucujiciPredmety).filter_by(vyucujici_id=vyucujici_id).all()
+
+        for zaznam in predmety:
+            vsechny_predmety.append(zaznam.kod_predmetu)
+        if vsechny_predmety:
+            return vsechny_predmety
         else:
             return not_found
     except:
@@ -471,7 +490,7 @@ def get_predmety_by_vyucujici(session: Session, vyucujici_id: str):
 
 if __name__ == "__main__":
 
-    print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
+    # print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
     # list_probehle_terminy(session)
     # list_probehle_terminy_predmet(session, 'CS101')
@@ -530,11 +549,17 @@ if __name__ == "__main__":
 
     #print(probehle + planovane)
 
-    #historie = historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
-    #splnene_terminy = uspesne_dokoncene_terminy(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
+    # historie = historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
+    # splnene_terminy = uspesne_dokoncene_terminy(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
 
-    #print(subtract_lists(historie, splnene_terminy))
-    #print(list_dostupnych_terminu(session, ["KMPMPS1", "KPPPO2R"], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
+    # print(subtract_lists(historie, splnene_terminy))
+    # print(list_dostupnych_terminu(session, ["KMPMPS1", "KPPPO2R"], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
+
+    # predmety = get_predmety_by_vyucujici(session, "a3b644c7413985be43e9e27c98bf8d46e95bbf44")
+    # print(predmety)
+
+    # for predmet in predmety:
+        # print(predmet)
 
     pass
 
