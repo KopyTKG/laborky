@@ -337,7 +337,10 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
         return bad_request
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
-    zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
+    vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
+    if vystup is None:
+        return not_found
+    zkratka_katedry, zkratka_predmetu = vystup[0], vystup[1]
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
@@ -396,7 +399,10 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
         return info
     
     list_studentu = list_studenti_z_terminu(session, id_terminu)
-    zkratka_predmetu, zkratka_katedry = get_katedra_predmet_by_idterminu(session, id_terminu)
+    vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
+    if vystup is None:
+        return not_found
+    zkratka_katedry, zkratka_predmetu = vystup[0], vystup[1]
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)

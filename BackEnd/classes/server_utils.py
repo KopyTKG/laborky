@@ -2,7 +2,7 @@ import hashlib
 from lib.HTTP_messages import *
 from classes.stag import *
 from lib.db_utils import *
-import os
+import os, json
 
 
 def encode_id(id):
