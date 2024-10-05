@@ -455,7 +455,19 @@ def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
     )
 
     return result is not None 
+from sqlalchemy.orm import Session
 
+def get_predmety_by_vyucujici(session: Session, vyucujici_id: str):
+    """ Vrátí všechny predmety, které vyucují daný vyucující """
+    try: 
+        list_predmetu = session.query(Predmet).filter_by(vyucuje_id=vyucujici_id).all()
+        zkratka_predmetu_list = [item.zkratka_predmetu for item in list_predmetu]
+        if zkratka_predmetu_list:
+            return zkratka_predmetu_list
+        else:
+            return not_found
+    except:
+        return internal_server_error
 
 if __name__ == "__main__":
 

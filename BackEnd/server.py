@@ -175,8 +175,8 @@ async def get_predmety(ticket: str | None = None):
 
     vsechny_predmety = get_vsechny_predmety(session)
 
-    if userid == "VY49712":
-        jmena_vsech_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
+    if role == "VY":
+        jmena_vsech_predmetu =get_predmety_by_vyucujici(session, userid)
         return jmena_vsech_predmetu
 
     elif role == "ST":
