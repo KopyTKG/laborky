@@ -32,7 +32,7 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     predmety = response.json()
     for predmet in predmety["predmetAbsolvoval"]:
         if predmet["zkratka"] in predmety_lab:
-            aktivni_predmety.append(predmet["katedra"] + predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
+            aktivni_predmety.append(predmet["katedra"] + "/" + predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
     predmety = [item for item in aktivni_predmety if item not in splneno]
     return predmety
 

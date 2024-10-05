@@ -174,15 +174,25 @@ async def get_predmety(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     vsechny_predmety = get_vsechny_predmety(session)
-
-    if role == "VY":
-        jmena_vsech_predmetu =get_predmety_by_vyucujici(session, userid)
+    # dekan#_ujp což je náš ekvivalent Škvora
+    if userid == "VY49712":
+        jmena_vsech_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
         return jmena_vsech_predmetu
+    if role == "VY":
+        zkratky_premdetu_vyucujiciho = get_predmety_by_vyucujici(session, userid)
+        if zkratky_premdetu_vyucujiciho is None:
+            return internal_server_error
+        jmena_predmetu_vyucujiciho = get_jmena_predmetu_by_kody(session, zkratky_premdetu_vyucujiciho)
+        return jmena_predmetu_vyucujiciho
 
     elif role == "ST":
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
-        return predmety_k_dispozici
+        if predmety_k_dispozici is None:
+            return internal_server_error
+        jmena_predmetu_k_dispozici = get_jmena_predmetu_by_kody(session, predmety_k_dispozici)
 
+        return predmety_k_dispozici
+    
     return get_vsechny_predmety(session)
 
 
