@@ -1,4 +1,4 @@
-import { NotFound, Unauthorized } from '@/lib/http'
+import { NotFound, Success, Unauthorized } from '@/lib/http'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmet } from '@/lib/types'
 
@@ -7,14 +7,14 @@ export async function GET(req: Request) {
  const rTicket = base.searchParams.get('ticket') || ''
 
  if (!rTicket) {
-  return Unauthorized
+  return Unauthorized()
  }
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/profil`)
  url.searchParams.set('ticket', rTicket)
 
  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
  if (!res.ok) {
-  return NotFound
+  return NotFound()
  }
  const data = (await res.json()) as { [key: string]: number[] }
  const keys = Object.keys(data)
@@ -27,5 +27,5 @@ export async function GET(req: Request) {
   parsed.push(tmp)
  })
 
- return Response.json({ data: parsed }, { status: 200 })
+ return Success({ data: parsed })
 }

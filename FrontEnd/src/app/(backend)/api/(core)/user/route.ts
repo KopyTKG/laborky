@@ -8,16 +8,16 @@ export async function GET(req: Request) {
  const rTicket = url.searchParams.get('ticket') || ''
 
  if (!rTicket) {
-  return Unauthorized
+  return Unauthorized()
  } else {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
   url.searchParams.set('ticket', rTicket)
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
 
   if (!res.ok) {
-   return Unauthorized
+   return Unauthorized()
   }
 
-  return Success
+  return Success()
  }
 }
