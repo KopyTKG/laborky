@@ -386,6 +386,10 @@ async def post_ucitel_uznat_studentovi(ticket: str, id_stud: str, zkratka_predme
     id_terminu = get_uznavaci_termin_by_zkratka(session, zkratka_predmetu)
     if id_terminu is None:
         return not_found
+    message = pridat_studenta(session, id_stud, id_terminu)
+    if message != ok:
+        return message
+    session.commit()
     message = uznat_termin(session, id_terminu, id_stud)
     return message
 
