@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
+import { fastHeaders } from '@/lib/stag'
 
 export async function middleware(request: NextRequest) {
  if (BaseAuth(request) && Validate(request.cookies.get('stagUserInfo')?.value || '')) {
@@ -9,8 +10,22 @@ export async function middleware(request: NextRequest) {
   const stid = decoded?.stagUserInfo[0].osCislo
   const vyid = 'vy' + decoded?.stagUserInfo[0].ucitIdno
 
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
+  const ticket = request.cookies.get('stagUserTicket')?.value || ''
+  if (!ticket) {
+   return
+  }
+
+  url.searchParams.set('ticket', ticket)
+  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+  if (!res.ok) {
+   return
+  }
+  const data = await res.json()
+  console.log(data)
+
   if (request.url.endsWith('/')) {
-   if (user.role == 'ST') {
+   if (data == 'ST') {
     request.nextUrl.pathname = '/student/' + stid
    } else {
     request.nextUrl.pathname = '/ucitel/' + vyid
@@ -40,11 +55,10 @@ export async function middleware(request: NextRequest) {
    request.nextUrl.pathname = '/'
    return NextResponse.redirect(request.nextUrl)
   }
-
-  // TBA // https://laborky.ujep.cz/terminy?t=zel parsing
  } else {
   if (!request.url.endsWith('/login')) {
-   return await Kick(request)
+   request.nextUrl.pathname = '/login'
+   return NextResponse.redirect(request.nextUrl)
   }
  }
 }
@@ -88,29 +102,6 @@ function base64ToText(base64: string) {
  const binaryString = atob(base64)
  const Bytes = new Uint8Array(Array.from(binaryString, (m) => m.charCodeAt(0)))
  return JSON.parse(new TextDecoder().decode(Bytes))
-}
-
-async function Kick(request: NextRequest) {
- const ticket = request.cookies.get('stagUserTicket')?.value || ''
-
- if (ticket == '') {
-  request.nextUrl.pathname = '/login'
-  return NextResponse.redirect(new URL(request.nextUrl))
- }
- const url = `${process.env.NEXT_PUBLIC_STAG_SERVER}services/rest2/help/invalidateTicket?ticket=${ticket}`
- const response = await fetch(url, {
-  method: 'GET',
-  headers: {
-   Accept: 'text/plain',
-  },
- })
- if (response.ok) {
-  request.cookies.clear()
-  request.nextUrl.pathname = '/login'
-  return NextResponse.redirect(new URL(request.nextUrl))
- } else {
-  throw new Error('Ticket not valid')
- }
 }
 
 export { base64ToText }

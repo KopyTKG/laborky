@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
+import { tPredmet } from '@/lib/types'
 
 async function fetchPredmetyData() {
  try {
@@ -14,7 +15,12 @@ async function fetchPredmetyData() {
   if (!res.ok) {
    throw new Error(`Failed to fetch: ${res.statusText}`)
   }
-  return await res.json()
+  const data = await res.json()
+  const names: string[] = []
+  data.map((item: tPredmet) => {
+   names.push(item.nazev)
+  })
+  return names
  } catch (error) {
   console.error('Error fetching predmety:', error)
   throw error
@@ -25,7 +31,6 @@ export default function Filtr({ search }: { search: string[] }) {
  const [selected, setSelected] = useState<string[]>(search)
  const [predmety, setPredmety] = useState<string[]>([])
  const [isLoading, setIsLoading] = useState(true)
- const [error, setError] = useState<string | null>(null)
 
  const router = useRouter()
  const pathname = usePathname()
@@ -42,10 +47,9 @@ export default function Filtr({ search }: { search: string[] }) {
    try {
     setIsLoading(true)
     const data = await fetchPredmetyData()
-    console.log(data)
-    setPredmety(data.data)
-   } catch (err) {
-    setError('Failed to load subjects. Please try again later.')
+    setPredmety(data)
+   } catch (e) {
+    console.error(e)
    } finally {
     setIsLoading(false)
    }

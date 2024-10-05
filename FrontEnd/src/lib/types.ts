@@ -30,15 +30,13 @@ export type tLink = {
  icon: string
 }
 
-export type tPredmet = {
+export type tPredmetSekce = {
  nazev: string
  cviceni: number[]
 }
 
-export type tPredmetInfo = {
+export type tPredmet = {
  _id: string
- zkratka: string
  nazev: string
  nCviceni: number
- vyucujici: string
 }

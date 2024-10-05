@@ -1,5 +1,4 @@
 'use client'
-import Icon from '@/components/icon'
 import {
  Button,
  Checkbox,
@@ -11,47 +10,69 @@ import {
  ModalHeader,
  Select,
  SelectItem,
+ TimeInput,
  useDisclosure,
 } from '@nextui-org/react'
 import React, { useLayoutEffect, useState } from 'react'
-import { Button as Btn } from '@/components/ui/button'
-import { tPredmetInfo } from '@/lib/types'
+import { tPredmet } from '@/lib/types'
 import { Get } from '@/app/actions'
+import { BellRing, Plus } from 'lucide-react'
+import { fastHeaders } from '@/lib/stag'
 
-const Skupiny = ['ZPS', 'ki/ZSP', 'ASD', 'QEEE', 'Neurčeno']
+const fetchPredmetyData = async () => {
+ try {
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/predmety`)
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
+  }
+  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+  if (!res.ok) {
+   console.error(res.statusText)
+  } else if (res.ok) {
+   return await res.json()
+  }
+ } catch (e) {
+  console.error(e)
+ }
+}
+
 export default function Vytvor() {
- const [predmety, setPredmety] = useState<tPredmetInfo[]>([])
- const [skupiny, setSkupiny] = useState<string[]>([])
- const [predmet, setPredmet] = useState<number>(-1)
+ const [predmety, setPredmety] = useState<tPredmet[]>([])
+ const [predmet, setPredmet] = useState<tPredmet>()
+ const [cviceni, setCviceni] = useState<number>(0)
  const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
+ function handlePredmetChange(e: any) {
+  const selectedValue = e.target.value
+  const selectedPredmet = predmety.find((predmet) => predmet._id === selectedValue)
+  if (selectedPredmet) {
+   setPredmet(selectedPredmet)
+  }
+ }
+
+ function handleSubmit() {
+  const tema = document.getElementById('tema')
+  const datum = document.getElementById('datum')
+  const zacatek = document.getElementById('od')
+  const konec = document.getElementById('do')
+  const misto = document.getElementById('misto')
+  const kapacita = document.getElementById('')
+ }
+
  useLayoutEffect(() => {
-  const fetchTerminy = async () => {
+  async function loadPredmety() {
    try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/predmety`)
-    url.searchParams.set('t', 'vypsane')
-    const cookie = await Get('stagUserTicket')
-    if (cookie) {
-     url.searchParams.set('ticket', cookie.value)
+    const data = (await fetchPredmetyData())?.predmety
+    if (data) {
+     setPredmety(data)
+     setPredmet(data[0])
     }
-    const headers = {
-     Accept: 'application/json',
-     'Content-Type': 'application/json',
-     Connection: 'keep-alive',
-     'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
-    }
-    const res = await fetch(url.toString(), { method: 'GET', headers })
-    if (res.status != 200) {
-     window.location.reload()
-    } else if (res.status == 200) {
-     let jsonParsed = await res.json()
-     setPredmety(jsonParsed.data)
-    }
-   } catch {
-    window.location.href = '/logout'
+   } catch (e) {
+    console.error(e)
    }
   }
-  //fetchTerminy()
+  loadPredmety()
  }, [])
 
  return (
@@ -60,71 +81,70 @@ export default function Vytvor() {
     <ModalContent>
      {(onClose) => (
       <>
-       <form>
+       <form onSubmit={handleSubmit}>
         <ModalHeader className="flex flex-col gap-1 text-2xl">Vypsání nového termínu</ModalHeader>
         <ModalBody>
          <SectionTitle>Vyberte předmět</SectionTitle>
          <Select
           placeholder="Vyberte předmět"
+          selectionMode="single"
+          onChange={handlePredmetChange}
           isRequired
-          onChange={(e) => {
-           setPredmet(predmety.findIndex((item) => item._id === e.target.value))
-          }}
          >
-          {predmety.map((item, key) => (
-           <SelectItem value={key} key={item._id}>
-            {item.zkratka}
+          {predmety.map((item: tPredmet) => (
+           <SelectItem value={item._id} key={item._id}>
+            {item.nazev}
            </SelectItem>
           ))}
          </Select>
-         {predmet < 0 || predmety[predmet].zkratka === 'Nic' ? (
-          <Input placeholder="Zadejte téma" isRequired />
-         ) : (
-          <Select placeholder="Vyberte cvičení" isRequired>
-           {Array.from({ length: predmety[predmet].nCviceni }, (_, index) => (
-            <SelectItem key={`${predmet}-${index}`} value={index + 1}>
-             {`Cvičení ${index + 1}`}
-            </SelectItem>
-           ))}
-          </Select>
-         )}
+         <Select
+          placeholder="Vyberte cvičení"
+          isRequired
+          value={cviceni}
+          onChange={(e) => setCviceni(parseInt(e.target.value))}
+         >
+          <SelectItem key={0} value={0}>
+           Neurčeno
+          </SelectItem>
+          {Array.from({ length: predmet?.nCviceni || 0 }).map((_, index) => (
+           <SelectItem key={index + 1} value={index + 1}>
+            {`Cvičení ${index + 1}`}
+           </SelectItem>
+          ))}
+         </Select>
+         <Input id="tema" placeholder="Zadejte téma" isRequired />
+
          <SectionTitle>Místo konání</SectionTitle>
-         <Input placeholder="Zadejte místo konání" isRequired />
+         <Input id="misto" placeholder="Zadejte místo konání" isRequired />
+         <SectionTitle>Kapacita termínu</SectionTitle>
+         <Input id="kapacita" type="number" placeholder="Zadejte kapacitu termínu" isRequired />
          <SectionTitle>Datum a čas konání</SectionTitle>
-         <Input type="date" placeholder="Zadejte datum a čas konání" isRequired />
-         <div className="flex flex-row gap-10 justify-between">
-          <div className="flex flex-row items-center text-lg gap-2 w-full">
+         <Input id="datum" type="date" placeholder="Zadejte datum a čas konání" isRequired />
+         <div className="flex flex-row gap-10">
+          <div className="flex flex-row items-center text-lg gap-2 w-max">
            od:
-           <Input type="time" placeholder="Zadejte datum a čas konání" isRequired />
+           <TimeInput id="od" hourCycle={24} granularity="minute" isRequired />
           </div>
-          <div className="flex flex-row items-center text-lg gap-2 w-full">
+          <div className="flex flex-row items-center text-lg gap-2 w-max">
            do:
-           <Input type="time" placeholder="Zadejte datum a čas konání" isRequired />
+           <TimeInput id="do" hourCycle={24} granularity="minute" isRequired />
           </div>
          </div>
-         <SectionTitle>Výběr cílové skupiny</SectionTitle>
-         <Select placeholder="Vyberte skupinu" selectionMode="multiple" isRequired>
-          {Skupiny.map((item) => (
-           <SelectItem value={item} key={item}>
-            {item}
-           </SelectItem>
-          ))}
-         </Select>
          <div className="pt-8">
           <Checkbox color="warning" size="lg" defaultSelected>
            <div className="flex flex-row gap-2">
-            <Icon name="bell-ring" className="w-6" />
+            <BellRing className="w-6" />
             <h3>Upozornit studenty</h3>
            </div>
           </Checkbox>
          </div>
         </ModalBody>
         <ModalFooter className="flex flex-row w-full justify-between">
-         <Button color="primary" type="submit">
-          Vytvořit
-         </Button>
          <Button color="danger" onPress={onClose}>
           Zrušit
+         </Button>
+         <Button color="primary" type="submit">
+          Vytvořit
          </Button>
         </ModalFooter>
        </form>
@@ -132,14 +152,16 @@ export default function Vytvor() {
      )}
     </ModalContent>
    </Modal>
-   <Btn
-    variant="highlight"
+   <Button
+    variant="solid"
+    isIconOnly
     onClick={onOpen}
     aria-label="Create new event"
+    color="primary"
     className="fixed bottom-6 right-6"
    >
-    <Icon name="plus" className="w-6 h-6" />
-   </Btn>
+    <Plus className="w-6 h-6" />
+   </Button>
   </>
  )
 }

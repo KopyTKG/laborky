@@ -1,6 +1,6 @@
 import { NotFound, Success, Unauthorized } from '@/lib/http'
 import { fastHeaders } from '@/lib/stag'
-import { tPredmet } from '@/lib/types'
+import { tPredmetSekce } from '@/lib/types'
 
 export async function GET(req: Request) {
  const base = new URL(req.url)
@@ -18,9 +18,9 @@ export async function GET(req: Request) {
  }
  const data = (await res.json()) as { [key: string]: number[] }
  const keys = Object.keys(data)
- const parsed: tPredmet[] = []
+ const parsed: tPredmetSekce[] = []
  keys.forEach((item: string) => {
-  let tmp: tPredmet = {
+  let tmp: tPredmetSekce = {
    nazev: item,
    cviceni: data[item],
   }

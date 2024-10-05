@@ -1,12 +1,12 @@
 import { Get } from '@/app/actions'
 import { Divider } from '@/components/ui/divider'
 import { fastHeaders } from '@/lib/stag'
-import { tPredmet } from '@/lib/types'
+import { tPredmetSekce } from '@/lib/types'
 import { Chip } from '@nextui-org/react'
 import { redirect } from 'next/navigation'
 
 export default async function Profil() {
- let predmety: tPredmet[] = []
+ let predmety: tPredmetSekce[] = []
  try {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/profil`)
   const cookie = await Get('stagUserTicket')
@@ -19,7 +19,7 @@ export default async function Profil() {
    redirect('/logout')
   } else if (res.status == 200) {
    let jsonParsed = await res.json()
-   predmety = jsonParsed.data as tPredmet[]
+   predmety = jsonParsed.data as tPredmetSekce[]
   }
  } catch {
   redirect('/logout')
@@ -28,7 +28,7 @@ export default async function Profil() {
  return (
   <>
    <div className="w-full">
-    {predmety.map((predmet: tPredmet, key: number) => {
+    {predmety.map((predmet: tPredmetSekce, key: number) => {
      return (
       <div className="mb-3" key={predmet.nazev}>
        <h3 className="font-bold text-2xl ">{predmet.nazev}</h3>

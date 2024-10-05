@@ -1,5 +1,6 @@
 import { Unauthorized, Internal, Success } from '@/lib/http'
 import { fastHeaders } from '@/lib/stag'
+import { tPredmet } from '@/lib/types'
 
 export async function GET(req: Request) {
  const base = new URL(req.url)
@@ -19,7 +20,16 @@ export async function GET(req: Request) {
   return Internal()
  } else {
   const data = await res.json()
-  console.log(data)
-  return Success({ data })
+  const predmety: tPredmet[] = []
+  data.map((item: any, key: number) => {
+   let predmet: tPredmet = {
+    _id: key.toString(),
+    nazev: item,
+    nCviceni: key,
+   }
+   predmety.push(predmet)
+  })
+
+  return Success({ predmety })
  }
 }
