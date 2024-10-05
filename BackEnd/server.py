@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI # type: ignore
 from classes.stag import *
 from classes.vyucujici import *
 from classes.student import *
@@ -8,7 +8,7 @@ from lib.conn import *
 from lib.db_utils import *
 from lib.db_terminy import *
 from lib.HTTP_messages import *
-from jose import jwt
+from jose import jwt # type: ignore
 from datetime import datetime
 from typing import Optional
 import re
@@ -282,8 +282,8 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
     if kod_predmetu is None:
         return not_found
 
-    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu)
-    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis)
+    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
     return message
 
 
@@ -456,7 +456,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         session.commit()
         datum_start = datetime.now()
         datum_konec = datetime.now() + timedelta(hours=2)
-        message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu")
+        message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
 
         return message
     
@@ -488,7 +488,7 @@ if __name__ == "__main__":
         raise Exception("Session creation failed!")
     #vyucujici_k_predmetum_to_txt(session)
 
-    uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT')))
+    uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT'))) # type: ignore
 
 
 
