@@ -36,7 +36,7 @@ async def kontrola_s_databazi(ticket: str | None = None):
         message = vytvor_student(session, userid)
         if message == internal_server_error:
             return internal_server_error
-    return role
+    return info[0], role, userid
 
 
 ### Student API
@@ -176,20 +176,20 @@ async def get_predmety(ticket: str | None = None):
     vsechny_predmety = get_vsechny_predmety(session)
     # dekan#_ujp což je náš ekvivalent Škvora
     if info[0] == "VY49712":
-        jmena_vsech_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
+        jmena_vsech_predmetu = get_jmena_predmetu_by_zkratka(session, vsechny_predmety)
         return jmena_vsech_predmetu
     if role == "VY":
         zkratky_premdetu_vyucujiciho = get_predmety_by_vyucujici(session, userid)
         if zkratky_premdetu_vyucujiciho is None:
             return internal_server_error
-        jmena_predmetu_vyucujiciho = get_jmena_predmetu_by_kody(session, zkratky_premdetu_vyucujiciho)
+        jmena_predmetu_vyucujiciho = get_jmena_predmetu_by_zkratka(session, zkratky_premdetu_vyucujiciho)
         return jmena_predmetu_vyucujiciho
 
     elif role == "ST":
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
         if predmety_k_dispozici is None:
             return internal_server_error
-        jmena_predmetu_k_dispozici = get_jmena_predmetu_by_kody(session, predmety_k_dispozici)
+        jmena_predmetu_k_dispozici = get_jmena_predmetu_by_zkratka(session, predmety_k_dispozici)
 
         return predmety_k_dispozici
     
@@ -281,7 +281,7 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str, vyucuje_id: Optional[str] = None):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_id: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
@@ -294,8 +294,17 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
 
     vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
     message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
-    return message
-
+    if message is not ok:
+        return message
+    elif upozornit:
+        katedra = get_katedra_by_predmet(session, zkratka_predmetu)
+        kod_predmetu = katedra + zkratka_predmetu
+        list_emailu = get_list_emailu_by_predmet(session, kod_predmetu, cislo_cviceni)
+        if list_emailu == []:
+            return not_found
+        return list_emailu
+    else:
+        return ok
 
 @app.patch("/ucitel/termin")
 async def ucitel_zmena_terminu(
@@ -354,7 +363,6 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-
     return jmena_studentu
         # vraci {osCislo: {jmeno: , prijmeni: , email: }}
 
@@ -489,7 +497,7 @@ def invalidate(ticket: str):
 @app.get("/")
 def root():
     vsechny_predmety = get_vsechny_predmety(session)
-    jmena_predmetu = get_jmena_predmetu_by_kody(session, vsechny_predmety)
+    jmena_predmetu = get_jmena_predmetu_by_zkratka(session, vsechny_predmety)
     return jmena_predmetu
 
 

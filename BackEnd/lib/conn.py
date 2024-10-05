@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime, distinct, func, and_
+from sqlalchemy import create_engine, MetaData, Table, ForeignKey, Column, String, Integer, Text, UUID, DateTime, distinct, func, and_, or_
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 import os, dotenv
 import uuid
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from lib.HTTP_messages import *
-
+from classes.vyucujici import *
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -488,9 +488,41 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     except:
         return internal_server_error
 
-if __name__ == "__main__":
+def get_list_emailu_by_predmet(session,zkratka_predmetu, index_cviceni: int, ticket: str = None):
+    try:
+        studenti_co_maji_ziskat_email = (session.query(Student)
+        .outerjoin(HistorieTerminu, HistorieTerminu.student_id == Student.id)
+        .outerjoin(Termin, Termin.id == HistorieTerminu.termin_id)
+        .filter(
+        or_(Termin.cislo_cviceni != 1, Termin.cislo_cviceni == None),  # Students without 'cislo_cviceni == 1'
+        Termin.kod_predmet == "KAPPF"  # Add filter for kod_predmetu == 'KAPPF'
+        ).all())
+        if studenti_co_maji_ziskat_email is None:
+            return not_found
+        print(f"studneti co maji ziskat email: {studenti_co_maji_ziskat_email}")
+        zkratka_katedry = "KAP"
+        zkratka_predmetu = "PF"
+        print("sanity test :(")
+        vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
+        print(f"vsichni studenti: {vsichni_studenti}")
+        if vsichni_studenti is None:
+            return not_found
+        os_cisla = compare_encoded(studenti_co_maji_ziskat_email, vsichni_studenti)
+        print("os_cisla: ", os_cisla)
+        if os_cisla is None:
+            return not_found
+        list_emailu = []
+        for student in os_cisla:
+                jmeno, prijmeni, email = get_studenti_info(ticket, student)
+                list_emailu.append(email)
+        print(list_emailu)
+        return list_emailu
+    except Exception as e:
+        return e
 
-    # print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
+if __name__ == "__main__":
+    #print(get_list_emailu_by_predmet(session, "KAPPF", 1))
+    #print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
     # list_probehle_terminy(session)
     # list_probehle_terminy_predmet(session, 'CS101')

@@ -62,7 +62,7 @@ def read_file():
     return vyucujici_list
 
 
-def get_jmena_predmetu_by_kody(session, zkratky_predmetu):
+def get_jmena_predmetu_by_zkratka(session, zkratky_predmetu):
     jmena_predmetu = []
     for zkratka in zkratky_predmetu:
         katedra = get_katedra_by_predmet(session, zkratka)
