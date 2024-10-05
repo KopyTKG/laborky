@@ -5,11 +5,12 @@ import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useSearchParams } from 'next/navigation'
 
-const fetchTerminyData = async () => {
+const fetchTerminyData = async (vybrane: string) => {
  try {
-  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/terminy`)
-  url.searchParams.set('t', 'vypsane')
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/filtr`)
+  url.searchParams.set('vybrane', vybrane)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
@@ -17,7 +18,7 @@ const fetchTerminyData = async () => {
   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (res.status == 401) {
    window.location.href = '/logout'
-  } else if (res.status == 200 || res.status == 404) {
+  } else if (res.status == 200) {
    return await res.json()
   }
  } catch (e) {
@@ -25,25 +26,28 @@ const fetchTerminyData = async () => {
  }
 }
 
-export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
+export default function FiltrTerminy({ typ }: { typ?: string }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
  const [reload, setReload] = useState<boolean>(false)
  const [fetching, setFetching] = useState<boolean>(true)
 
+ const searchParams = useSearchParams()
+
  const fetchTerminy = useCallback(async () => {
-  const data = await fetchTerminyData()
+  const vybrane = searchParams.get('s')
+  const data = await fetchTerminyData(vybrane || '')
   if (data) {
    setTerminy(data.data)
    setReload(false)
   }
 
   setFetching(false)
- }, [reload])
+ }, [searchParams])
 
  useLayoutEffect(() => {
   fetchTerminy()
- }, [reload])
+ }, [reload, fetchTerminy])
 
  if (Terminy?.length === 0 && fetching) {
   return (

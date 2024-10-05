@@ -8,10 +8,10 @@ export async function GET(req: Request) {
  const rType = base.searchParams.get('type') || ''
 
  if (!rTicket) {
-  return Unauthorized
+  return Unauthorized()
  }
  if (!rID || !rType) {
-  return NotFound
+  return NotFound()
  }
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/student`)
@@ -23,12 +23,12 @@ export async function GET(req: Request) {
 
  switch (res.status) {
   case 200:
-   return Success
+   return Success()
   case 409:
-   return Conflict
+   return Conflict()
   case 401:
-   return Unauthorized
+   return Unauthorized()
   default:
-   return Internal
+   return Internal()
  }
 }

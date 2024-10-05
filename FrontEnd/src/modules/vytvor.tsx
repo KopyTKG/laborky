@@ -51,7 +51,7 @@ export default function Vytvor() {
     window.location.href = '/logout'
    }
   }
-  fetchTerminy()
+  //fetchTerminy()
  }, [])
 
  return (

@@ -1,6 +1,6 @@
 import { Get } from '@/app/actions'
-import { Badge } from '@/components/ui/badge'
 import { Divider } from '@/components/ui/divider'
+import { fastHeaders } from '@/lib/stag'
 import { tPredmet } from '@/lib/types'
 import { Chip } from '@nextui-org/react'
 import { redirect } from 'next/navigation'
@@ -13,13 +13,8 @@ export default async function Profil() {
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
   }
-  const headers = {
-   Accept: 'application/json',
-   'Content-Type': 'application/json',
-   Connection: 'keep-alive',
-   'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
-  }
-  const res = await fetch(url.toString(), { method: 'GET', headers })
+
+  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
   if (res.status != 200) {
    redirect('/logout')
   } else if (res.status == 200) {
