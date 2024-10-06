@@ -3,7 +3,10 @@
 SESH="laborky"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if [[ "$1" == "-tmux" ]]; then
+	if [[ "$1" == "-dev" ]]; then
+		gnome-terminal -- bash -c "./run.sh -rtmux"
+		nvim .
+	elif [[ "$1" == "-tmux" ]]; then
 		gnome-terminal -- bash -c "./run.sh -rtmux"
 	elif [[ "$1" == "-rtmux" ]]; then
 		tmux has-session -t $SESH 2>/dev/null
