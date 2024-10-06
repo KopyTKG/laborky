@@ -15,12 +15,7 @@ async function fetchPredmetyData() {
   if (!res.ok) {
    throw new Error(`Failed to fetch: ${res.statusText}`)
   }
-  const data = await res.json()
-  const names: string[] = []
-  data.map((item: tPredmet) => {
-   names.push(item.nazev)
-  })
-  return names
+  return await res.json()
  } catch (error) {
   console.error('Error fetching predmety:', error)
   throw error
@@ -29,7 +24,7 @@ async function fetchPredmetyData() {
 
 export default function Filtr({ search }: { search: string[] }) {
  const [selected, setSelected] = useState<string[]>(search)
- const [predmety, setPredmety] = useState<string[]>([])
+ const [predmety, setPredmety] = useState<tPredmet[]>([])
  const [isLoading, setIsLoading] = useState(true)
 
  const router = useRouter()
@@ -46,7 +41,7 @@ export default function Filtr({ search }: { search: string[] }) {
   async function loadPredmety() {
    try {
     setIsLoading(true)
-    const data = await fetchPredmetyData()
+    const data = (await fetchPredmetyData())?.predmety
     setPredmety(data)
    } catch (e) {
     console.error(e)
@@ -72,8 +67,8 @@ export default function Filtr({ search }: { search: string[] }) {
     )}
     {!isLoading &&
      predmety.map((item, key) => (
-      <Checkbox value={item} key={item + key}>
-       {item}
+      <Checkbox value={item.nazev} key={item._id}>
+       {item.nazev}
       </Checkbox>
      ))}
    </CheckboxGroup>

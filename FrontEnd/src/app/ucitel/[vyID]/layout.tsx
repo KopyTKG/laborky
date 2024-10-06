@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavbarTeacher as Navbar } from '@/components/navbars'
-import Vytvor from '@/modules/vytvor'
+import Vytvor from '@/components/vytvor'
 
 export default function RootLayout({
  children,
