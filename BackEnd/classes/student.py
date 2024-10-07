@@ -30,8 +30,12 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     splneno = []
     aktivni_predmety = []
     predmety = response.json()
+    zkratky = []
+    for predmet in predmety_lab:
+        zkratky.append((predmet.kod_predmetu).split("/")[-1])
+
     for predmet in predmety["predmetAbsolvoval"]:
-        if predmet["zkratka"] in predmety_lab:
+        if predmet["zkratka"] in zkratky:
             aktivni_predmety.append(predmet["katedra"] + "/" + predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
     predmety = [item for item in aktivni_predmety if item not in splneno]
     return predmety

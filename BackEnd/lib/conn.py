@@ -463,10 +463,10 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     """ Vrátí všechny předměty, které daný vyučíjící učí """
     try:
         vsechny_predmety = []
-        predmety = session.query(VyucujiciPredmety).filter_by(vyucujici_id=vyucujici_id).all()
+        predmety = session.query(Predmet).join(VyucujiciPredmety).filter_by(vyucujici_id=vyucujici_id).all()
 
         for zaznam in predmety:
-            vsechny_predmety.append(zaznam.kod_predmetu)
+            vsechny_predmety.append(zaznam)
         if vsechny_predmety:
             return vsechny_predmety
         else:

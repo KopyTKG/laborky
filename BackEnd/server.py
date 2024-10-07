@@ -171,24 +171,27 @@ async def get_predmety(ticket: str | None = None):
         return info
     userid, role = encode_id(info[0]), info[1]
 
-    vsechny_predmety = get_vsechny_predmety(session)
+    vsechny_predmety = get_vsechny_predmety_obj(session)
+
     # dekan#_ujp což je náš ekvivalent Škvora
     if info[0] == "VY49712":
-        jmena_vsech_predmetu = get_jmena_predmetu_by_zkratka(session, vsechny_predmety)
+        jmena_vsech_predmetu = get_predmet_id_jmeno_cisla(vsechny_predmety)
         return jmena_vsech_predmetu
-    if role == "VY":
-        zkratky_premdetu_vyucujiciho = get_predmety_by_vyucujici(session, userid)
-        if zkratky_premdetu_vyucujiciho is None:
+    
+    if role == "VY": # možná přidáme ještě nějaké role
+        predmety_vyucujiciho = get_predmety_by_vyucujici(session, userid)
+        if predmety_vyucujiciho is None:
             return internal_server_error
-        jmena_predmetu_vyucujiciho = get_jmena_predmetu_by_zkratka(session, zkratky_premdetu_vyucujiciho)
+        
+        jmena_predmetu_vyucujiciho = get_predmet_id_jmeno_cisla(predmety_vyucujiciho)
         return jmena_predmetu_vyucujiciho
 
     elif role == "ST":
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
         if predmety_k_dispozici is None:
             return internal_server_error
-        jmena_predmetu_k_dispozici = get_jmena_predmetu_by_zkratka(session, predmety_k_dispozici)
-
+        predmety = get_predmety_by_kody(session, predmety_k_dispozici)
+        jmena_predmetu_k_dispozici = get_predmet_id_jmeno_cisla(predmety)
         return jmena_predmetu_k_dispozici
     
     return None # vrací nic, když uživatel není žádná role
@@ -361,7 +364,6 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
         return bad_request
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
-    print(list_studentu)
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found

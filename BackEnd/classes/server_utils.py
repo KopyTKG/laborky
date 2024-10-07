@@ -73,3 +73,26 @@ def get_jmena_predmetu_by_zkratka(session, zkratky_predmetu):
         jmena_predmetu.append(jmeno)
 
     return jmena_predmetu
+
+
+def get_predmet_id_jmeno_cisla(predmety):
+    predmet_id_jmeno_cisla = []
+    for predmet in predmety:
+        info = {}
+        info["id"] = predmet.kod_predmetu
+        info["pocet_cviceni"] = predmet.pocet_cviceni
+        predmet_id_jmeno_cisla.append(info)
+
+    return predmet_id_jmeno_cisla
+
+
+def get_predmety_by_kody(session, kody_predmetu):
+    predmety = []
+    for kod in kody_predmetu:
+        predmet = get_predmet_by_id(session, kod)
+        if predmet is None:
+            continue
+        else:
+            predmety.append(predmet)
+
+    return predmety

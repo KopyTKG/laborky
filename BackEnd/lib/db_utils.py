@@ -11,13 +11,18 @@ def get_vyucujiciho_by_predmet(session, kod_predmetu):
     return None
 
 
+def get_vsechny_predmety_obj(session):
+    """ Vrátí vsechny predmety """
+    predmety = session.query(Predmet).all()
+    return predmety
+
 
 # tohle je obsolete imho
 def get_predmet_by_id(session, id_predmetu):
     """ Vrátí kód předmětu podle jeho identifikačního kódů """
-    predmet = session.query(Predmet).filter_by(id=id_predmetu).first()
+    predmet = session.query(Predmet).filter_by(kod_predmetu=id_predmetu).first()
     if predmet:
-        return predmet.kod_predmetu
+        return predmet
     return None
 
 
