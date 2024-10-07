@@ -94,6 +94,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
 @app.get("/student/moje")
 async def get_student_moje(ticket: str | None = None):
     """ Vrátí cvičení, na kterých je student aktuálně zapsán
+
     Args:
         ticket (str): Uživatelský autentizační token.
 
@@ -131,27 +132,22 @@ async def get_student_moje(ticket: str | None = None):
 async def get_student_profil(ticket: str | None = None):
     """ Vraci zaznam o vsech typech cviceni na vsechny predmety, ktere ma student
     zapsane na portalu STAG a jsou zaroven v Databazi, zda je student splnil ci nikoli"""
-    #ticket = os.getenv("TICKET") # prozatimni reseni
     info = kontrola_ticketu(ticket, vyucujici=False)
     if info == unauthorized or info == internal_server_error:
         return info
     userid, role = encode_id(info[0]), info[1]
 
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
-
-    if role != "ST":
-        return unauthorized
-
-    pocet_pro_predmet = pocet_cviceni_pro_predmet(session)
-    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet)
-
+    
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session)) # vrátí předměty, které student studuje podle stagu (formát KAT/PRED)
+    pocet_pro_predmet = pocet_cviceni_pro_predmet(session) # vrací dict všech předmětů z DB a počet cvičení, formát: {kat/pred: [0, 0, 0], ...}
+    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db 
     vyhodnoceni = {}
 
     for predmet in predmety_k_dispozici:
         if predmet in list(vyhodnoceni_vsech_predmetu.keys()):
             vyhodnoceni[predmet] = vyhodnoceni_vsech_predmetu[predmet]
 
-    # format: {"KodPred": [0, 1, 1]} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
+    # format: {"kat/pred": [0, 1, 1], ...} # len list = pocet cviceni, index = index cviceni, 0 nesplnil 1 splnil
     return vyhodnoceni
 
 
@@ -167,6 +163,8 @@ async def get_predmety(ticket: str | None = None):
         # studentovi vrací předměty, pouze které studuje
         # učitelovi vrací předměty, kterých je cvičící
         # škvorovi vrací všechno - neimplementováno
+
+    # vracet: idpredmetu, jmeno, pocet cviceni
 
     info = kontrola_ticketu(ticket, vyucujici=False)
     if info == unauthorized or info == internal_server_error:
@@ -191,9 +189,9 @@ async def get_predmety(ticket: str | None = None):
             return internal_server_error
         jmena_predmetu_k_dispozici = get_jmena_predmetu_by_zkratka(session, predmety_k_dispozici)
 
-        return predmety_k_dispozici
+        return jmena_predmetu_k_dispozici
     
-    return get_vsechny_predmety(session)
+    return None # vrací nic, když uživatel není žádná role
 
 
 
@@ -268,8 +266,8 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
-        predmety = ";".join(pomocny_list)
-    list_predmetu = predmety.split(";")
+        predmety = ";".join(pomocny_list) # type: ignore
+    list_predmetu = predmety.split(";") # type: ignore
     list_terminu = []
     vyucujici_list = read_file()
     for predmet in list_predmetu:
@@ -281,7 +279,7 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_id: Optional[str] = None):
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_prijmeni: Optional[str] = None):
     """ Učitel vytvoří termín do databáze """
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
@@ -292,13 +290,20 @@ async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, d
     if kod_predmetu is None:
         return not_found
 
-    vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+    if vyucuje_prijmeni is not None:
+        vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+# TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
+# navrh: random()
+
+    else:
+        vyucuje_id = vypsal_id
+
     message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
     if message is not ok:
         return message
     elif upozornit:
         katedra = get_katedra_by_predmet(session, zkratka_predmetu)
-        kod_predmetu = katedra + zkratka_predmetu
+        kod_predmetu = katedra + "/" +zkratka_predmetu # type: ignore
         list_emailu = get_list_emailu_by_predmet(session, kod_predmetu, cislo_cviceni)
         if list_emailu == []:
             return not_found
@@ -356,10 +361,11 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
         return bad_request
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
+    print(list_studentu)
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
-    zkratka_katedry, zkratka_predmetu = vystup[0], vystup[1]
+    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
@@ -369,7 +375,9 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
 
 @app.post("/ucitel/zapis")
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None
-    """ Ručně přihlásí studenta do vypsaného termínu cvičení """
+    """ Ručně přihlásí studenta do vypsaného termínu cvičení 
+
+    Args: id_studenta je jeho Fčíslo s F na začátku! [F*****] (nutno připsat dovnitř vstupu)"""
     # ticket = os.getenv("TICKET")
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
@@ -465,13 +473,16 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         return info
     id_vypsal, role = encode_id(info[0]), info[1]
 
-    kod_predmetu = katedra + zkratka_predmetu
+    kod_predmetu = katedra + "/" + zkratka_predmetu
     if vyucuje_id is None:
         vyucuje_id = id_vypsal
     else:
         vyucuje_id = encode_id(vyucuje_id)
 
-    message = vytvor_predmet(session, kod_predmetu,zkratka_predmetu,katedra,vyucuje_id, pocet_cviceni)
+    if not bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
+        return bad_request
+
+    message = vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id, pocet_cviceni)
 
     if message == ok:
         vyucujici_k_predmetum_to_txt(session)
@@ -490,7 +501,6 @@ def invalidate(ticket: str):
     url = "https://stag-demo.zcu.cz/ws/services/rest2/help/invalidateTicket?ticket=" + ticket
 
     response = requests.get(url)
-    print(response)
     return 200
 
 
@@ -512,21 +522,3 @@ if __name__ == "__main__":
 
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT'))) # type: ignore
 
-
-
-
-
-"""
-url = "https://stag-demo.zcu.cz/ws/services/rest2/rozvrhy/getRozvrhByMistnost"
-params = {
-    'budova':'CP',
-    'mistnost':'6.13',
-    'semestr': 'ZS',
-    'katedra': 'KI',
-}
-ticket = 'a7fdf5c7e56ebdc48356eb0a3701ad5fa5524f8920d36f4c11ca4681aec209f4'
-response = Get(url=url,params=params,ticket=ticket)
-print(response)
-with open("dump.json", "w") as outfile:
-(response, outfile)
-"""

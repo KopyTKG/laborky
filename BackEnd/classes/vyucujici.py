@@ -13,7 +13,7 @@ def get_student_info(ticket, osobni_cislo):
         "Connection": "keep-alive", 
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
-    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentInfo"
+    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentInfo" # type: ignore
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     
     jmeno = response["jmeno"]
@@ -53,8 +53,9 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
         "katedra": katedra,
     }
 
-    response = get(ticket, url, params)["studentPredmetu"]
+    response = get(ticket, url, params)["studentPredmetu"] # type: ignore
     osobni_cisla = []
+    print(response)
     for student in response:
         osobni_cisla.append(student["osCislo"])
 
@@ -66,7 +67,7 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
 
     hash_studenti_na_predmetu = []
     for student in studenti_na_predmetu:
-        student = "F" + student
+        student = student
         hash_studenti_na_predmetu.append(hashlib.sha1(student.encode()).hexdigest())
     
 

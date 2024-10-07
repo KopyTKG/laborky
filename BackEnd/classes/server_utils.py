@@ -27,6 +27,14 @@ def kontrola_ticketu(ticket, vyucujici = True):
     return [userid, role]
 
 
+def read_file():
+    temp_file = ".temp_vyucujici.txt"
+
+    with open(temp_file, "r", encoding="utf-8") as infile:
+        vyucujici_list = json.load(infile)
+    return vyucujici_list
+
+
 def vyucujici_k_predmetum_to_txt(session):
     temp_file = ".temp_vyucujici.txt"
 
@@ -45,21 +53,13 @@ def vyucujici_k_predmetum_to_txt(session):
                 vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
                 vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
 
-        vyucujici[predmet[1] + predmet[0]] = vyucujici_seznam
+        vyucujici[predmet[1] + "/" + predmet[0]] = vyucujici_seznam if vyucujici_seznam else [""]
 
 
     if os.path.exists(temp_file):
         os.remove(temp_file)
     with open(temp_file, "w", encoding="utf-8") as outfile:
         json.dump(vyucujici, outfile, ensure_ascii=False, indent=4)
-
-
-def read_file():
-    temp_file = ".temp_vyucujici.txt"
-
-    with open(temp_file, "r", encoding="utf-8") as infile:
-        vyucujici_list = json.load(infile)
-    return vyucujici_list
 
 
 def get_jmena_predmetu_by_zkratka(session, zkratky_predmetu):

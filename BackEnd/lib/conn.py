@@ -11,10 +11,10 @@ from classes.vyucujici import *
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv('DB_URL')
 
-interval_vypisu_terminu = int(os.getenv('INTERVAL_VYPISU_DNY'))
+interval_vypisu_terminu = int(os.getenv('INTERVAL_VYPISU_DNY')) # type: ignore
 
 # navazani pripojeni k DB
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL) # type: ignore
 
 Base = declarative_base()
 
@@ -82,11 +82,11 @@ class Predmet(Base):
     pocet_cviceni = Column("pocet_cviceni", Integer)
     #! JE MOZNE ZE BUDE CHYBET vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
     # Many-to-many relationship via VyucujiciPredmety
+    # - uz nechybi, zmena v databazi
     vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet")
     #! je mozne ze bude chybet / vyucuje = relationship('Vyucujici', back_populates="predmet")
     # Other relationships
     termin = relationship('Termin', back_populates="predmet")
-    zapsane_predmety = relationship('ZapsanePredmety', back_populates="predmet")
 
 
 class Student(Base):
@@ -95,20 +95,7 @@ class Student(Base):
     id = Column("id", String, primary_key=True)
     datum_vytvoreni = Column("datum_vytvoreni", DateTime)
 
-    zapsane_predmety = relationship('ZapsanePredmety', back_populates="student")
     historie_terminu = relationship('HistorieTerminu', back_populates="student")
-
-
-class ZapsanePredmety(Base):
-    __tablename__ = "zapsane_predmety"
-
-    id = Column("id", UUID, primary_key=True)
-    zapsano = Column("zapsano", DateTime)
-    student_id = Column(String, ForeignKey('student.id'))
-    kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
-
-    student = relationship('Student', back_populates="zapsane_predmety")
-    predmet = relationship('Predmet', back_populates="zapsane_predmety")
 
 
 class HistorieTerminu(Base):
@@ -244,7 +231,6 @@ def smazat_termin(session, id_terminu):
         termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
 
         if termin is None:
-            print(f"Termin s ID {id_terminu} neexistuje. Nebo na termin nejste prihlasen.")
             return 404
 
         session.delete(termin)
@@ -304,14 +290,15 @@ def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id,
     try:
         if session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first() is not None:
             return conflict
+        predmet = Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,pocet_cviceni=pocet_cviceni)
 
-        predmet = Predmet(kod_predmetu=kod_predmetu,zkratka_predmetu=zkratka_predmetu,katedra=katedra,vyucuje_id=vyucuje_id,pocet_cviceni=pocet_cviceni)
-
+        vyucujici_na_predmetu = VyucujiciPredmety(kod_predmetu=kod_predmetu, vyucujici_id=vyucuje_id)
+        session.add(vyucujici_na_predmetu)
         session.add(predmet)
-
         session.commit()
+
         return ok
-    except:
+    except Exception as e:
         session.rollback()
         return internal_server_error
 
@@ -374,7 +361,10 @@ def uspesne_dokoncene_terminy(session, id):
         for history in student.historie_terminu:
             termin = history.termin
 
-            if history.datum_splneni is not None:
+            if termin.cislo_cviceni == -1:
+                splnene_terminy.append(termin)
+
+            elif history.datum_splneni is not None:
                 splnene_terminy.append(termin)
 
         return splnene_terminy
@@ -382,24 +372,22 @@ def uspesne_dokoncene_terminy(session, id):
     except:
         return internal_server_error
 
+
 def pocet_cviceni_pro_predmet(session):
     try:
-        predmety = session.query(distinct(Predmet.kod_predmetu)).all()
+        predmety = session.query(Predmet).all()
         predmet_pocet_cviceni = {}
 
         if not predmety:
             return {}
 
         for predmet in predmety:
-            nazev = predmet[0]
-            predmet_obj = session.query(Predmet).filter_by(kod_predmetu=nazev).first()
-
-            if predmet_obj:
-                pocet_cviceni = predmet_obj.pocet_cviceni
-                if pocet_cviceni:
-                    predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
-                else:
-                    predmet_pocet_cviceni[nazev] = []
+            nazev = predmet.kod_predmetu
+            pocet_cviceni = predmet.pocet_cviceni
+            if pocet_cviceni:
+                predmet_pocet_cviceni[nazev] = [0] * pocet_cviceni
+            else:
+                predmet_pocet_cviceni[nazev] = []
 
         return predmet_pocet_cviceni
 
@@ -416,13 +404,12 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
             for historie_terminu in uspesne_terminy:
                 termin = session.query(Termin).filter(Termin.id == historie_terminu.termin_id).first()
                 if termin:
-                    if termin.cislo_cviceni == -1:
+                    if get_uznani_predmetu_by_student(session, id_studenta, termin.kod_predmet):
                         for i in range(len(pocet_pro_predmet[kod_predmetu])):
-                            pocet_pro_predmet[kod_predmetu][i] = historie_terminu.datum_splneni
+                            pocet_pro_predmet[kod_predmetu][i] = historie_terminu.datum_splneni if historie_terminu.datum_splneni else datetime.now()
                     else:
                         cislo_cviceni = termin.cislo_cviceni - 1
                         pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
-
     return pocet_pro_predmet
 
 
@@ -467,7 +454,6 @@ def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
         )
         .first()  # Use first() to return one result or None
     )
-
     return result is not None
 
 
@@ -488,7 +474,7 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     except:
         return internal_server_error
 
-def get_list_emailu_by_predmet(session,zkratka_predmetu, index_cviceni: int, ticket: str = None):
+def get_list_emailu_by_predmet(session,zkratka_predmetu, index_cviceni: int, ticket: str = None): # type: ignore
     try:
         studenti_co_maji_ziskat_email = (session.query(Student)
         .outerjoin(HistorieTerminu, HistorieTerminu.student_id == Student.id)

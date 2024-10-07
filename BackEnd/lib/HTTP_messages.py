@@ -1,4 +1,4 @@
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse # type: ignore
 ok = JSONResponse(status_code=200, content={"message": 'OK'})
 bad_request = JSONResponse(status_code=400, content={"message": 'Bad Request'})
 unauthorized = JSONResponse(status_code=401, content={"message": 'Unauthorized'})

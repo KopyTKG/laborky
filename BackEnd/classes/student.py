@@ -17,7 +17,7 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     """
     Vrati vsechny predmety, pro ktere existuje moznost seminare, ktere student jeste nema splneny, ale zapsany
     """
-    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentPredmetyAbsolvoval"
+    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentPredmetyAbsolvoval" # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",

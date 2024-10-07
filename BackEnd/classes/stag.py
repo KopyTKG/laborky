@@ -23,7 +23,7 @@ def get(ticket, url, params):
 
 def get_stag_user_info(ticket):
     """ Vrátí jméno, příjmení, email, titul a stagUserInfo (username, role, nazev, ucitIdno/osCilo, email)"""
-    url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket 
+    url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -40,13 +40,40 @@ def get_stag_user_info(ticket):
     return response
 
 
+def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
+    """ Vrátí informace o předmětu """
+    url = os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://stag-demo.zcu.cz",
+    }
+    params = {
+        "katedra": katedra,
+        "zkratka": zkratka_predmetu
+    }
+    response = requests.get(url, headers=headers, params=params)
+    if not response.ok:
+        return None
+    try:
+        response = response.json()
+        if response:
+            return True
+        else:
+            return False
+    except:
+        return None
+    return response
+
+
 def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
     """ Vrátí informace o predmetu"""
     params = {
         "katedra": katedra,
         "zkratka": zkratka_predmetu
     }
-    url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo"
+    url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -71,7 +98,7 @@ def get_userid_and_role(json):
     if role == "":
         return internal_server_error, internal_server_error
     if role != "ST":
-        userid = "VY" + str(json["stagUserInfo"][0]["ucitIdno"])
+        userid = str(json["stagUserInfo"][0]["ucitIdno"])
     else:
-        userid = "F" + str(json["stagUserInfo"][0]["osCislo"])
+        userid = str(json["stagUserInfo"][0]["osCislo"])
     return userid, role
