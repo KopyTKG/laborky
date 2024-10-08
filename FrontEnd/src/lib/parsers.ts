@@ -14,6 +14,7 @@ export function resTotTermin(data: any): tTermin[] {
    kapacita: item.max_kapacita,
    zapsany: item.aktualni_kapacita,
    vypsal: item.vyucujici,
+   poznamka: item.popis,
   }
   terminy.push(tmp)
  })

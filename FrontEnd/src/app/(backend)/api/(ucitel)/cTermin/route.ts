@@ -39,8 +39,8 @@ export async function POST(req: Request) {
   popis: body.tema,
   jmeno: body.predmet._id,
   kod_predmetu: body.predmet._id,
-  upozornit: false,
-  vyucuje_prijmeni: '',
+  upozornit: null,
+  vyucuje_prijmeni: null,
  }
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)

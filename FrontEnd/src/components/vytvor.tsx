@@ -20,6 +20,7 @@ import { tPredmet, tTerminBody } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { BellRing, Plus } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
+import { useToast } from '@/hooks/use-toast'
 
 const fetchPredmetyData = async () => {
  try {
@@ -53,6 +54,8 @@ export default function Vytvor() {
   start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
   end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
  })
+
+ const { toast } = useToast()
 
  const [notFilled, setnotFilled] = useState({
   nazev: true,
@@ -118,8 +121,25 @@ export default function Vytvor() {
   })
 
   if (res) {
-   alert(res.statusText)
+   toast({
+    title: 'Úspěch',
+    description: 'Termín byl úspěšně vypsán',
+   })
   }
+ }
+
+ function reset() {
+  setFormData({
+   predmet: { _id: '', nazev: '', nCviceni: 0 },
+   cviceni: 0,
+   nazev: '',
+   tema: '',
+   ucebna: '',
+   kapacita: 0,
+   datum: '',
+   start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
+   end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
+  })
  }
 
  useLayoutEffect(() => {
@@ -292,7 +312,15 @@ export default function Vytvor() {
          <Button color="danger" onPress={onClose}>
           Zrušit
          </Button>
-         <Button color="primary" type="button" onClick={handleSubmit} isDisabled={!submit}>
+         <Button
+          color="primary"
+          type="button"
+          onClick={() => {
+           handleSubmit()
+           onClose()
+          }}
+          isDisabled={!submit}
+         >
           Vytvořit
          </Button>
         </ModalFooter>

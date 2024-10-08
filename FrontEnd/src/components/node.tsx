@@ -30,9 +30,7 @@ export default function Node(props: tNode) {
   <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.predmet} cvičení ${props.cislo}`}</div>
-    <p className="text-sm text-justify">
-     Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Morbi scelerisque luctus velit.
-    </p>
+    <p className="text-sm text-justify">{props.poznamka}</p>
    </CardHeader>
    <Divider />
    <CardContent>
