@@ -25,6 +25,12 @@ def get_predmet_by_id(session, id_predmetu):
         return predmet
     return None
 
+def get_termin_info(session, id_terminu):
+    """ Vrátí informace o terminu """
+    termin = session.query(Termin).filter_by(id=id_terminu).first()
+    if termin:
+        return termin
+    return not_found
 
 def get_katedra_predmet_by_idterminu(session, id_terminu):
     """ Vrátí zkratku předmětu a zkratku katedry podle id termínu """

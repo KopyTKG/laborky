@@ -261,6 +261,29 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
     return list_terminu
 
 
+@app.get("/ucitel/termin")
+async def get_info_o_terminu(ticket: str, id_terminu: str):
+    """ Vrácení všech studentů, a i kteří se zapsali na daný seminář a info o termínu"""
+    #ticket = os.getenv('TICKET') # prozatimni reseni
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+    vsechny_terminy = get_vsechny_terminy(session)
+    if id_terminu not in vsechny_terminy:
+        return bad_request
+
+    list_studentu = list_studenti_z_terminu(session, id_terminu)
+    vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
+    if vystup is None:
+        return not_found
+    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
+    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
+    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
+    jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    termin_info = get_termin_info(session, id_terminu)
+    return jmena_studentu, termin_info
+
 @app.get("/ucitel/board_by_predmet")
 async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     """ Vrátí všechny vypsané termíny pro daný předmět """
