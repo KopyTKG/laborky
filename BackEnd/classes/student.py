@@ -32,7 +32,7 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     predmety = response.json()
     zkratky = []
     for predmet in predmety_lab:
-        zkratky.append((predmet.kod_predmetu).split("/")[-1])
+        zkratky.append(predmet) #(predmet.kod_predmetu).split("/")[-1])
 
     for predmet in predmety["predmetAbsolvoval"]:
         if predmet["zkratka"] in zkratky:
