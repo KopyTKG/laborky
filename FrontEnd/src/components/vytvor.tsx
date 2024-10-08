@@ -16,7 +16,7 @@ import {
  useDisclosure,
 } from '@nextui-org/react'
 import React, { useLayoutEffect, useState } from 'react'
-import { tPredmet } from '@/lib/types'
+import { tPredmet, tTerminBody } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { BellRing, Plus } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
@@ -42,16 +42,16 @@ const fetchPredmetyData = async () => {
 export default function Vytvor() {
  const { isOpen, onOpen, onOpenChange } = useDisclosure()
  const [predmety, setPredmety] = useState<tPredmet[]>([])
- const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState<tTerminBody>({
   predmet: { _id: '', nazev: '', nCviceni: 0 },
   cviceni: 0,
   nazev: '',
   tema: '',
   ucebna: '',
-  kapacita: '',
+  kapacita: 0,
   datum: '',
-  start: null as TimeInputValue | null,
-  end: null as TimeInputValue | null,
+  start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
+  end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
  })
 
  const [notFilled, setnotFilled] = useState({
@@ -236,8 +236,8 @@ export default function Vytvor() {
            type="number"
            placeholder="20"
            isRequired={true}
-           value={kapacita}
-           onValueChange={(value) => handleChange('kapacita', value)}
+           value={kapacita.toString()}
+           onValueChange={(value) => handleChange('kapacita', parseInt(value))}
            isInvalid={notFilled.kapacita}
           />
          </div>

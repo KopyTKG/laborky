@@ -1,3 +1,4 @@
+import { TimeInputValue } from '@nextui-org/react'
 import React from 'react'
 
 export type tTermin = {
@@ -45,4 +46,20 @@ export type tUser = {
  id: string
  role: string
  hash: string
+}
+
+export type tTerminBody = {
+ predmet: {
+  _id: string
+  nazev: string
+  nCviceni: number
+ }
+ cviceni: number
+ nazev: string
+ tema: string
+ ucebna: string
+ kapacita: number
+ datum: string
+ start: TimeInputValue
+ end: TimeInputValue
 }
