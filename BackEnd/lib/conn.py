@@ -474,39 +474,33 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     except:
         return internal_server_error
 
-def get_list_emailu_by_predmet(session,zkratka_predmetu, index_cviceni: int, ticket: str = None): # type: ignore
+def get_list_emailu_by_predmet(session, zkratka_predmetu: str, katedra: str,  index_cviceni: int, ticket: str = None):
     try:
-        studenti_co_maji_ziskat_email = (session.query(Student)
-        .outerjoin(HistorieTerminu, HistorieTerminu.student_id == Student.id)
-        .outerjoin(Termin, Termin.id == HistorieTerminu.termin_id)
-        .filter(
-        or_(Termin.cislo_cviceni != 1, Termin.cislo_cviceni == None),  # Students without 'cislo_cviceni == 1'
-        Termin.kod_predmet == "KAPPF"  # Add filter for kod_predmetu == 'KAPPF'
-        ).all())
+        predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
+        kod_predmetu = zkratka_predmetu + katedra
+        studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(ZapsanePredmety, ZapsanePredmety.student_id == Student.id).outerjoin(Predmet, Predmet.kod_predmetu == ZapsanePredmety.kod_predmet).outerjoin(HistorieTerminu, HistorieTerminu.student_id == Student.id).outerjoin(Termin, Termin.id == HistorieTerminu.termin_id).filter(Predmet.kod_predmetu == kod_predmetu,Termin.cislo_cviceni == index_cviceni,HistorieTerminu.datum_splneni == None,).filter(not_(session.query(Termin).join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id).filter(Termin.cislo_cviceni == -1,HistorieTerminu.datum_splneni == None,).exists())).all()
         if studenti_co_maji_ziskat_email is None:
             return not_found
-        print(f"studneti co maji ziskat email: {studenti_co_maji_ziskat_email}")
-        zkratka_katedry = "KAP"
-        zkratka_predmetu = "PF"
-        print("sanity test :(")
-        vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-        print(f"vsichni studenti: {vsichni_studenti}")
+        hash_list = [row[0].strip() for row in studenti_co_maji_ziskat_email]
+        vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
         if vsichni_studenti is None:
-            return not_found
-        os_cisla = compare_encoded(studenti_co_maji_ziskat_email, vsichni_studenti)
-        print("os_cisla: ", os_cisla)
+            return not_found # not here
+        os_cisla = compare_encoded(hash_list, vsichni_studenti)
         if os_cisla is None:
-            return not_found
+            return not_found # not here
         list_emailu = []
         for student in os_cisla:
-                jmeno, prijmeni, email = get_studenti_info(ticket, student)
-                list_emailu.append(email)
-        print(list_emailu)
-        return list_emailu
+            jmeno, prijmeni, email = get_student_info(ticket, student)
+            list_emailu.append(email)
+        if list_emailu == []:
+            return not_found # not here either?
+        else: 
+            return list_emailu, os_cisla
     except Exception as e:
         return e
 
 if __name__ == "__main__":
+
     #print(get_list_emailu_by_predmet(session, "KAPPF", 1))
     #print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
     # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')

@@ -1,6 +1,7 @@
 import requests
 import hashlib
 from classes.stag import *
+import os
 
 def get_student_info(ticket, osobni_cislo):
     """ Vrátí informace o studentovi podle osobního čísla """
@@ -13,7 +14,7 @@ def get_student_info(ticket, osobni_cislo):
         "Connection": "keep-alive", 
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
-    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentInfo" # type: ignore
+    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentInfo"
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     
     jmeno = response["jmeno"]
@@ -47,13 +48,19 @@ def get_ucitel_predmety(ticket, ucitIdno):
 
 def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
-    url = "ws/services/rest2/student/getStudentiByPredmet"
+    url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
         "katedra": katedra,
     }
-
-    response = get(ticket, url, params)["studentPredmetu"] # type: ignore
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive", 
+        "Accept-Origin": "https://stag-demo.zcu.cz",
+    }
+    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
+    response = response.json()["studentPredmetu"]
     osobni_cisla = []
     print(response)
     for student in response:
