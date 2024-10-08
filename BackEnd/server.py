@@ -293,7 +293,7 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
         return not_found
 
     if termin.vyucuje_prijmeni is not None:
-        vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu) # type: ignore
+        vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu)[0] # type: ignore
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 

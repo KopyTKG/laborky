@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   max_kapacita: body.kapacita,
   cislo_cviceni: body.cviceni,
   popis: body.tema,
-  jmeno: '',
+  jmeno: body.predmet._id,
   kod_predmetu: body.predmet._id,
   upozornit: false,
   vyucuje_prijmeni: '',
