@@ -138,4 +138,4 @@ def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ti
         else:
             return list_emailu
     except Exception as e:
-        return e
+        return internal_server_error
