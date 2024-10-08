@@ -32,6 +32,12 @@ def get_termin_info(session, id_terminu):
         return termin
     return not_found
 
+def get_termin_zapsane_by_studentid(session, student_id):
+    """ Vrátí terminy studenta podle ID """
+    terminy = session.query(HistorieTerminu).filter(and_(HistorieTerminu.student_id == student_id, HistorieTerminu.datum_splneni == None)).all()
+    return terminy
+
+
 def get_katedra_predmet_by_idterminu(session, id_terminu):
     """ Vrátí zkratku předmětu a zkratku katedry podle id termínu """
     termin = session.query(Termin).filter_by(id=id_terminu).first()

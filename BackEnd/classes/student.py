@@ -26,7 +26,7 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     }
     response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
     if not response.ok:
-        raise Exception(response.text)
+        return not_found
     splneno = []
     aktivni_predmety = []
     predmety = response.json()

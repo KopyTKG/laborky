@@ -24,6 +24,33 @@ def get_student_info(ticket, osobni_cislo):
     return jmeno, prijmeni, email
 
 
+def get_student_predmety(ticket, osobni_cislo, predmety_db):
+    """ Vrátí informace o studentovi podle osobního čísla """
+    try:
+        params = {
+            "osCislo": osobni_cislo,
+        }
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive",
+            "Accept-Origin": "https://stag-demo.zcu.cz",
+        }
+        url = "https://stag-demo.zcu.cz/ws/services/rest2/rozvrhy/getRozvrhByStudent"
+        response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
+    except:
+        return not_found
+    response = response["rozvrhovaAkce"]
+    predmety = []
+    predmety_db = [predmet_db.kod_predmetu for predmet_db in predmety_db] 
+    for predmet in response:
+        kod = (predmet["katedra"] + "/" + predmet["predmet"])
+        if kod in predmety_db:
+            if kod not in predmety:
+                predmety.append(kod)
+
+    return predmety
+
 def get_studenti_info(ticket, list_studentu):
     """ Vrátí informace o studentech podle osobního čísla """
     info = {}
