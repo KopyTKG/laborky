@@ -28,7 +28,7 @@ export type tNode = tTermin & {
 export type tLink = {
  label: string
  href: string
- icon: string
+ icon: React.ReactNode
 }
 
 export type tPredmetSekce = {
