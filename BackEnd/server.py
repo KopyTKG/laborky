@@ -14,6 +14,9 @@ from typing import Optional
 import re
 import dotenv, os, requests, json, hashlib
 import time
+from classes.server_utils import tTermin
+
+
 
 dotenv.load_dotenv()
 
@@ -62,7 +65,7 @@ async def get_student_home(ticket: str | None = None):
 
     return list_terminu
 
- 
+
 @app.post("/student")
 async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     """ Zaregistruje, či se odhlásí z labu, na základě ukázky na hlavní straně
@@ -81,7 +84,7 @@ async def zmena_statusu_zapsani(ticket: str, typ: str, id_terminu: str):
     userid, role = encode_id(info[0]), info[1]
 
     if typ == "zapsat":
-        message = zapsat_se_na_termin(session, userid, id_terminu) 
+        message = zapsat_se_na_termin(session, userid, id_terminu)
         return message
     elif typ == "odhlasit":
         message = odepsat_z_terminu(session, userid, id_terminu)
@@ -137,10 +140,10 @@ async def get_student_profil(ticket: str | None = None):
         return info
     userid, role = encode_id(info[0]), info[1]
 
-    
+
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session)) # vrátí předměty, které student studuje podle stagu (formát KAT/PRED)
     pocet_pro_predmet = pocet_cviceni_pro_predmet(session) # vrací dict všech předmětů z DB a počet cvičení, formát: {kat/pred: [0, 0, 0], ...}
-    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db 
+    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db
     vyhodnoceni = {}
 
     for predmet in predmety_k_dispozici:
@@ -177,12 +180,12 @@ async def get_predmety(ticket: str | None = None):
     if info[0] == "VY49712":
         jmena_vsech_predmetu = get_predmet_id_jmeno_cisla(vsechny_predmety)
         return jmena_vsech_predmetu
-    
+
     if role == "VY": # možná přidáme ještě nějaké role
         predmety_vyucujiciho = get_predmety_by_vyucujici(session, userid)
         if predmety_vyucujiciho is None:
             return internal_server_error
-        
+
         jmena_predmetu_vyucujiciho = get_predmet_id_jmeno_cisla(predmety_vyucujiciho)
         return jmena_predmetu_vyucujiciho
 
@@ -193,7 +196,7 @@ async def get_predmety(ticket: str | None = None):
         predmety = get_predmety_by_kody(session, predmety_k_dispozici)
         jmena_predmetu_k_dispozici = get_predmet_id_jmeno_cisla(predmety)
         return jmena_predmetu_k_dispozici
-    
+
     return None # vrací nic, když uživatel není žádná role
 
 
@@ -251,7 +254,7 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
     if info == unauthorized or info == internal_server_error:
         return info
     userid, role = encode_id(info[0]), info[1]
-    
+
     list_terminu = list_terminy_vyucujici(session, userid)
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
@@ -266,7 +269,7 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     if info == unauthorized or info == internal_server_error:
         return info
     userid, role = encode_id(info[0]), info[1]
-    
+
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
         predmety = ";".join(pomocny_list) # type: ignore
@@ -297,6 +300,7 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 
+
     else:
         vyucuje_id = vypsal_id
 
@@ -313,6 +317,31 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     #     return list_emailu
     # else:
     #     return ok
+
+
+@app.post("/ucitel/termin")
+async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_prijmeni: Optional[str] = None):
+    """ Učitel vytvoří termín do databáze """
+    info = kontrola_ticketu(ticket, vyucujici=True)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    vypsal_id, role = encode_id(info[0]), info[1]
+
+    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
+    if kod_predmetu is None:
+        return conflict
+    katedra = get_katedra_by_predmet(session, zkratka_predmetu)
+    if vyucuje_id is None:
+        vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+    vyucuje_id = encode_id(vyucuje_id)
+    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
+    if message is not ok:
+        return message
+    elif upozornit:
+        emaily = get_list_emailu_pro_cviceni(session, kod_predmetu, cislo_cviceni, ticket)
+        return emaily
+    else:
+        return ok
 
 @app.patch("/ucitel/termin")
 async def ucitel_zmena_terminu(
@@ -371,7 +400,7 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
 
 @app.post("/ucitel/zapis")
 async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None
-    """ Ručně přihlásí studenta do vypsaného termínu cvičení 
+    """ Ručně přihlásí studenta do vypsaného termínu cvičení
 
     Args: id_studenta je jeho Fčíslo s F na začátku! [F*****] (nutno připsat dovnitř vstupu)"""
     # ticket = os.getenv("TICKET")
@@ -423,7 +452,7 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
-    
+
     list_studentu = list_studenti_z_terminu(session, id_terminu)
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
@@ -488,7 +517,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
 
         return message
-    
+
     else:
         return message
 
@@ -502,9 +531,16 @@ def invalidate(ticket: str):
 
 @app.get("/")
 def root():
-    vsechny_predmety = get_vsechny_predmety(session)
-    jmena_predmetu = get_jmena_predmetu_by_zkratka(session, vsechny_predmety)
-    return jmena_predmetu
+    # skod_predmet = 'KIV/BOPX'
+    # index_cviceni = 1
+
+    # emails = get_list_emailu_by_predmet(session, kod_predmetu=skod_predmet, index_cviceni=1, ticket='24106176d4e18f76c346be8fc9e01bb32318fc7f00c6876037a47f351ac3d7a4')
+    pass
+    # return emails
+
+
+
+
 
 
 if __name__ == "__main__":

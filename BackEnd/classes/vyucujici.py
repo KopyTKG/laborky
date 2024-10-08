@@ -11,12 +11,12 @@ def get_student_info(ticket, osobni_cislo):
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Connection": "keep-alive", 
+        "Connection": "keep-alive",
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
     url = "https://stag-demo.zcu.cz/ws/services/rest2/student/getStudentInfo"
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
-    
+
     jmeno = response["jmeno"]
     prijmeni = response["prijmeni"]
     email = response["email"]
@@ -30,14 +30,14 @@ def get_studenti_info(ticket, list_studentu):
     for student in list_studentu:
         jmeno, prijmeni, email = get_student_info(ticket, student)
         info[student] = {"jmeno": jmeno, "prijmeni": prijmeni, "email": email}
-        
+
     return info
 
 
 # Asi není potřeba - pouze pro to, kdyby mohl učitel vypisovat pouze na svoje předměty
 def get_ucitel_predmety(ticket, ucitIdno):
     """
-     Vrati predmety, ktere ucitel vyucuje 
+     Vrati predmety, ktere ucitel vyucuje
     """
     url = "ws/services/rest2/predmety/getPredmetyByUcitel"
     params = {
@@ -56,13 +56,13 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Connection": "keep-alive", 
+        "Connection": "keep-alive",
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
     response = response.json()["studentPredmetu"]
     osobni_cisla = []
-    print(response)
+    # print(response)
     for student in response:
         osobni_cisla.append(student["osCislo"])
 
@@ -76,7 +76,7 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
     for student in studenti_na_predmetu:
         student = student
         hash_studenti_na_predmetu.append(hashlib.sha1(student.encode()).hexdigest())
-    
+
 
     matching = find_matching_hash_positions(hash_studenti_na_predmetu, hash_studentu_na_terminu)
 
@@ -90,10 +90,10 @@ def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
 
 def find_matching_hash_positions(big_list, small_list):
     matching_positions = []
-    
+
     for small_hash in small_list:
         if small_hash in big_list:
             big_list_index = big_list.index(small_hash)
             matching_positions.append(big_list_index)
-    
+
     return matching_positions

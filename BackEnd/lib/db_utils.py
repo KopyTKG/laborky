@@ -98,3 +98,44 @@ def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu):
     if termin is not None:
         return termin.id
     return None
+
+def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str = None):
+    try:
+        info = get_predmet_by_id(session, kod_predmetu)
+        katedra, zkratka = info.katedra, info.zkratka_predmetu
+        kandidati_na_email = get_studenti_na_predmetu(ticket, katedra, zkratka)
+        if kandidati_na_email is None:
+            return not_found # zadny studenti nemaji zapsany predmet
+
+        terminy_predmetu = select(Termin.id).filter(
+        Termin.kod_predmet == kod_predmetu,
+        Termin.cislo_cviceni == index_cviceni
+        )
+
+        studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(HistorieTerminu).filter(
+        (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
+        (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
+        ).all()
+
+        email_list = []
+
+        for student in studenti_co_maji_ziskat_email:
+            email_list.append(student[0])
+
+        if email_list is None:
+            print("query je prazdna")
+            return not_found
+        os_cisla = compare_encoded(email_list, kandidati_na_email)
+        print(os_cisla)
+        if os_cisla is None:
+            return not_found # not here
+        list_emailu = []
+        for student in os_cisla:
+            jmeno, prijmeni, email = get_student_info(ticket, student)
+            list_emailu.append(email)
+        if list_emailu == []:
+            return not_found # not here either?
+        else:
+            return list_emailu
+    except Exception as e:
+        return e

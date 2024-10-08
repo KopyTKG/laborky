@@ -5,7 +5,14 @@ import uuid
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from lib.HTTP_messages import *
+from typing import Optional
+
+
 from classes.vyucujici import *
+
+
+from sqlalchemy import select # smazat mozna
+# from classes.vyucujici import *
 
 # nacteni DB connection stringu z .env
 dotenv.load_dotenv()
@@ -139,7 +146,7 @@ def vytvor_vyucujici(session, id):
 
 
 ### USER ACTIONS
-def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None, newPopis=None, newVyucuje_prijmeni = None):
+def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None, newPopis=None):
     try:
         termin = session.query(Termin).filter(Termin.id == id_terminu).first()
 
@@ -166,8 +173,7 @@ def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, 
 
         if newPopis is not None:
             termin.popis = newPopis
-        if newVyucuje_prijmeni is not None:
-            termin.vyucuje_prijmeni = newVyucuje_prijmeni
+
         session.commit()
         return ok
     except:
@@ -475,31 +481,6 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     except:
         return internal_server_error
 
-def get_list_emailu_by_predmet(session, zkratka_predmetu: str, katedra: str,  index_cviceni: int, ticket: str = None):
-    try:
-        predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
-        kod_predmetu = zkratka_predmetu + katedra
-        studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(ZapsanePredmety, ZapsanePredmety.student_id == Student.id).outerjoin(Predmet, Predmet.kod_predmetu == ZapsanePredmety.kod_predmet).outerjoin(HistorieTerminu, HistorieTerminu.student_id == Student.id).outerjoin(Termin, Termin.id == HistorieTerminu.termin_id).filter(Predmet.kod_predmetu == kod_predmetu,Termin.cislo_cviceni == index_cviceni,HistorieTerminu.datum_splneni == None,).filter(not_(session.query(Termin).join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id).filter(Termin.cislo_cviceni == -1,HistorieTerminu.datum_splneni == None,).exists())).all()
-        if studenti_co_maji_ziskat_email is None:
-            return not_found
-        hash_list = [row[0].strip() for row in studenti_co_maji_ziskat_email]
-        vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
-        if vsichni_studenti is None:
-            return not_found # not here
-        os_cisla = compare_encoded(hash_list, vsichni_studenti)
-        if os_cisla is None:
-            return not_found # not here
-        list_emailu = []
-        for student in os_cisla:
-            jmeno, prijmeni, email = get_student_info(ticket, student)
-            list_emailu.append(email)
-        if list_emailu == []:
-            return not_found # not here either?
-        else: 
-            return list_emailu, os_cisla
-    except Exception as e:
-        return e
-
 if __name__ == "__main__":
 
     #print(get_list_emailu_by_predmet(session, "KAPPF", 1))
@@ -573,6 +554,39 @@ if __name__ == "__main__":
 
     # for predmet in predmety:
         # print(predmet)
+
+
+    # skod_predmet = 'KIV/BOPX'
+    # index_cviceni = 1
+
+    # get_list_emailu_by_predmet(session, skod_predmet, index_cviceni, ticket='24106176d4e18f76c346be8fc9e01bb32318fc7f00c6876037a47f351ac3d7a4')
+
+
+
+    # terminy_predmetu = select(Termin.id).filter(
+    # Termin.kod_predmet == skod_predmet,
+    # Termin.cislo_cviceni == index_cviceni
+    # )
+
+    # # Step 2: Main query - Join HistorieTerminu and filter by matching terms and datum_splneni
+    # studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(HistorieTerminu).filter(
+    # # Either the student hasn't attended any termin OR attended but didn't complete it successfully
+    # (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
+    # (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
+    # ).all()
+    # if studenti_co_maji_ziskat_email is None:
+    #     print("None")
+    # if studenti_co_maji_ziskat_email:
+    #     for student in studenti_co_maji_ziskat_email:
+    #         print('1')
+    #         print(student)
+    # else:
+    #     print("Leda hovno pi4o")
+
+    # test = session.query(Termin).filter(Termin.kod_predmet == skod_predmet, Termin.cislo_cviceni == index_cviceni).all()
+
+
+
 
     pass
 
