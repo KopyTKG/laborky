@@ -49,7 +49,7 @@ async def get_student_home(ticket: str | None = None):
         return info
     userid, role = encode_id(info[0]), info[1]
 
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session))
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety_obj(session))
 
     vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_cviceni_pro_predmet(session))
 
@@ -138,7 +138,7 @@ async def get_student_profil(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     
-    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety(session)) # vrátí předměty, které student studuje podle stagu (formát KAT/PRED)
+    predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety_obj(session)) # vrátí předměty, které student studuje podle stagu (formát KAT/PRED)
     pocet_pro_predmet = pocet_cviceni_pro_predmet(session) # vrací dict všech předmětů z DB a počet cvičení, formát: {kat/pred: [0, 0, 0], ...}
     vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db 
     vyhodnoceni = {}
