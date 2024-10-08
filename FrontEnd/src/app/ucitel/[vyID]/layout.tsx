@@ -1,6 +1,8 @@
+'use client'
 import React from 'react'
 import { NavbarTeacher as Navbar } from '@/components/navbars'
 import Vytvor from '@/components/vytvor'
+import ReloadProvider from '@/components/ReloadProvider'
 
 export default function RootLayout({
  children,
@@ -12,8 +14,10 @@ export default function RootLayout({
  return (
   <>
    <Navbar id={params.vyID} />
-   <main className="max-w-4xl mx-auto">{children}</main>
-   <Vytvor />
+   <ReloadProvider>
+    <main className="max-w-4xl mx-auto">{children}</main>
+    <Vytvor />
+   </ReloadProvider>
   </>
  )
 }

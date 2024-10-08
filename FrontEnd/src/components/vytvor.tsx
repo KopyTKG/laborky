@@ -15,12 +15,13 @@ import {
  TimeInputValue,
  useDisclosure,
 } from '@nextui-org/react'
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useContext, useLayoutEffect, useState } from 'react'
 import { tPredmet, tTerminBody } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { BellRing, Plus } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
 import { useToast } from '@/hooks/use-toast'
+import { ReloadCtx } from './ReloadProvider'
 
 const fetchPredmetyData = async () => {
  try {
@@ -56,6 +57,14 @@ export default function Vytvor() {
  })
 
  const { toast } = useToast()
+ const context = useContext(ReloadCtx)
+
+ // Handle the case where context is undefined
+ if (!context) {
+  throw new Error('Missing ReloadProvider')
+ }
+
+ const [reload, setReload] = context
 
  const [notFilled, setnotFilled] = useState({
   nazev: true,
@@ -124,6 +133,14 @@ export default function Vytvor() {
    toast({
     title: 'Úspěch',
     description: 'Termín byl úspěšně vypsán',
+   })
+   reset()
+   setReload(!reload)
+  } else {
+   toast({
+    variant: 'destructive',
+    title: 'Problém',
+    description: 'Něco se nepovedlo při vypisování',
    })
   }
  }

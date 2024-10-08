@@ -9,6 +9,7 @@ import {
 } from '@nextui-org/react'
 import Icon from '@/components/icon'
 import { tLink } from '@/lib/types'
+import { House, Menu, Users } from 'lucide-react'
 
 export function NavbarStudent({ id }: { id: string }) {
  const baseUrl = '/student/#id'
@@ -17,12 +18,12 @@ export function NavbarStudent({ id }: { id: string }) {
   {
    label: 'Domů',
    href: `${url}`,
-   icon: 'house',
+   icon: <House className="w-5" />,
   },
   {
    label: 'Moje termíny',
    href: `${url}/moje`,
-   icon: 'menu',
+   icon: <Menu className="w-5" />,
   },
  ]
  return <NavbarComponent id={id} links={links} url={url} st={false} />
@@ -35,17 +36,17 @@ export function NavbarTeacher({ id }: { id: string }) {
   {
    label: 'Domů',
    href: `${url}`,
-   icon: 'house',
+   icon: <House className="w-5" />,
   },
   {
    label: 'Procházet',
    href: `${url}/predmety`,
-   icon: 'menu',
+   icon: <Menu className="w-5" />,
   },
   {
    label: 'Studenti',
    href: `${url}/hledat`,
-   icon: 'users',
+   icon: <Users className="w-5" />,
   },
  ]
 
@@ -69,13 +70,7 @@ function NavbarComponent({
     {links.map((item: tLink) => {
      return (
       <NavbarItem key={item.href}>
-       <Button
-        as={Link}
-        href={item.href}
-        color="primary"
-        endContent={<Icon name={item.icon as any} className="w-5" />}
-        variant="solid"
-       >
+       <Button as={Link} href={item.href} color="primary" endContent={item.icon} variant="solid">
         {item.label}
        </Button>
       </NavbarItem>
