@@ -3,7 +3,25 @@ from lib.HTTP_messages import *
 from classes.stag import *
 from lib.db_utils import *
 import os, json
+from pydantic import BaseModel
+import datetime
+from typing import Optional
 
+
+class tTermin(BaseModel):
+    model_config =  {
+        "arbitrary_types_allowed": True
+    }
+    ucebna: str
+    datum_start: datetime
+    datum_konec: datetime
+    max_kapacita: int
+    kod_predmetu: str
+    jmeno: str
+    cislo_cviceni: int
+    popis: str
+    upozornit: Optional[bool] = None
+    vyucuje_prijmeni: Optional[str] = None
 
 def encode_id(id):
     """ Sha1 pro hashování osobních čísel / ucitIdnu """

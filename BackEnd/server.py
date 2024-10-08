@@ -282,55 +282,49 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
 
 
 @app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_prijmeni: Optional[str] = None):
+async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     """ Učitel vytvoří termín do databáze """
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
     vypsal_id, role = encode_id(info[0]), info[1]
 
-    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
-    if kod_predmetu is None:
+    if termin.kod_predmetu is None:
         return not_found
 
-    if vyucuje_prijmeni is not None:
-        vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+    if termin.vyucuje_prijmeni is not None:
+        vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu) # type: ignore
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 
     else:
         vyucuje_id = vypsal_id
 
-    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
-    if message is not ok:
-        return message
-    elif upozornit:
-        katedra = get_katedra_by_predmet(session, zkratka_predmetu)
-        kod_predmetu = katedra + "/" +zkratka_predmetu # type: ignore
-        list_emailu = get_list_emailu_by_predmet(session, kod_predmetu, cislo_cviceni)
-        if list_emailu == []:
-            return not_found
-        return list_emailu
-    else:
-        return ok
+    message = vypsat_termin(session, termin.ucebna, termin.datum_start, termin.datum_konec, termin.max_kapacita, vypsal_id, vyucuje_id, termin.kod_predmetu, termin.jmeno, termin.cislo_cviceni, termin.popis) # type: ignore
+    return message
+    # if message is not ok:
+    #     return message
+    # elif upozornit:
+    #     katedra = get_katedra_by_predmet(session, zkratka_predmetu)
+    #     kod_predmetu = katedra + "/" +zkratka_predmetu # type: ignore
+    #     list_emailu = get_list_emailu_by_predmet(session, kod_predmetu, cislo_cviceni)
+    #     if list_emailu == []:
+    #         return not_found
+    #     return list_emailu
+    # else:
+    #     return ok
 
 @app.patch("/ucitel/termin")
 async def ucitel_zmena_terminu(
     ticket: str,
     id_terminu: str,
-    ucebna: Optional[str] = None,
-    datum_start: Optional[datetime] = None,
-    datum_konec: Optional[datetime] = None,
-    max_kapacita: Optional[int] = None,
-    jmeno: Optional[str] = None,
-    cislo_cviceni: Optional[int] = None,
-    popis: Optional[str] = None
+    termin: tTermin
     ):
     """ Učitel změní parametry v již vypsaném termínu """
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
-    message = upravit_termin(session, id_terminu, newStartDatum=datum_start,newKonecDatum=datum_konec, newUcebna=ucebna, newMax_kapacita=max_kapacita, newJmeno=jmeno, cislo_cviceni=cislo_cviceni,newPopis=popis)
+    message = upravit_termin(session, id_terminu, newStartDatum=termin.datum_start,newKonecDatum=termin.datum_konec, newUcebna=termin.ucebna, newMax_kapacita=termin.max_kapacita, newJmeno=termin.jmeno, cislo_cviceni=termin.cislo_cviceni,newPopis=termin.popis, newVyucuje_prijmeni=termin.vyucuje_prijmeni)
     return message
 
 

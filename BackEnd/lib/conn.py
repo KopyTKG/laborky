@@ -139,7 +139,7 @@ def vytvor_vyucujici(session, id):
 
 
 ### USER ACTIONS
-def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None, newPopis=None):
+def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, newUcebna=None, newMax_kapacita=None, newJmeno=None, cislo_cviceni=None, newPopis=None, newVyucuje_prijmeni = None):
     try:
         termin = session.query(Termin).filter(Termin.id == id_terminu).first()
 
@@ -166,7 +166,8 @@ def upravit_termin(session, id_terminu, newStartDatum=None, newKonecDatum=None, 
 
         if newPopis is not None:
             termin.popis = newPopis
-
+        if newVyucuje_prijmeni is not None:
+            termin.vyucuje_prijmeni = newVyucuje_prijmeni
         session.commit()
         return ok
     except:
