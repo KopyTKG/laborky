@@ -30,7 +30,7 @@ Windows / Linux:
 ```env
 PORT=9999 # Pro testovani bylo pouzito 3010
 HOST=0.0.0.0 # neboli all
-DB_URL=postgresql://postgres:postgres@localhost:56131 # connection string pro připojení k databázi
+DB_URL=postgresql://postgres:postgres@localhost:56131/railway # connection string pro připojení k databázi
 INTERVAL_VYPISU_DNY=14 #(7-14-30....etc)vami zvoleny pocet dnu, dle kterych se budou zobrazovat nadchazejici terminy
 STAG_URL=https://stag-demo.zcu.cz/
 ```
