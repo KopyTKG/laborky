@@ -40,3 +40,9 @@ export type tPredmet = {
  nazev: string
  nCviceni: number
 }
+
+export type tUser = {
+ id: string
+ role: string
+ hash: string
+}

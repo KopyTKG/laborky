@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { fastHeaders } from '@/lib/stag'
+import { setupParser } from './lib/parsers'
 
 export async function middleware(request: NextRequest) {
  if (BaseAuth(request) && Validate(request.cookies.get('stagUserInfo')?.value || '')) {
@@ -16,11 +17,7 @@ export async function middleware(request: NextRequest) {
    return
   }
   const data = await res.json()
-  const info = {
-   id: data[0],
-   role: data[1],
-   hash: data[2],
-  }
+  const info = setupParser(data)
 
   if (request.url.endsWith('/')) {
    if (info.role == 'ST') {

@@ -1,5 +1,5 @@
 import { Unauthorized, NotFound, Success } from '@/lib/http'
-import { resTotTermin } from '@/lib/parsers'
+import { resTotTermin, setupParser } from '@/lib/parsers'
 import { fastHeaders } from '@/lib/stag'
 import { tTermin } from '@/lib/types'
 
@@ -20,12 +20,13 @@ export async function GET(req: Request) {
   return Unauthorized()
  }
 
- const role = await roleRes.json()
+ const data = await roleRes.json()
+ const info = setupParser(data)
 
  let apipoint = '/ucitel'
- if (role === 'ST') {
+ if (info.role === 'ST') {
   apipoint = '/student'
- } else if (role === 'RE') {
+ } else if (info.role === 'RE') {
   apipoint = '/admin'
  }
 

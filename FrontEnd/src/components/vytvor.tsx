@@ -105,8 +105,21 @@ export default function Vytvor() {
   }
  }
 
- const handleSubmit = () => {
-  console.log(formData)
+ const handleSubmit = async () => {
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/cTermin`)
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
+  }
+  const res = await fetch(url.toString(), {
+   method: 'POST',
+   headers: fastHeaders,
+   body: JSON.stringify(formData),
+  })
+
+  if (res) {
+   alert(res.statusText)
+  }
  }
 
  useLayoutEffect(() => {
