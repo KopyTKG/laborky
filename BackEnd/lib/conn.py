@@ -323,9 +323,9 @@ def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: dat
         session.commit()
         return ok
 
-    except Exception as e:
+    except:
         session.rollback()
-        return e
+        return internal_server_error
 
 
 def historie_studenta(session, id):

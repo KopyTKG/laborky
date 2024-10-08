@@ -1,4 +1,5 @@
 import { tTermin, tUser } from '@/lib/types'
+import { TimeInputValue } from '@nextui-org/react'
 
 export function resTotTermin(data: any): tTermin[] {
  const terminy: tTermin[] = []
@@ -25,4 +26,9 @@ export function setupParser(data: string[]): tUser {
   role: data[1],
   hash: data[2],
  }
+}
+
+export function formatTime(timeObj: TimeInputValue) {
+ const { hour, minute, second } = timeObj
+ return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`
 }
