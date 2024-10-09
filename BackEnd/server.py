@@ -271,7 +271,7 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
     userid, role = encode_id(info[0]), info[1]
     vsechny_terminy = get_vsechny_terminy(session)
     if id_terminu not in vsechny_terminy:
-        return bad_request
+        return not_found
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
