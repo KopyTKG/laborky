@@ -1,17 +1,13 @@
 'use client'
 import { Get } from '@/app/actions'
 import React from 'react'
-import { Button } from '@nextui-org/react'
+import { Button, Link } from '@nextui-org/react'
 import { toast, useToast } from '@/hooks/use-toast'
 import { useState } from 'react'
 
 export function Zobrazit({ id }: { id: string }) {
- const { toast } = useToast()
- function APIcall(id: string) {
-  alert(id)
- }
  return (
-  <Button onClick={() => APIcall(id)} color="default">
+  <Button as={Link} href={`/termin/${id}`} color="default">
    Zobrazit
   </Button>
  )
