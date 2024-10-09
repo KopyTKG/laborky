@@ -41,7 +41,6 @@ export async function middleware(request: NextRequest) {
  if (ucitelPathMatch && ucitelPathMatch[1] === info.id) {
   return NextResponse.next() // Already on the correct teacher page
  }
- console.log(pathname)
  // Handle redirect to the correct role path
  if (pathname === '/') {
   if (info.role === 'ST') {

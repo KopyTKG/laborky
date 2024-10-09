@@ -78,9 +78,10 @@ export async function GET(req: Request) {
   else return Internal()
  }
 
- const data = await res.json()
+ let data = await res.json()
 
  const studenti: tStudent[] = data.studenti
+ data = data.termin
  const termin: tTermin = {
   _id: data.kod_predmet,
   ucebna: data.ucebna,
@@ -99,4 +100,27 @@ export async function GET(req: Request) {
 export async function PATCH(req: Request) {}
 
 // Delete
-export async function DELETE(req: Request) {}
+export async function DELETE(req: Request) {
+ const rTicket = GetTicket(req)
+ if (!rTicket) return Unauthorized()
+
+ const base = new URL(req.url)
+ const rID = base.searchParams.get('id') || ''
+
+ if (!rID) {
+  return NotFound()
+ }
+
+ const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
+ url.searchParams.set('ticket', rTicket)
+ url.searchParams.set('id_terminu', rID)
+
+ const res = await fetch(url.toString(), {
+  method: 'DELETE',
+  headers: fastHeaders,
+ })
+ if (!res.ok) {
+  return Internal()
+ }
+ return Success()
+}
