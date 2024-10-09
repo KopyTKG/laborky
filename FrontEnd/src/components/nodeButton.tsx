@@ -73,7 +73,7 @@ export function Zapsat({
  return (
   <Button
    color={owned ? 'danger' : CapRender ? 'danger' : 'success'}
-   disabled={!owned ? VolnoRender : date ? false : true}
+   disabled={!owned ? VolnoRender : date ? true : false}
    onClick={() => APIcall(id, setReload)}
    isLoading={loading}
   >

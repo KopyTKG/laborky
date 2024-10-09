@@ -3,15 +3,15 @@ import React from 'react'
 
 export type tTermin = {
  _id: string
- location: string
- start: Date
- end: Date
- predmet: string
- poznamka?: string
- cislo: number
+ ucebna: string
+ start: string
+ konec: string
+ nazev: string
+ tema: string
+ cviceni: number
  kapacita: number
- zapsany: number
- vypsal: string[]
+ zapsany?: number
+ vypsal?: string[]
  owned?: boolean
 }
 
@@ -62,4 +62,11 @@ export type tTerminBody = {
  datum: string
  start: TimeInputValue
  end: TimeInputValue
+}
+
+export type tStudent = {
+ osCislo: string
+ jmeno: string
+ prijmeni: string
+ email: string
 }

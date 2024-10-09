@@ -16,12 +16,12 @@ export default function Node(props: tNode) {
  const loc = 'cs-CZ'
 
  const VolnoRender: boolean = CheckDate(props.start)
-  ? props.zapsany < props.kapacita
+  ? (props?.zapsany || 0) < props.kapacita
     ? false
     : true
   : true
  const CapRender: boolean = CheckDate(props.start)
-  ? props.zapsany >= props.kapacita
+  ? (props?.zapsany || 0) >= props.kapacita
     ? true
     : false
   : true
@@ -29,8 +29,8 @@ export default function Node(props: tNode) {
  return (
   <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
    <CardHeader>
-    <div className="text-2xl font-bold">{`${props.predmet} cvičení ${props.cislo}`}</div>
-    <p className="text-sm text-justify">{props.poznamka}</p>
+    <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
+    <p className="text-sm text-justify">{props.tema}</p>
    </CardHeader>
    <Divider />
    <CardContent>
@@ -39,23 +39,23 @@ export default function Node(props: tNode) {
       <Clock className="w-6" />
       <div className="pt-1">
        {new Date(props.start).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })} -
-       {new Date(props.end).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}
+       {new Date(props.konec).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}
       </div>
      </div>
      <div className="flex flex-row justify-start gap-1">
       <CalendarDays className="w-6" />
-      <div className="pt-1">{new Date(props.end).toLocaleDateString()}</div>
+      <div className="pt-1">{new Date(props.konec).toLocaleDateString()}</div>
      </div>
      <div className="flex flex-row justify-start gap-1">
       <MapPin className="w-6" />
-      <div className="pt-1">{props.location}</div>
+      <div className="pt-1">{props.ucebna}</div>
      </div>
     </div>
    </CardContent>
    <CardFooter className="flex justify-between width-fultems-center">
     <div className="grid grid-cols-[70%_30%] gap-1 w-full">
      <div className="flex flex-col gap-1 justify-end">
-      {props.vypsal.map((item: string, key: number) => (
+      {props.vypsal?.map((item: string, key: number) => (
        <span key={item + key} className="text-xs">{`${item}`}</span>
       ))}
      </div>
@@ -71,7 +71,7 @@ export default function Node(props: tNode) {
         date={CheckDate(props.start)}
         VolnoRender={VolnoRender}
         CapRender={CapRender}
-        volno={props.zapsany >= props.kapacita}
+        volno={(props?.zapsany || 0) >= props.kapacita}
         setReload={props.setReload}
        />
       ) : (

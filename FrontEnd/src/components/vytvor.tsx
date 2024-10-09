@@ -22,6 +22,7 @@ import { BellRing, Plus } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
 import { useToast } from '@/hooks/use-toast'
 import { ReloadCtx } from './ReloadProvider'
+import { tBodyTOtTermin } from '@/lib/parsers'
 
 const fetchPredmetyData = async () => {
  try {
@@ -118,15 +119,16 @@ export default function Vytvor() {
  }
 
  const handleSubmit = async () => {
-  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/cTermin`)
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/termin`)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
   }
+  const body = tBodyTOtTermin(formData)
   const res = await fetch(url.toString(), {
    method: 'POST',
    headers: fastHeaders,
-   body: JSON.stringify(formData),
+   body: JSON.stringify(body),
   })
 
   if (res) {
@@ -233,13 +235,13 @@ export default function Vytvor() {
           </Select>
          </div>
 
-         <SectionTitle className={predmet.nCviceni != 0 ? 'text-gray-500/50' : ''}>
+         <SectionTitle className={isNazevDisabled ? 'text-gray-500/50' : ''}>
           Název termínu
          </SectionTitle>
          <Input
           id="nazev"
           placeholder="Prezentace"
-          isDisabled={predmet.nCviceni != 0}
+          isDisabled={isNazevDisabled}
           isRequired={predmet.nCviceni == 0}
           value={nazev}
           onValueChange={(value) => handleChange('nazev', value)}
@@ -272,6 +274,7 @@ export default function Vytvor() {
            id="kapacita"
            type="number"
            placeholder="20"
+           min={0}
            isRequired={true}
            value={kapacita.toString()}
            onValueChange={(value) => handleChange('kapacita', parseInt(value))}
