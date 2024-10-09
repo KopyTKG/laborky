@@ -53,10 +53,11 @@ def get_student_predmety(ticket, osobni_cislo, predmety_db):
 
 def get_studenti_info(ticket, list_studentu):
     """ Vrátí informace o studentech podle osobního čísla """
-    info = {}
+    info = []
     for student in list_studentu:
         jmeno, prijmeni, email = get_student_info(ticket, student)
-        info[student] = {"jmeno": jmeno, "prijmeni": prijmeni, "email": email}
+        student_info = {"osCislo": student, "jmeno": jmeno, "prijmeni": prijmeni, "email": email}
+        info.append(student_info)
 
     return info
 

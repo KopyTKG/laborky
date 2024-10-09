@@ -282,7 +282,8 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
     termin_info = get_termin_info(session, id_terminu)
-    return jmena_studentu, termin_info
+    return {"studenti" :jmena_studentu, "termin": termin_info}
+
 
 @app.get("/ucitel/board_by_predmet")
 async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
@@ -513,13 +514,13 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
-    zkratka_katedry, zkratka_predmetu = vystup[0], vystup[1]
+    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
     vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
 
     return emaily_studentu
-        # vraci: {osobniCislo: {jemno: , prijmeni:, email: }}
+        # vraci: {osobniCislo: , jemno: , prijmeni:, email: }
 
 
 @app.get("/ucitel/uspesni_studenti")
@@ -548,7 +549,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         zkratka predmetu,
         zkratka katedry,
         pocet_cviceni,
-        vyucuje_id : id vyučujícího začínající "VY"... když se nechá prázný, bude bráno ID admina,
+        vyucuje_id : id vyučujícího ... když se nechá prázný, bude bráno ID admina,
     """
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
