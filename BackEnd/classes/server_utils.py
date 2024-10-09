@@ -114,3 +114,17 @@ def get_predmety_by_kody(session, kody_predmetu):
             predmety.append(predmet)
 
     return predmety
+
+
+def get_list_studentu(ticket, list_studentu, pred_kat):
+    """ Vrací seznam studentů dekódovaný s informacema o nich
+    Args:
+        list_studentu: zahashovaný seznam studentů
+        pred_kat: [predmet, katedra]
+    """
+
+    predmet, katedra = pred_kat[0], pred_kat[1]
+    vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, predmet)
+    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
+    jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    return jmena_studentu

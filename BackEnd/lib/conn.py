@@ -274,7 +274,7 @@ def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
     try:
         if session.query(Student).filter_by(id=student_id).first() is None:
             return not_found
-
+        
         elif session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id,HistorieTerminu.student_id == student_id)).first() is not None:
             return conflict
 

@@ -277,12 +277,9 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
-    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
-    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
-    jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    studenti = get_list_studentu(ticket, list_studentu, vystup)
     termin_info = get_termin_info(session, id_terminu)
-    return {"studenti" :jmena_studentu, "termin": termin_info}
+    return {"studenti": studenti, "termin": termin_info}
 
 
 @app.get("/ucitel/board_by_predmet")
@@ -343,29 +340,30 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     #     return ok
 
 
-@app.post("/ucitel/termin")
-async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_prijmeni: Optional[str] = None):
-    """ Učitel vytvoří termín do databáze """
-    info = kontrola_ticketu(ticket, vyucujici=True)
-    if info == unauthorized or info == internal_server_error:
-        return info
-    vypsal_id, role = encode_id(info[0]), info[1]
+#@app.post("/ucitel/termin")
+#async def ucitel_vytvor_termin(ticket: str, ucebna:str, datum_start: datetime, datum_konec:datetime, max_kapacita:int, zkratka_predmetu: str, jmeno: str, cislo_cviceni: int,popis:str,upozornit: Optional[bool] = None, vyucuje_prijmeni: Optional[str] = None):
+#    """ Učitel vytvoří termín do databáze """
+#    info = kontrola_ticketu(ticket, vyucujici=True)
+#    if info == unauthorized or info == internal_server_error:
+#        return info
+#    vypsal_id, role = encode_id(info[0]), info[1]
+#
+#    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
+#    if kod_predmetu is None:
+#        return conflict
+#    katedra = get_katedra_by_predmet(session, zkratka_predmetu)
+#    if vyucuje_id is None:
+#        vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
+#    vyucuje_id = encode_id(vyucuje_id)
+#    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
+#    if message is not ok:
+#        return message
+#    elif upozornit:
+#        emaily = get_list_emailu_pro_cviceni(session, kod_predmetu, cislo_cviceni, ticket)
+#        return emaily
+#    else:
+#        return ok
 
-    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
-    if kod_predmetu is None:
-        return conflict
-    katedra = get_katedra_by_predmet(session, zkratka_predmetu)
-    if vyucuje_id is None:
-        vyucuje_id = get_vyucujiciho_by_predmet(session, kod_predmetu) # type: ignore
-    vyucuje_id = encode_id(vyucuje_id)
-    message = vypsat_termin(session, ucebna, datum_start, datum_konec, max_kapacita, vypsal_id, vyucuje_id, kod_predmetu, jmeno, cislo_cviceni, popis) # type: ignore
-    if message is not ok:
-        return message
-    elif upozornit:
-        emaily = get_list_emailu_pro_cviceni(session, kod_predmetu, cislo_cviceni, ticket)
-        return emaily
-    else:
-        return ok
 
 @app.patch("/ucitel/termin")
 async def ucitel_zmena_terminu(
@@ -414,12 +412,9 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
-    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
-    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
-    jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    jmena_studentu = get_list_studentu(ticket, list_studentu, vystup)
     return jmena_studentu
-        # vraci {osCislo: {jmeno: , prijmeni: , email: }}
+        # vraci list {osCislo: {jmeno: , prijmeni: , email: }}
 
 
 @app.get("/ucitel/student")
@@ -514,10 +509,7 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
-    zkratka_katedry, zkratka_predmetu = vystup[1], vystup[0]
-    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
-    emaily_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    emaily_studentu = get_list_studentu(ticket, list_studentu, vystup)
 
     return emaily_studentu
         # vraci: {osobniCislo: , jemno: , prijmeni:, email: }
@@ -530,15 +522,11 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zk
     if info == unauthorized or info == internal_server_error:
         return info
 
-    vsichni_studenti = get_studenti_na_predmetu(ticket, zkratka_katedry, zkratka_predmetu)
-    vypis_uspesnych = vypis_uspesnych_studentu(session, zkratka_predmetu)
+    vypis_uspesnych = list((vypis_uspesnych_studentu(session, zkratka_predmetu)).keys())
+    vystup = [zkratka_predmetu, zkratka_katedry]
+    studenti = get_list_studentu(ticket, vypis_uspesnych, vystup)
 
-    uspesni_studenti = list(vypis_uspesnych.keys())
-
-    dekodovane = compare_encoded(uspesni_studenti, vsichni_studenti)
-    info = get_studenti_info(ticket, dekodovane)
-
-    return info
+    return studenti
 
 
 @app.post("/ucitel/pridat_predmet")
