@@ -385,12 +385,14 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
-
-    if smazat_termin(session, id_terminu) == not_found:
+    
+    res = smazat_termin(session, id_terminu)
+    if res == not_found:
         return not_found
-    if smazat_termin(session, id_terminu) == ok:
+    elif res == ok:
         return ok
-    return internal_server_error
+    else:
+        return internal_server_error
 
 
 ## /UCITEL STUDENTI

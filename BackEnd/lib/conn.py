@@ -235,10 +235,10 @@ def zapsat_se_na_termin(session, student_id, termin_id):
 
 def smazat_termin(session, id_terminu):
     try:
-        termin = session.query(HistorieTerminu).filter(HistorieTerminu.termin_id == id_terminu).first()
-
+        termin = session.query(Termin).filter(Termin.id == id_terminu).first()
+        print(termin)
         if termin is None:
-            return 404
+            return not_found
 
         session.delete(termin)
         session.commit()
