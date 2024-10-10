@@ -109,8 +109,8 @@ class HistorieTerminu(Base):
     __tablename__ = "historie_terminu"
 
     id = Column("id", UUID, primary_key=True)
-    student_id = Column(String, ForeignKey('student.id'))
-    termin_id = Column(UUID, ForeignKey('termin.id'))
+    student_id = Column(String, ForeignKey('student.id', ondelete="CASCADE"))
+    termin_id = Column(UUID, ForeignKey('termin.id', ondelete="CASCADE"))
     datum_splneni = Column("datum_splneni", DateTime)
 
     student = relationship('Student', back_populates="historie_terminu")
@@ -236,7 +236,7 @@ def zapsat_se_na_termin(session, student_id, termin_id):
 def smazat_termin(session, id_terminu):
     try:
         termin = session.query(Termin).filter(Termin.id == id_terminu).first()
-        print(termin)
+        # print(termin)
         if termin is None:
             return not_found
 
@@ -270,7 +270,7 @@ def pridat_studenta(session, student_id, termin_id, datum_splneni=None):
     try:
         if session.query(Student).filter_by(id=student_id).first() is None:
             return not_found
-        
+
         elif session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id,HistorieTerminu.student_id == student_id)).first() is not None:
             return conflict
 
