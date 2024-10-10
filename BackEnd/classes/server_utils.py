@@ -128,3 +128,12 @@ def get_list_studentu(ticket, list_studentu, pred_kat):
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
     return jmena_studentu
+
+
+def pridej_datum_splneni_do_listu_studentu(list_studentu, termin_id):
+    """ Přidá datum splnení do listu studentů """
+    for student in list_studentu:
+        id_student = encode_id(student["osCislo"])
+        student["datum_splneni"] = get_datum_splneni_terminu(session, id_student, termin_id)
+    
+    return list_studentu

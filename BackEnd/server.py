@@ -278,6 +278,7 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
     if vystup is None:
         return not_found
     studenti = get_list_studentu(ticket, list_studentu, vystup)
+    studenti = pridej_datum_splneni_do_listu_studentu(studenti, id_terminu)
     termin_info = get_termin_info(session, id_terminu)
     return {"studenti": studenti, "termin": termin_info}
 
@@ -579,11 +580,10 @@ def invalidate(ticket: str):
 
 @app.get("/")
 def root():
-    # skod_predmet = 'KIV/BOPX'
-    # index_cviceni = 1
+    termin = "c5d0c8c6-3c0b-4cac-b053-5f6d301a2f43"
+    list = list_studenti_z_terminu(session, termin)
+    return list
 
-    # emails = get_list_emailu_by_predmet(session, kod_predmetu=skod_predmet, index_cviceni=1, ticket='24106176d4e18f76c346be8fc9e01bb32318fc7f00c6876037a47f351ac3d7a4')
-    pass
     # return emails
 
 
@@ -598,7 +598,7 @@ if __name__ == "__main__":
         print("Session successfully created!")
     else:
         raise Exception("Session creation failed!")
-    vyucujici_k_predmetum_to_txt(session)
+    #vyucujici_k_predmetum_to_txt(session)
 
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT'))) # type: ignore
 

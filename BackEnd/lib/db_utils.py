@@ -103,13 +103,23 @@ def subtract_lists(list1, list2):
     return result
 
 
-def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu):
+def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu, kod_predmetu=None):
     """ Vrátí id uznačovacího terminu podle zkratky předmětu """
-    kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
+    if kod_predmetu == None:
+        kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
     termin = session.query(Termin).filter(and_(Termin.kod_predmet==kod_predmetu, Termin.cislo_cviceni==-1)).first()
     if termin is not None:
         return termin.id
     return None
+
+
+def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
+    """ Vrátí datum užnávaciho terminu studenta """
+    termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == id_termin, HistorieTerminu.student_id == id_studenta)).first()
+    if termin is not None:
+        return termin.datum_splneni
+    return None
+
 
 def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str = None):
     try:
@@ -150,4 +160,21 @@ def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ti
         else:
             return list_emailu
     except Exception as e:
+        return internal_server_error
+
+
+def get_datum_splneni_terminu(session, student_id, termin_id):
+    try:
+        termin_obj = session.query(Termin).filter(Termin.id == termin_id).first()
+        kod_predmetu = termin_obj.kod_predmet
+        termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id)).first()
+        if get_uznani_predmetu_by_student(session, student_id, kod_predmetu):
+            print("nasel se uznavaci termin studenta")
+            termin_id = get_uznavaci_termin_by_zkratka(session, "zkratka", kod_predmetu)
+            return get_datum_uznavaci_termin_student(session, student_id, termin_id)
+        if termin.datum_splneni:
+            return termin.datum_splneni
+        else:
+            return ""
+    except:
         return internal_server_error
