@@ -35,7 +35,8 @@ def kontrola_ticketu(ticket, vyucujici = True):
     userinfo = get_stag_user_info(ticket)
     if userinfo is None:
         return unauthorized
-
+    if userinfo == internal_server_error:
+        return internal_server_error
     userid, role = get_userid_and_role(userinfo)
     if role == internal_server_error:
         return internal_server_error
@@ -57,9 +58,13 @@ def vyucujici_k_predmetum_to_txt(session):
     temp_file = ".temp_vyucujici.txt"
 
     predmety_kod_katedra = get_vsechny_predmety_kod_katedra(session)
+    if predmety_kod_katedra == internal_server_error:
+        return internal_server_error
     vyucujici = {}
     for predmet in predmety_kod_katedra:
         vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
+        if vyucujici_predmetu == internal_server_error:
+            return internal_server_error
         if vyucujici_predmetu is None:
             vyucujici_seznam = []
         elif vyucujici_predmetu == "":
@@ -84,6 +89,8 @@ def get_jmena_predmetu_by_zkratka(session, zkratky_predmetu):
     jmena_predmetu = []
     for zkratka in zkratky_predmetu:
         katedra = get_katedra_by_predmet(session, zkratka)
+        if katedra == internal_server_error:
+            return internal_server_error
         if katedra is None:
             jmeno = zkratka
         else:
@@ -108,6 +115,8 @@ def get_predmety_by_kody(session, kody_predmetu):
     predmety = []
     for kod in kody_predmetu:
         predmet = get_predmet_by_id(session, kod)
+        if predmet == internal_server_error:
+            return internal_server_error
         if predmet is None:
             continue
         else:
@@ -125,8 +134,12 @@ def get_list_studentu(ticket, list_studentu, pred_kat):
 
     predmet, katedra = pred_kat[0], pred_kat[1]
     vsichni_studenti = get_studenti_na_predmetu(ticket, katedra, predmet)
+    if vsichni_studenti == internal_server_error:
+        return internal_server_error
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
+    if jmena_studentu == internal_server_error:
+        return internal_server_error
     return jmena_studentu
 
 
@@ -135,5 +148,6 @@ def pridej_datum_splneni_do_listu_studentu(list_studentu, termin_id):
     for student in list_studentu:
         id_student = encode_id(student["osCislo"])
         student["datum_splneni"] = get_datum_splneni_terminu(session, id_student, termin_id)
-    
+        if student["datum_splneni"] == internal_server_error:
+            return internal_server_error
     return list_studentu

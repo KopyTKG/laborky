@@ -400,53 +400,61 @@ def pocet_cviceni_pro_predmet(session):
 
 # zde nesmi prichazet parametr katedra - musi si to brat z "Uspesne zakonceni studenta"
 def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
-    for kod_predmetu in list(pocet_pro_predmet.keys()):
-        uspesne_terminy = uspesne_zakonceni_studenta_terminy(session, id_studenta, kod_predmetu)
+    try:
+        for kod_predmetu in list(pocet_pro_predmet.keys()):
+            uspesne_terminy = uspesne_zakonceni_studenta_terminy(session, id_studenta, kod_predmetu)
 
-        if uspesne_terminy:
-            for historie_terminu in uspesne_terminy:
-                termin = session.query(Termin).filter(Termin.id == historie_terminu.termin_id).first()
-                if termin:
-                    if get_uznani_predmetu_by_student(session, id_studenta, termin.kod_predmet):
-                        for i in range(len(pocet_pro_predmet[kod_predmetu])):
-                            pocet_pro_predmet[kod_predmetu][i] = historie_terminu.datum_splneni if historie_terminu.datum_splneni else datetime.now()
-                    else:
-                        cislo_cviceni = termin.cislo_cviceni - 1
-                        pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
-    return pocet_pro_predmet
-
+            if uspesne_terminy:
+                for historie_terminu in uspesne_terminy:
+                    termin = session.query(Termin).filter(Termin.id == historie_terminu.termin_id).first()
+                    if termin:
+                        if get_uznani_predmetu_by_student(session, id_studenta, termin.kod_predmet):
+                            for i in range(len(pocet_pro_predmet[kod_predmetu])):
+                                pocet_pro_predmet[kod_predmetu][i] = historie_terminu.datum_splneni if historie_terminu.datum_splneni else datetime.now()
+                        else:
+                            cislo_cviceni = termin.cislo_cviceni - 1
+                            pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
+        return pocet_pro_predmet
+    except: 
+        return internal_server_error
 
 def vypis_uspesnych_studentu(session, zkratka_predmetu):
-    kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
-    if kod_predmetu is None:
-        return not_found
+    try:
+        kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
+        if kod_predmetu is None:
+            return not_found
 
-    studenti = (
-        session.query(Student)
-        .join(HistorieTerminu, HistorieTerminu.student_id == Student.id)  # Join HistorieTerminu with Student
-        .join(Termin, HistorieTerminu.termin_id == Termin.id)             # Join HistorieTerminu with Termin
-        .filter(Termin.kod_predmet == kod_predmetu)                       # Filter by the given kod_predmetu
-        .all()  # Return all matching students
-    )
+        studenti = (
+            session.query(Student)
+            .join(HistorieTerminu, HistorieTerminu.student_id == Student.id)  # Join HistorieTerminu with Student
+            .join(Termin, HistorieTerminu.termin_id == Termin.id)             # Join HistorieTerminu with Termin
+            .filter(Termin.kod_predmet == kod_predmetu)                       # Filter by the given kod_predmetu
+            .all()  # Return all matching students
+        )
 
-    pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
+        pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
 
-    vyhodnoceni_studentu = {}
-    for student in studenti:
-        if get_uznani_predmetu_by_student(session, student.id, kod_predmetu):
-            vyhodnoceni_studentu[student.id] = 1
-        else:
-            vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
-            if 0 in vyhodnoceni[kod_predmetu]:
-                continue
+        vyhodnoceni_studentu = {}
+        for student in studenti:
+            if get_uznani_predmetu_by_student(session, student.id, kod_predmetu):
+                vyhodnoceni_studentu[student.id] = 1
             else:
-                vyhodnoceni_studentu[student.id] = vyhodnoceni
+                vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
+                if 0 in vyhodnoceni[kod_predmetu]:
+                    continue
+                else:
+                    vyhodnoceni_studentu[student.id] = vyhodnoceni
 
-    return vyhodnoceni_studentu
+        return vyhodnoceni_studentu
+
+    except:
+        return internal_server_error
+
 
 def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
     """ Vrátí, zda má student předmět celý uznán """
-    result = (
+    try:
+        result = (
         session.query(Termin)
         .join(HistorieTerminu, HistorieTerminu.termin_id == Termin.id)
         .join(Student, Student.id == HistorieTerminu.student_id)
@@ -457,7 +465,10 @@ def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
         )
         .first()  # Use first() to return one result or None
     )
-    return result is not None
+
+        return result is not None
+    except:
+        return internal_server_error
 
 
 

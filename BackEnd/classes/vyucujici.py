@@ -5,23 +5,27 @@ import os
 
 def get_student_info(ticket, osobni_cislo):
     """ Vrátí informace o studentovi podle osobního čísla """
-    params = {
-        "osCislo": osobni_cislo,
-    }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive",
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    url = os.getenv('STAG_URL') + "/services/rest2/student/getStudentInfo"
-    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
+    try:
+        params = {
+            "osCislo": osobni_cislo,
+        }
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive",
+            "Accept-Origin": os.getenv("STAG_URL"),
+        }
 
-    jmeno = response["jmeno"]
-    prijmeni = response["prijmeni"]
-    email = response["email"]
+        url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentInfo"
+        response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
+    except:
+        return internal_server_error
 
-    return jmeno, prijmeni, email
+        jmeno = response["jmeno"]
+        prijmeni = response["prijmeni"]
+        email = response["email"]
+
+        return jmeno, prijmeni, email
 
 
 def get_student_predmety(ticket, osobni_cislo, predmety_db):
@@ -34,9 +38,9 @@ def get_student_predmety(ticket, osobni_cislo, predmety_db):
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive",
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
-        url = os.getenv('STAG_URL') + "/services/rest2/rozvrhy/getRozvrhByStudent"
+        url = os.getenv('STAG_URL') + "ws/services/rest2/rozvrhy/getRozvrhByStudent"
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     except:
         return not_found
@@ -67,35 +71,40 @@ def get_ucitel_predmety(ticket, ucitIdno):
     """
      Vrati predmety, ktere ucitel vyucuje
     """
-    url = "/services/rest2/predmety/getPredmetyByUcitel"
-    params = {
-        "ucitIdno": ucitIdno,
-    }
-    return get(ticket, url, params)
-
+    try:
+        url = "ws/services/rest2/predmety/getPredmetyByUcitel"
+        params = {
+            "ucitIdno": ucitIdno,
+        }
+        return get(ticket, url, params)
+    except:
+        return internal_server_error
 
 def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
     url = os.getenv("STAG_URL") + "/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
-        "katedra": katedra,
+        "katedra": katedra, 
     }
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
         "Connection": "keep-alive",
-        "Accept-Origin": "https://stag-demo.zcu.cz",
+        "Accept-Origin": os.getenv("STAG_URL"),
     }
-    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
-    response = response.json()["studentPredmetu"]
-    osobni_cisla = []
+    try:
+        response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
+        response = response.json()["studentPredmetu"]
+        osobni_cisla = []
     # print(response)
-    for student in response:
-        osobni_cisla.append(student["osCislo"])
+        for student in response:
+            osobni_cisla.append(student["osCislo"])
 
-    return osobni_cisla
+        return osobni_cisla
 
+    except:
+        return internal_server_error
 
 def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
     """ Vrátí nekódované Fčísla studentů, bere argument hashovaných Fčísel studentů, které porovná se všemi zapsanými studenty na předmětu """

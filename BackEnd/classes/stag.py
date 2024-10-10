@@ -8,12 +8,15 @@ def get(ticket, url, params):
         "accept": "application/json",
         "Content-Type": "application/json",
         "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
+        "Accept-Origin": os.getenv("STAG_URL"),
     }
     url = os.getenv('STAG_URL') + url
-    response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
-    if not response.ok: 
-        raise Exception(response.text)
+    try:
+        response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
+        if not response.ok: 
+            raise Exception(response.text)
+    except:
+        return internal_server_error
     try:
         response = response.json()
     except:
@@ -23,14 +26,17 @@ def get(ticket, url, params):
 
 def get_stag_user_info(ticket):
     """ Vrátí jméno, příjmení, email, titul a stagUserInfo (username, role, nazev, ucitIdno/osCilo, email)"""
-    url = os.getenv('STAG_URL') + "/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url, headers=headers)
+    try:
+        url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive", 
+            "Accept-Origin": os.getenv("STAG_URL"),
+        }
+        response = requests.get(url, headers=headers)
+    except:
+        return internal_server_error
     if not response.ok:
         return None
     try:
@@ -42,18 +48,21 @@ def get_stag_user_info(ticket):
 
 def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
     """ Vrátí informace o předmětu """
-    url = os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    params = {
-        "katedra": katedra,
-        "zkratka": zkratka_predmetu
-    }
-    response = requests.get(url, headers=headers, params=params)
+    try:
+        url = os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive", 
+            "Accept-Origin": os.getenv("STAG_URL"),
+        }
+        params = {
+            "katedra": katedra,
+            "zkratka": zkratka_predmetu
+        }
+        response = requests.get(url, headers=headers, params=params)
+    except:
+        return internal_server_error
     if not response.ok:
         return None
     try:
@@ -69,18 +78,21 @@ def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
 
 def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
     """ Vrátí informace o predmetu"""
-    params = {
-        "katedra": katedra,
-        "zkratka": zkratka_predmetu
-    }
-    url= os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url, headers=headers, params=params)
+    try:
+        params = {
+            "katedra": katedra,
+            "zkratka": zkratka_predmetu
+        }
+        url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive", 
+            "Accept-Origin": os.getenv("STAG_URL"),
+        }
+        response = requests.get(url, headers=headers, params=params)
+    except:
+        return internal_server_error
     if not response.ok:
         return "chyba"
     

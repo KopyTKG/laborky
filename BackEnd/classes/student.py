@@ -5,7 +5,7 @@ import json
 
 def get_predmet_by_student(ticket, semestr, userid):
     """ Vrátí všechny zapsané předměty studentem v daném semestru (ZS / LS)"""
-    url = "/services/rest2/predmety/getPredmetyByStudent"
+    url = "ws/services/rest2/predmety/getPredmetyByStudent"
     params = {
         "osCislo": userid,
         "semestr": semestr,
@@ -17,16 +17,19 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     """
     Vrati vsechny predmety, pro ktere existuje moznost seminare, ktere student jeste nema splneny, ale zapsany
     """
-    url = os.getenv('STAG_URL') + "/services/rest2/student/getStudentPredmetyAbsolvoval" # type: ignore
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
-    }
-    response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
-    if not response.ok:
-        return not_found
+    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentPredmetyAbsolvoval" # type: ignore
+    try:
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive", 
+            "Accept-Origin": os.getenv("STAG_URL"),
+        }
+        response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
+        if not response.ok:
+            return not_found
+    except:
+        return internal_server_error
     splneno = []
     aktivni_predmety = []
     predmety = response.json()
@@ -43,14 +46,11 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
 
 def pridat_vyucujici_k_terminu(terminy, vyucujici_list):
     """ Prida vyucujici do terminu """
-    try: 
-        for i, termin in enumerate(terminy):
-            termin_dict = vars(termin)
-            kod = termin_dict["kod_predmet"]
-            vyucujici = vyucujici_list[kod]
-            termin_dict["vyucujici"] = vyucujici
+    for i, termin in enumerate(terminy):
+        termin_dict = vars(termin)
+        kod = termin_dict["kod_predmet"]
+        vyucujici = vyucujici_list[kod]
+        termin_dict["vyucujici"] = vyucujici
 
-            terminy[i] = termin_dict
-    except:
-        return terminy
+        terminy[i] = termin_dict
     return terminy
