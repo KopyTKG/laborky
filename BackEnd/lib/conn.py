@@ -50,10 +50,11 @@ class Termin(Base):
     cislo_cviceni = Column("cislo_cviceni", Integer)
     popis = Column("popis", Text)
 
+
     predmet = relationship('Predmet', back_populates="termin")
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
-    historie_terminu = relationship('HistorieTerminu', back_populates="termin")
+    historie_terminu = relationship('HistorieTerminu', back_populates="termin", passive_deletes=True)
 
 class VyucujiciPredmety(Base):
     __tablename__ = "vyucujici_predmety"
@@ -109,8 +110,8 @@ class HistorieTerminu(Base):
     __tablename__ = "historie_terminu"
 
     id = Column("id", UUID, primary_key=True)
-    student_id = Column(String, ForeignKey('student.id', ondelete="CASCADE"))
-    termin_id = Column(UUID, ForeignKey('termin.id', ondelete="CASCADE"))
+    student_id = Column(String, ForeignKey('student.id', ondelete='CASCADE'))
+    termin_id = Column(UUID, ForeignKey('termin.id', ondelete='CASCADE'))
     datum_splneni = Column("datum_splneni", DateTime)
 
     student = relationship('Student', back_populates="historie_terminu")
@@ -415,7 +416,7 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
                             cislo_cviceni = termin.cislo_cviceni - 1
                             pocet_pro_predmet[kod_predmetu][cislo_cviceni] = historie_terminu.datum_splneni
         return pocet_pro_predmet
-    except: 
+    except:
         return internal_server_error
 
 def vypis_uspesnych_studentu(session, zkratka_predmetu):
