@@ -82,7 +82,7 @@ def get_ucitel_predmety(ticket, ucitIdno):
 
 def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
-    url = os.getenv("STAG_URL") + "/services/rest2/student/getStudentiByPredmet"
+    url = os.getenv("STAG_URL") + "ws/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
         "katedra": katedra, 
@@ -134,3 +134,27 @@ def find_matching_hash_positions(big_list, small_list):
             matching_positions.append(big_list_index)
 
     return matching_positions
+
+
+def get_vyucujici_predmety(ticket, predmety_db):
+    """ Vrátí kódy předmětů, které vyučující má v rozvrhu a zároveň jsou tyto předměty k dispozici v DB"""
+    url = os.getenv("STAG_URL") + "ws/services/rest2/rozvrhy/getRozvrhByUcitel"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive",
+        "Accept-Origin": os.getenv("STAG_URL"),
+    }
+    id = get_userid_and_role(get_stag_user_info(ticket))[0]
+
+    params = {
+        "ucitIdno": id,
+    }
+    try:
+        response = (requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})).json()
+    except:
+        return unauthorized
+    
+    predmety = []
+    
+

@@ -33,6 +33,7 @@ async def kontrola_s_databazi(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
     if role != "ST":
         message = vytvor_vyucujici(session, userid)
+        predmety_vyucujiciho = get_vyucujici_predmety(ticket, "")
         if message == internal_server_error:
             return internal_server_error
     else:
