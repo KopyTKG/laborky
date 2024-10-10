@@ -169,7 +169,6 @@ def get_datum_splneni_terminu(session, student_id, termin_id):
         kod_predmetu = termin_obj.kod_predmet
         termin = session.query(HistorieTerminu).filter(and_(HistorieTerminu.termin_id == termin_id, HistorieTerminu.student_id == student_id)).first()
         if get_uznani_predmetu_by_student(session, student_id, kod_predmetu):
-            print("nasel se uznavaci termin studenta")
             termin_id = get_uznavaci_termin_by_zkratka(session, "zkratka", kod_predmetu)
             return get_datum_uznavaci_termin_student(session, student_id, termin_id)
         if termin.datum_splneni:
