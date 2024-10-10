@@ -3,9 +3,26 @@
 SESH="laborky"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if [[ "$1" == "-dev" ]]; then
+	if [[ "$1" == "dev" ]]; then
 		gnome-terminal -- bash -c "./run.sh -rtmux"
 		nvim .
+        elif [[ "$1" == "build" ]]; then
+		gnome-terminal -- bash -c "./run.sh -tbuild"
+		nvim .		
+	elif [[ "$1" == "-tbuild" ]]; then
+		tmux has-session -t $SESH 2>/dev/null
+		if [ $? != 0 ]; then
+			tmux new-session -d -s $SESH -n "api"
+			tmux send-keys -t $SESH:api "cd Backend	&& python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && sleep 5 && python server.py" C-m
+
+			tmux new-window -t $SESH -n "webserver"
+			tmux send-keys -t $SESH:webserver "cd FrontEnd && bun install && bun run build && bun start" C-m
+
+			tmux new-window -t $SESH -n "db"
+			tmux send-keys -t $SESH:db "docker compose up" C-m
+		fi
+		tmux attach-session -t $SESH
+
 	elif [[ "$1" == "-tmux" ]]; then
 		gnome-terminal -- bash -c "./run.sh -rtmux"
 	elif [[ "$1" == "-rtmux" ]]; then

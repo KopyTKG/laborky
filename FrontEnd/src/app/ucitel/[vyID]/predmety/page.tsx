@@ -4,7 +4,7 @@ import FiltrTerminy from '@/components/user/FiltrTerminy'
 import { tSelected } from '@/lib/types'
 
 export default function Page({ searchParams }: { searchParams: tSelected }) {
- const selected = searchParams.s?.split('-') || []
+ const selected = searchParams.s?.split('-') || ([] as string[])
 
  return (
   <div className="w-full grid grid-cols-5 gap-2">

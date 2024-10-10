@@ -26,7 +26,7 @@ const fetchTerminyData = async (vybrane: string) => {
  }
 }
 
-export default function FiltrTerminy({ typ }: { typ?: string }) {
+export default function FiltrTerminy({ vybrane, typ }: { vybrane: string; typ?: string }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
  const [reload, setReload] = useState<boolean>(false)

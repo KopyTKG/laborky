@@ -41,7 +41,7 @@ export async function GET(req: Request) {
   }
   const data = await res.json()
   const terminy: tTermin[] = resTotTermin(data)
-  const sorted = terminy.sort((a, b) => new Date(a.end).getTime() - new Date(b.end).getTime())
+  const sorted = terminy.sort((a, b) => new Date(a.konec).getTime() - new Date(b.konec).getTime())
   return Success({ data: sorted })
  } else {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${apipoint}/moje`)
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
   }
   const data = await res.json()
   const terminy: tTermin[] = resTotTermin(data)
-  const sorted = terminy.sort((a, b) => new Date(a.end).getTime() - new Date(b.end).getTime())
+  const sorted = terminy.sort((a, b) => new Date(a.konec).getTime() - new Date(b.konec).getTime())
   return Success({ data: sorted })
  }
 }
