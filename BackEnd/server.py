@@ -53,11 +53,16 @@ async def get_student_home(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety_obj(session))
-
+    if predmety_k_dispozici == internal_server_error:
+        return internal_server_error
     vyhodnoceni = vyhodnoceni_studenta(session, userid, pocet_cviceni_pro_predmet(session))
-
+    if vyhodnoceni == internal_server_error:
+        return internal_server_error
+    
     list_terminu = list_dostupnych_terminu(session, predmety_k_dispozici, vyhodnoceni, userid)
-        # vrací seznam laborek, které jsou studentovi k dispozici
+    if list_terminu == internal_server_error:
+        return internal_server_error
+            # vrací seznam laborek, které jsou studentovi k dispozici
             # předmět nemá uznaný a studuje ho
 
     vyucujici_list = read_file()
@@ -142,8 +147,16 @@ async def get_student_profil(ticket: str | None = None):
 
 
     predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, get_vsechny_predmety_obj(session)) # vrátí předměty, které student studuje podle stagu (formát KAT/PRED)
+    if predmety_k_dispozici == internal_server_error:
+        return internal_server_error
+
     pocet_pro_predmet = pocet_cviceni_pro_predmet(session) # vrací dict všech předmětů z DB a počet cvičení, formát: {kat/pred: [0, 0, 0], ...}
+    if pocet_pro_predmet == internal_server_error:
+        return internal_server_error
+
     vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db
+    if vyhodnoceni_vsech_studentu == internal_server_error:
+        return internal_server_error
     vyhodnoceni = {}
 
     for predmet in predmety_k_dispozici:
@@ -175,6 +188,8 @@ async def get_predmety(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     vsechny_predmety = get_vsechny_predmety_obj(session)
+    if vsechny_predmety == internal_server_error:
+        return internal_server_error
 
     # dekan#_ujp což je náš ekvivalent Škvora
     if info[0] == "VY49712":
@@ -185,6 +200,8 @@ async def get_predmety(ticket: str | None = None):
         predmety_vyucujiciho = get_predmety_by_vyucujici(session, userid)
         if predmety_vyucujiciho is None:
             return internal_server_error
+        if predmety_vyucujiciho == internal_server_error:
+            return internal_server_error
 
         jmena_predmetu_vyucujiciho = get_predmet_id_jmeno_cisla(predmety_vyucujiciho)
         return jmena_predmetu_vyucujiciho
@@ -193,7 +210,11 @@ async def get_predmety(ticket: str | None = None):
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
         if predmety_k_dispozici is None:
             return internal_server_error
+        if predmety_k_dispozici == internal_server_error:
+            return internal_server_error
         predmety = get_predmety_by_kody(session, predmety_k_dispozici)
+        if predmety == internal_server_error:
+            return internal_server_error
         jmena_predmetu_k_dispozici = get_predmet_id_jmeno_cisla(predmety)
         return jmena_predmetu_k_dispozici
 
@@ -211,7 +232,8 @@ async def get_admin_board_next_ones(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     list_terminy_dopredu = terminy_dopredu(session)
-
+    if list_terminy_dopredu == internal_server_error:
+        return internal_server_error
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
     return list_terminu
@@ -227,6 +249,8 @@ async def get_admin_board(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     list_terminu = list_terminy(session)
+    if list_terminu == internal_server_error:
+        return internal_server_error
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
@@ -242,6 +266,8 @@ async def get_ucitel_board_future_ones(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     list_terminy_dopredu = terminy_dopredu_pro_vyucujiciho(session, userid)
+    if list_terminy_dopredu == internal_server_error:
+        return internal_server_error
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
     return list_terminu
@@ -256,6 +282,8 @@ async def get_ucitel_moje_vypsane(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
 
     list_terminu = list_terminy_vyucujici(session, userid)
+    if list_terminu == internal_server_error:
+        return internal_server_error
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
     return list_terminu
@@ -270,16 +298,29 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
         return info
     userid, role = encode_id(info[0]), info[1]
     vsechny_terminy = get_vsechny_terminy(session)
+    if vsechny_terminy == internal_server_error:
+        return internal_server_error
     if id_terminu not in vsechny_terminy:
         return not_found
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
+    if list_studentu == internal_server_error:
+        return internal_server_error
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
+    if vystup == internal_server_error:
+        return internal_server_error
     if vystup is None:
         return not_found
+    
     studenti = get_list_studentu(ticket, list_studentu, vystup)
+    if get_list_studnetu == internal_server_error:
+        return internal_server_error
     studenti = pridej_datum_splneni_do_listu_studentu(studenti, id_terminu)
+    if studenti == internal_server_error:
+        return internal_server_error
     termin_info = get_termin_info(session, id_terminu)
+    if termin_info == internal_server_error:
+        return internal_server_error
     return {"studenti": studenti, "termin": termin_info}
 
 
@@ -294,12 +335,16 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
 
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
+        if pomocny_list == internal_server_error:
+            return internal_server_error
         predmety = ";".join(pomocny_list) # type: ignore
     list_predmetu = predmety.split(";") # type: ignore
     list_terminu = []
     vyucujici_list = read_file()
     for predmet in list_predmetu:
         predmet = get_kod_predmetu_by_zkratka(session, predmet)
+        if predmet == internal_server_error:
+            return internal_server_error
         list_terminu.extend(list_probehle_terminy_predmet(session, predmet))
         list_terminu.extend(list_planovane_terminy_predmet(session, predmet))
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
@@ -319,6 +364,8 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
 
     if not termin.vyucuje_prijmeni:
         vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu)[0] # type: ignore
+        if vyucuje_id == internal_server_error:
+            return internal_server_error
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 
@@ -388,12 +435,7 @@ async def ucitel_smazani_terminu(ticket: str, id_terminu: str):
         return info
     
     res = smazat_termin(session, id_terminu)
-    if res == not_found:
-        return not_found
-    elif res == ok:
-        return ok
-    else:
-        return internal_server_error
+    return res
 
 
 ## /UCITEL STUDENTI
@@ -407,14 +449,20 @@ async def get_vypis_studentu(ticket: str, id_terminu: str):
     userid, role = encode_id(info[0]), info[1]
 
     vsechny_terminy = get_vsechny_terminy(session)
-
+    if vsechny_terminy == internal_server_error:
+        return internal_server_error
     if id_terminu not in vsechny_terminy:
         return bad_request
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
+    if list_studentu == internal_server_error:
+        return internal_server_error
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
+    elif vystup == internal_server_error:
+        return internal_server_error
+
     jmena_studentu = get_list_studentu(ticket, list_studentu, vystup)
     return jmena_studentu
         # vraci list {osCislo: {jmeno: , prijmeni: , email: }}
@@ -443,9 +491,14 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
 
     id_stud = encode_id(id_stud)
     vyucujici_list = read_file()
-    terminy_prihlaseny = pridat_vyucujici_k_terminu(get_termin_zapsane_by_studentid(session, id_stud), vyucujici_list)
+    list_terminu = get_termin_zapsane_by_studentid(session, id_stud)
+    if list_terminu == internal_server_error:
+        return internal_server_error
+    terminy_prihlaseny = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
     vyhodnoceni = vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session))
+    if vyhodnoceni == internal_server_error:
+        return internal_server_error
     list_terminu = pridat_vyucujici_k_terminu(list_dostupnych_terminu(session, predmety_studenta, vyhodnoceni, id_stud), vyucujici_list)
 
     student_full = {"info": student_info, "dostupne_terminy": list_terminu, "terminy_prihlaseny": terminy_prihlaseny, "predmety": predmety_studenta}
@@ -490,7 +543,9 @@ async def post_ucitel_uznat_studentovi(ticket: str, id_stud: str, zkratka_predme
 
     id_stud = encode_id(id_stud)
     id_terminu = get_uznavaci_termin_by_zkratka(session, zkratka_predmetu)
-    if id_terminu is None:
+    if id_terminu == internal_server_error:
+        return internal_server_error
+    elif id_terminu is None:
         return not_found
     message = pridat_studenta(session, id_stud, id_terminu)
     if message != ok:
@@ -509,11 +564,15 @@ async def get_ucitel_emaily(ticket: str, id_terminu: str): #ticket: str | None =
         return info
 
     list_studentu = list_studenti_z_terminu(session, id_terminu)
+    if list_studentu == internal_server_error:
+        return internal_server_error
+
     vystup = get_katedra_predmet_by_idterminu(session, id_terminu)
     if vystup is None:
         return not_found
+    elif vystup == internal_server_error:
+        return internal_server_error
     emaily_studentu = get_list_studentu(ticket, list_studentu, vystup)
-
     return emaily_studentu
         # vraci: {osobniCislo: , jemno: , prijmeni:, email: }
 
@@ -526,6 +585,8 @@ async def get_uspesni_studenti_by_predmet(ticket: str, zkratka_predmetu: str, zk
         return info
 
     vypis_uspesnych = list((vypis_uspesnych_studentu(session, zkratka_predmetu)).keys())
+    if vypis_uspesnych == internal_server_error:
+        return internal_server_error
     vystup = [zkratka_predmetu, zkratka_katedry]
     studenti = get_list_studentu(ticket, vypis_uspesnych, vystup)
 
@@ -572,7 +633,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
 
 @app.get("/invalidate")
 def invalidate(ticket: str):
-    url = "https://ws.ujep.cz/ws/services/rest2/help/invalidateTicket?ticket=" + ticket
+    url = os.getenv("STAG_URL") + "/services/rest2/help/invalidateTicket?ticket=" + ticket
 
     response = requests.get(url)
     return 200
