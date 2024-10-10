@@ -1,0 +1,41 @@
+from fastapi import APIRouter
+from classes.server_utils import *
+
+
+router = APIRouter()
+
+
+@router.get("/student/moje")
+async def get_student_moje(ticket: str | None = None):
+    """ Vrátí cvičení, na kterých je student aktuálně zapsán
+
+    Args:
+        ticket (str): Uživatelský autentizační token.
+
+    Returns:
+        list_terminu (list): Seznam cvičení, na kterých je student aktuálně zapsán a nemá je splněné
+    """
+
+    info = kontrola_ticketu(ticket, vyucujici=False)
+    if info == unauthorized or info == internal_server_error:
+        return info
+    userid, role = encode_id(info[0]), info[1]
+
+    historie = historie_studenta(session, userid)
+    if historie == not_found:
+        return not_found
+    elif historie == internal_server_error:
+        return internal_server_error
+
+    splnene = uspesne_dokoncene_terminy(session, userid)
+    if splnene == internal_server_error:
+        return internal_server_error
+    if splnene == not_found:
+        return not_found
+
+    list_terminu = subtract_lists(historie, splnene)
+
+    vyucujici_list = read_file()
+    list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
+
+    return list_terminu

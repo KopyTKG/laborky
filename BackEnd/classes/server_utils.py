@@ -154,3 +154,16 @@ def pridej_datum_splneni_do_listu_studentu(list_studentu, termin_id):
         if student["datum_splneni"] == internal_server_error:
             return internal_server_error
     return list_studentu
+
+
+
+def pridat_vyucujici_k_terminu(terminy, vyucujici_list):
+    """ Prida vyucujici do terminu """
+    for i, termin in enumerate(terminy):
+        termin_dict = vars(termin)
+        kod = termin_dict["kod_predmet"]
+        vyucujici = vyucujici_list[kod]
+        termin_dict["vyucujici"] = vyucujici
+
+        terminy[i] = termin_dict
+    return terminy

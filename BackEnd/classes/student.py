@@ -43,14 +43,3 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     predmety = [item for item in aktivni_predmety if item not in splneno]
     return predmety
 
-
-def pridat_vyucujici_k_terminu(terminy, vyucujici_list):
-    """ Prida vyucujici do terminu """
-    for i, termin in enumerate(terminy):
-        termin_dict = vars(termin)
-        kod = termin_dict["kod_predmet"]
-        vyucujici = vyucujici_list[kod]
-        termin_dict["vyucujici"] = vyucujici
-
-        terminy[i] = termin_dict
-    return terminy
