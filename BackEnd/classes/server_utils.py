@@ -138,7 +138,7 @@ def get_list_studentu(ticket, list_studentu, pred_kat):
         return internal_server_error
     dekodovane_cisla = compare_encoded(list_studentu, vsichni_studenti)
     jmena_studentu = get_studenti_info(ticket,  dekodovane_cisla)
-    if jmena_studnetu == internal_server_error:
+    if jmena_studentu == internal_server_error:
         return internal_server_error
     return jmena_studentu
 

@@ -104,7 +104,7 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
         return osobni_cisla
 
     except:
-        return intenral_server_error
+        return internal_server_error
 
 def compare_encoded(hash_studentu_na_terminu, studenti_na_predmetu):
     """ Vrátí nekódované Fčísla studentů, bere argument hashovaných Fčísel studentů, které porovná se všemi zapsanými studenty na předmětu """

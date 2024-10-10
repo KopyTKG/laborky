@@ -155,7 +155,7 @@ async def get_student_profil(ticket: str | None = None):
         return internal_server_error
 
     vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, userid, pocet_pro_predmet) # vraci dict vyhodnoceni studenta všech předmětů z db
-    if vyhodnoceni_vsech_studentu == internal_server_error:
+    if vyhodnoceni_vsech_predmetu == internal_server_error:
         return internal_server_error
     vyhodnoceni = {}
 
@@ -313,7 +313,7 @@ async def get_info_o_terminu(ticket: str, id_terminu: str):
         return not_found
     
     studenti = get_list_studentu(ticket, list_studentu, vystup)
-    if get_list_studnetu == internal_server_error:
+    if studenti == internal_server_error:
         return internal_server_error
     studenti = pridej_datum_splneni_do_listu_studentu(studenti, id_terminu)
     if studenti == internal_server_error:
