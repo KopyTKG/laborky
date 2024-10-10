@@ -223,3 +223,26 @@ def get_datum_splneni_terminu(session, student_id, termin_id):
             return ""
     except:
         return internal_server_error
+    
+
+def pridej_vyucujicimu_predmety_list(session, id_vyucujiciho, list_kodu_predmetu):
+    try:
+        odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho)
+        for kod_predmetu in list_kodu_predmetu:
+            message = pridej_vyucujiciho_na_predmet(session, kod_predmetu, id_vyucujiciho)
+            if message != ok:
+                return message
+    except:
+        return internal_server_error
+    return ok
+
+
+def odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho):
+    try:
+        session.query(VyucujiciPredmety).filter(VyucujiciPredmety.vyucujici_id == id_vyucujiciho).delete()
+        session.commit()
+    except:
+        session.rollback()
+        return internal_server_error
+    return ok
+        

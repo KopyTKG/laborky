@@ -33,14 +33,31 @@ async def kontrola_s_databazi(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
     if role != "ST":
         message = vytvor_vyucujici(session, userid)
-        predmety_vyucujiciho = get_vyucujici_predmety(ticket, "")
-        if message == internal_server_error:
-            return internal_server_error
+
+        if message != ok:
+            return message
     else:
         message = vytvor_student(session, userid)
         if message == internal_server_error:
             return internal_server_error
     return info[0], role, userid
+
+
+@app.get("/setup/ucitel")
+async def nastavit_uciteli_jeho_predmety(ticket: str | None = None):
+    """ Podle rozvrhu vyučujícího a předmětů z DB, vytvoří relace se všemi předměty, které vyučující vyučuje"""
+    try:
+        info = kontrola_ticketu(ticket, vyucujici=False)
+        if info == unauthorized or info == internal_server_error:
+            return info
+        userid, role = encode_id(info[0]), info[1]
+        predmety_vyucujiciho = get_vyucujici_predmety(ticket, get_vsechny_predmety_obj(session))
+        message = pridej_vyucujicimu_predmety_list(session, userid, predmety_vyucujiciho)
+        if message != ok:
+            return message
+    except:
+        return internal_server_error
+    return ok
 
 
 ### Student API
@@ -272,6 +289,7 @@ async def get_ucitel_board_future_ones(ticket: str | None = None):
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminy_dopredu, vyucujici_list)
     return list_terminu
+
 
 @app.get("/ucitel/moje")
 async def get_ucitel_moje_vypsane(ticket: str | None = None):
@@ -660,7 +678,7 @@ if __name__ == "__main__":
         print("Session successfully created!")
     else:
         raise Exception("Session creation failed!")
-    vyucujici_k_predmetum_to_txt(session)
+    #vyucujici_k_predmetum_to_txt(session)
 
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT'))) # type: ignore
 

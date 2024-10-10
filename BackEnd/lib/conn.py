@@ -306,6 +306,18 @@ def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id,
         session.rollback()
         return internal_server_error
 
+
+def pridej_vyucujiciho_na_predmet(session, kod_predmetu, vyucujici_id):
+    try:
+        vyucujici_na_predmetu = VyucujiciPredmety(kod_predmetu=kod_predmetu, vyucujici_id=vyucujici_id)
+        session.add(vyucujici_na_predmetu)
+        session.commit()
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
+
+
 ### TERMINY
 def vypsat_termin(session, ucebna: Text, datum_start: datetime, datum_konec: datetime, max_kapacita: int, vypsal_id: Text, vyucuje_id: Text, kod_predmet: Text, jmeno: Text, cislo_cviceni: int,popis: Text, aktualni_kapacita=0):
     try:
@@ -485,7 +497,7 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
         if vsechny_predmety:
             return vsechny_predmety
         else:
-            return not_found
+            return []
     except:
         return internal_server_error
 
