@@ -64,6 +64,21 @@ export async function GET(req: Request) {
   return NotFound()
  }
 
+ const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
+ checkURL.searchParams.set('ticket', rTicket)
+ const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
+
+ if (!roleRes.ok) {
+  return Unauthorized()
+ }
+
+ let data = await roleRes.json()
+ const info = setupParser(data)
+
+ if (info.role == 'ST') {
+  return Unauthorized()
+ }
+
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
  url.searchParams.set('id_terminu', rID)
@@ -78,7 +93,7 @@ export async function GET(req: Request) {
   else return Internal()
  }
 
- let data = await res.json()
+ data = await res.json()
 
  const studenti: tStudent[] = data.studenti
  data = data.termin
@@ -97,7 +112,63 @@ export async function GET(req: Request) {
 }
 
 // Update
-export async function PATCH(req: Request) {}
+export async function PATCH(req: Request) {
+ const rTicket = GetTicket(req)
+ if (!rTicket) return Unauthorized()
+
+ const base = new URL(req.url)
+ const rID = base.searchParams.get('id') || ''
+
+ if (!rID) {
+  return NotFound()
+ }
+
+ const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
+ checkURL.searchParams.set('ticket', rTicket)
+ const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
+
+ if (!roleRes.ok) {
+  return Unauthorized()
+ }
+
+ const data = await roleRes.json()
+ const info = setupParser(data)
+
+ if (info.role == 'ST') {
+  return Unauthorized()
+ }
+
+ const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
+ url.searchParams.set('ticket', rTicket)
+ url.searchParams.set('id_terminu', rID)
+
+ const body: tTermin = await req.json()
+ if (!body) {
+  return NotFound()
+ }
+ const fBody = {
+  ucebna: body.ucebna,
+  datum_start: body.start,
+  datum_konec: body.konec,
+  max_kapacita: body.kapacita,
+  cislo_cviceni: body.cviceni,
+  popis: body.tema,
+  jmeno: body.nazev,
+  kod_predmetu: body._id,
+  upozornit: null,
+  vyucuje_prijmeni: null,
+ }
+
+ const res = await fetch(url.toString(), {
+  method: 'PATCH',
+  headers: fastHeaders,
+  body: JSON.stringify(fBody),
+ })
+ if (!res.ok) {
+  return Internal()
+ }
+ return Success()
+}
 
 // Delete
 export async function DELETE(req: Request) {
@@ -109,6 +180,21 @@ export async function DELETE(req: Request) {
 
  if (!rID) {
   return NotFound()
+ }
+
+ const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
+ checkURL.searchParams.set('ticket', rTicket)
+ const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
+
+ if (!roleRes.ok) {
+  return Unauthorized()
+ }
+
+ const data = await roleRes.json()
+ const info = setupParser(data)
+
+ if (info.role == 'ST') {
+  return Unauthorized()
  }
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
