@@ -14,7 +14,7 @@ def get_student_info(ticket, osobni_cislo):
         "Connection": "keep-alive",
         "Accept-Origin": "https://stag-demo.zcu.cz",
     }
-    url = "https://ws.ujep.cz/ws/services/rest2/student/getStudentInfo"
+    url = os.getenv('STAG_URL') + "/services/rest2/student/getStudentInfo"
     response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
 
     jmeno = response["jmeno"]
@@ -36,7 +36,7 @@ def get_student_predmety(ticket, osobni_cislo, predmety_db):
             "Connection": "keep-alive",
             "Accept-Origin": "https://stag-demo.zcu.cz",
         }
-        url = "https://ws.ujep.cz/ws/services/rest2/rozvrhy/getRozvrhByStudent"
+        url = os.getenv('STAG_URL') + "/services/rest2/rozvrhy/getRozvrhByStudent"
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     except:
         return not_found
@@ -67,7 +67,7 @@ def get_ucitel_predmety(ticket, ucitIdno):
     """
      Vrati predmety, ktere ucitel vyucuje
     """
-    url = "ws/services/rest2/predmety/getPredmetyByUcitel"
+    url = "/services/rest2/predmety/getPredmetyByUcitel"
     params = {
         "ucitIdno": ucitIdno,
     }
@@ -76,7 +76,7 @@ def get_ucitel_predmety(ticket, ucitIdno):
 
 def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
-    url = "https://ws.ujep.cz/ws/services/rest2/student/getStudentiByPredmet"
+    url = os.getenv("STAG_URL") + "/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
         "katedra": katedra,

@@ -23,7 +23,7 @@ def get(ticket, url, params):
 
 def get_stag_user_info(ticket):
     """ Vrátí jméno, příjmení, email, titul a stagUserInfo (username, role, nazev, ucitIdno/osCilo, email)"""
-    url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
+    url = os.getenv('STAG_URL') + "/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ def get_stag_user_info(ticket):
 
 def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
     """ Vrátí informace o předmětu """
-    url = os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
+    url = os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
         "katedra": katedra,
         "zkratka": zkratka_predmetu
     }
-    url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
+    url= os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",

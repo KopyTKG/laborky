@@ -5,7 +5,7 @@ import json
 
 def get_predmet_by_student(ticket, semestr, userid):
     """ Vrátí všechny zapsané předměty studentem v daném semestru (ZS / LS)"""
-    url = "ws/services/rest2/predmety/getPredmetyByStudent"
+    url = "/services/rest2/predmety/getPredmetyByStudent"
     params = {
         "osCislo": userid,
         "semestr": semestr,
@@ -17,7 +17,7 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     """
     Vrati vsechny predmety, pro ktere existuje moznost seminare, ktere student jeste nema splneny, ale zapsany
     """
-    url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentPredmetyAbsolvoval" # type: ignore
+    url = os.getenv('STAG_URL') + "/services/rest2/student/getStudentPredmetyAbsolvoval" # type: ignore
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
