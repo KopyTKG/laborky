@@ -21,11 +21,11 @@ def get_student_info(ticket, osobni_cislo):
     except:
         return internal_server_error
 
-        jmeno = response["jmeno"]
-        prijmeni = response["prijmeni"]
-        email = response["email"]
+    jmeno = response["jmeno"]
+    prijmeni = response["prijmeni"]
+    email = response["email"]
 
-        return jmeno, prijmeni, email
+    return jmeno, prijmeni, email
 
 
 def get_student_predmety(ticket, osobni_cislo, predmety_db):
@@ -46,7 +46,7 @@ def get_student_predmety(ticket, osobni_cislo, predmety_db):
         return not_found
     response = response["rozvrhovaAkce"]
     predmety = []
-    predmety_db = [predmet_db.kod_predmetu for predmet_db in predmety_db] 
+    predmety_db = [predmet_db.kod_predmetu for predmet_db in predmety_db]
     for predmet in response:
         kod = (predmet["katedra"] + "/" + predmet["predmet"])
         if kod in predmety_db:
@@ -85,7 +85,7 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
     url = os.getenv("STAG_URL") + "ws/services/rest2/student/getStudentiByPredmet"
     params = {
         "zkratka": zkratka_predmetu,
-        "katedra": katedra, 
+        "katedra": katedra,
     }
     headers = {
         "accept": "application/json",
@@ -154,7 +154,7 @@ def get_vyucujici_predmety(ticket, predmety_db):
         response = (requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})).json()
     except:
         return unauthorized
-    
+
     predmety = []
-    
+
 
