@@ -633,7 +633,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
 
 @app.get("/invalidate")
 def invalidate(ticket: str):
-    url = os.getenv("STAG_URL") + "/services/rest2/help/invalidateTicket?ticket=" + ticket
+    url = os.getenv("STAG_URL") + "ws/services/rest2/help/invalidateTicket?ticket=" + ticket
 
     response = requests.get(url)
     return 200

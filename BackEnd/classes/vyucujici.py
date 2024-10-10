@@ -13,10 +13,10 @@ def get_student_info(ticket, osobni_cislo):
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive",
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
 
-        url = os.getenv('STAG_URL') + "/services/rest2/student/getStudentInfo"
+        url = os.getenv('STAG_URL') + "ws/services/rest2/student/getStudentInfo"
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     except:
         return internal_server_error
@@ -38,9 +38,9 @@ def get_student_predmety(ticket, osobni_cislo, predmety_db):
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive",
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
-        url = os.getenv('STAG_URL') + "/services/rest2/rozvrhy/getRozvrhByStudent"
+        url = os.getenv('STAG_URL') + "ws/services/rest2/rozvrhy/getRozvrhByStudent"
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket}).json()
     except:
         return not_found
@@ -72,7 +72,7 @@ def get_ucitel_predmety(ticket, ucitIdno):
      Vrati predmety, ktere ucitel vyucuje
     """
     try:
-        url = "/services/rest2/predmety/getPredmetyByUcitel"
+        url = "ws/services/rest2/predmety/getPredmetyByUcitel"
         params = {
             "ucitIdno": ucitIdno,
         }
@@ -91,7 +91,7 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
         "accept": "application/json",
         "Content-Type": "application/json",
         "Connection": "keep-alive",
-        "Accept-Origin": "https://stag-demo.zcu.cz",
+        "Accept-Origin": os.getenv("STAG_URL"),
     }
     try:
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})

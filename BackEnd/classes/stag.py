@@ -8,7 +8,7 @@ def get(ticket, url, params):
         "accept": "application/json",
         "Content-Type": "application/json",
         "Connection": "keep-alive", 
-        "Accept-Origin": "https://stag-demo.zcu.cz",
+        "Accept-Origin": os.getenv("STAG_URL"),
     }
     url = os.getenv('STAG_URL') + url
     try:
@@ -27,12 +27,12 @@ def get(ticket, url, params):
 def get_stag_user_info(ticket):
     """ Vrátí jméno, příjmení, email, titul a stagUserInfo (username, role, nazev, ucitIdno/osCilo, email)"""
     try:
-        url = os.getenv('STAG_URL') + "/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
+        url = os.getenv('STAG_URL') + "ws/services/rest2/help/getStagUserListForLoginTicketV2?ticket=" + ticket  # type: ignore
         headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive", 
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
         response = requests.get(url, headers=headers)
     except:
@@ -49,12 +49,12 @@ def get_stag_user_info(ticket):
 def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
     """ Vrátí informace o předmětu """
     try:
-        url = os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
+        url = os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
         headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive", 
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
         params = {
             "katedra": katedra,
@@ -83,12 +83,12 @@ def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
             "katedra": katedra,
             "zkratka": zkratka_predmetu
         }
-        url= os.getenv('STAG_URL') + "/services/rest2/predmety/getPredmetInfo" # type: ignore
+        url= os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetInfo" # type: ignore
         headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
             "Connection": "keep-alive", 
-            "Accept-Origin": "https://stag-demo.zcu.cz",
+            "Accept-Origin": os.getenv("STAG_URL"),
         }
         response = requests.get(url, headers=headers, params=params)
     except:
