@@ -59,12 +59,12 @@ class Termin(Base):
 class VyucujiciPredmety(Base):
     __tablename__ = "vyucujici_predmety"
 
-    kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu'), primary_key=True)
-    vyucujici_id = Column(String, ForeignKey('vyucujici.id'), primary_key=True)
+    id = Column("id", Integer, primary_key=True)
+    kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
+    vyucujici_id = Column(String, ForeignKey('vyucujici.id', ondelete='CASCADE'))
 
     vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje")
     predmet = relationship('Predmet', back_populates="vyucujici_predmety")
-
 
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
@@ -77,6 +77,7 @@ class Vyucujici(Base):
     # Relationships to Termin
     terminy_vyucuje = relationship("Termin", foreign_keys=[Termin.vyucuje_id], back_populates="vyucuje")
     terminy_vypsal = relationship("Termin", foreign_keys=[Termin.vypsal_id], back_populates="vypsal")
+    vyucujici_predmety = relationship("VyucujiciPredmety", back_populates="vyucujici", passive_deletes=True)
 
     #! je mozne ze bude chybet / predmet = relationship("Predmet", back_populates="vyucuje")
 
@@ -91,7 +92,7 @@ class Predmet(Base):
     #! JE MOZNE ZE BUDE CHYBET vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
     # Many-to-many relationship via VyucujiciPredmety
     # - uz nechybi, zmena v databazi
-    vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet")
+    vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet", passive_deletes=True)
     #! je mozne ze bude chybet / vyucuje = relationship('Vyucujici', back_populates="predmet")
     # Other relationships
     termin = relationship('Termin', back_populates="predmet")
@@ -103,7 +104,7 @@ class Student(Base):
     id = Column("id", String, primary_key=True)
     datum_vytvoreni = Column("datum_vytvoreni", DateTime)
 
-    historie_terminu = relationship('HistorieTerminu', back_populates="student")
+    historie_terminu = relationship('HistorieTerminu', back_populates="student", passive_deletes=True)
 
 
 class HistorieTerminu(Base):
