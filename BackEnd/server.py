@@ -469,7 +469,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
 
 
 @app.post("/ucitel/splneno")
-async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str, zvolene_datum_splneni: Optional[datetime] = None): #ticket: str | None = None, id_stud: str | None = None, date: date
+async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str) #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
     # ticket = os.getenv("TICKET")
     info = kontrola_ticketu(ticket, vyucujici=True)
@@ -477,7 +477,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
         return info
 
     id_stud = encode_id(id_stud)
-    message = uznat_termin(session, id_terminu, id_stud, zvolene_datum_splneni)
+    message = uznat_termin(session, id_terminu, id_stud)
     return message
 
 
