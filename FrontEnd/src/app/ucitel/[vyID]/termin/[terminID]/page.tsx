@@ -17,6 +17,7 @@ import { Skeleton, useDisclosure } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
 import TerminInfo from '@/components/terminInfo'
 import Uprav from '@/components/uprav'
+import { toast } from '@/hooks/use-toast'
 
 const fetchTerminData = async (id: string) => {
  try {
@@ -78,6 +79,30 @@ export default function TerminPage({ params }: { params: { terminID: string } })
   return null // This will be rendered briefly before the redirect takes effect
  }
 
+ const sendStudent = async (osCislo: string) => {
+  try {
+   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/splnil`)
+   const cookie = await Get('stagUserTicket')
+   if (cookie) {
+    url.searchParams.set('ticket', cookie.value)
+   }
+   url.searchParams.set('id_stud', osCislo)
+   url.searchParams.set('id_terminu', params.terminID)
+   const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+   if (!res.ok) {
+    return null
+   }
+   setReload(true)
+   toast({
+	title: 'Úspěch',
+	description: 'Splnění termínu zapsáno'
+   })
+  } catch (e) {
+   console.error(e)
+   return null
+  }
+ }
+
  return (
   <>
    <TerminInfo
@@ -104,15 +129,29 @@ export default function TerminPage({ params }: { params: { terminID: string } })
        <TableCell>{student.prijmeni}</TableCell>
        <TableCell>{student.email}</TableCell>
        <TableCell>
-        <span className="text-green-500 cursor-pointer active:opacity-50">
-         <Check className="w-6" />
-        </span>
+        {!student.datum_splneni ? (
+         <span
+          className="text-green-500 cursor-pointer active:opacity-50"
+          onClick={() => sendStudent(student.osCislo)}
+         >
+          <Check className="w-6" />
+         </span>
+        ) : (
+         <></>
+        )}
        </TableCell>
       </TableRow>
      ))}
     </TableBody>
    </Table>
-   <Uprav onOpenChange={onOpenChange} isOpen={isOpen} termin={Termin || ({} as tTermin)} setReload={setReload} />
+   <Uprav
+    onOpenChange={onOpenChange}
+    isOpen={isOpen}
+    termin={Termin || ({} as tTermin)}
+    setReload={setReload}
+    reload={reload}
+    id={params.terminID}
+   />
   </>
  )
 }

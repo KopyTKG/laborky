@@ -14,7 +14,7 @@ import {
  TimeInput,
  TimeInputValue,
 } from '@nextui-org/react'
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { tPredmet, tTermin, tTerminBody } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { BellRing } from 'lucide-react'
@@ -45,11 +45,15 @@ export default function Uprav({
  onOpenChange,
  termin,
  setReload,
+ reload,
+ id,
 }: {
  isOpen: boolean
  onOpenChange: (isOpen: boolean) => void
  termin: tTermin
  setReload: React.Dispatch<boolean>
+ reload: boolean
+ id: string
 }) {
  const [predmety, setPredmety] = useState<tPredmet[]>([])
  const [formData, setFormData] = useState<tTerminBody>({
@@ -123,7 +127,7 @@ export default function Uprav({
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
   }
-  url.searchParams.set('id', termin._id)
+  url.searchParams.set('id', id)
   const body = tBodyTOtTermin(formData)
   const res = await fetch(url.toString(), {
    method: 'PATCH',
@@ -132,33 +136,15 @@ export default function Uprav({
   })
 
   if (res) {
-   toast({
-    title: 'Úspěch',
-    description: 'Termín byl úspěšně změněn',
-   })
-   reset()
-   setReload(true)
+   window.location.reload()
   } else {
    toast({
     variant: 'destructive',
     title: 'Problém',
     description: 'Něco se nepovedlo změnit',
    })
+   setReload(true)
   }
- }
-
- function reset() {
-  setFormData({
-   predmet: { _id: '', nazev: '', nCviceni: 0 },
-   cviceni: 0,
-   nazev: '',
-   tema: '',
-   ucebna: '',
-   kapacita: 0,
-   datum: '',
-   start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
-   end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
-  })
  }
 
  function formatDateToYYYYMMDD(date: Date) {
@@ -202,7 +188,7 @@ export default function Uprav({
    }
   }
   loadPredmety()
- }, [])
+ }, [reload])
 
  const { predmet, cviceni, nazev, tema, ucebna, kapacita, datum, start, end } = formData
  const isCviceniDisabled = predmet.nCviceni === 0
