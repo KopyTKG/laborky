@@ -32,7 +32,7 @@ PORT=9999 # Pro testovani bylo pouzito 3010
 HOST=0.0.0.0 # neboli all
 DB_URL=postgresql://postgres:postgres@localhost:56131/railway # connection string pro připojení k databázi
 INTERVAL_VYPISU_DNY=14 #(7-14-30....etc)vami zvoleny pocet dnu, dle kterych se budou zobrazovat nadchazejici terminy
-STAG_URL=https://stag-demo.zcu.cz/
+STAG_URL=https://ws.ujep.cz/
 ```
 - `FrontEnd/.env`
 ```env
@@ -42,7 +42,7 @@ NEXT_PUBLIC_BASE=`http://localhost:3000`
 NEXT_PUBLIC_API_URL=`http://localhost:9999`
 
 # DEV VALUE NEED TO BE CHANGED
-NEXT_PUBLIC_STAG_SERVER=`https://stag-demo.zcu.cz/ws/`
+NEXT_PUBLIC_STAG_SERVER=`https://ws.ujep.cz/ws/`
 ```
 
 2. Nainstalování všech balíčků viz [Instalace](#instalace)
