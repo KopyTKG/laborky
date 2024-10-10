@@ -598,7 +598,7 @@ if __name__ == "__main__":
         print("Session successfully created!")
     else:
         raise Exception("Session creation failed!")
-    #vyucujici_k_predmetum_to_txt(session)
+    vyucujici_k_predmetum_to_txt(session)
 
     uvicorn.run(app, host=os.getenv('HOST'), port=int(os.getenv('PORT'))) # type: ignore
 
