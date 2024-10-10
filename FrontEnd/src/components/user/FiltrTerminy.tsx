@@ -53,15 +53,12 @@ export default function FiltrTerminy({ vybrane, typ }: { vybrane: string; typ?: 
   return (
    <div className="w-max h-[10rem] grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
     {Array.from({ length: 3 }, (_, index) => (
-     <Skeleton
-      key={index}
-      className="w-[25rem] h-[18rem] rounded-xl border-1 border-gray-700 bg-gradient-to-tr from-black to-gray-800"
-     />
+     <Skeleton key={index} className="w-[25rem] h-[18rem] rounded-xl" />
     ))}
    </div>
   )
  } else if (!fetching && Terminy?.length === 0) {
-  return <h2 className="text-xl text-white font-bold"> Nebyl nalezen žádný termín</h2>
+  return <h2 className="text-xl dark:text-white font-bold"> Nebyl nalezen žádný termín</h2>
  }
 
  return (

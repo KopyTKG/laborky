@@ -1,5 +1,6 @@
 'use client'
-import { Button, Checkbox, CheckboxGroup, Skeleton } from '@nextui-org/react'
+import { Checkbox, CheckboxGroup, Skeleton } from '@nextui-org/react'
+import { Button } from '@/components/ui/button'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Get } from '@/app/actions'
@@ -60,13 +61,13 @@ export default function Filtr({ search }: { search: string[] }) {
    <CheckboxGroup color="warning" value={selected} onValueChange={setSelected}>
     {isLoading && (
      <>
-      <Skeleton className="w-full h-6 rounded-xl border-1 border-gray-700 bg-gradient-to-tr from-black to-gray-800 " />
-      <Skeleton className="w-full h-6 rounded-xl border-1 border-gray-700 bg-gradient-to-tr from-black to-gray-800 " />
-      <Skeleton className="w-full h-6 rounded-xl border-1 border-gray-700 bg-gradient-to-tr from-black to-gray-800 " />
+      <Skeleton className="w-full h-6 rounded-xl" />
+      <Skeleton className="w-full h-6 rounded-xl" />
+      <Skeleton className="w-full h-6 rounded-xl" />
      </>
     )}
     {!isLoading &&
-     predmety.map((item, key) => (
+     predmety.map((item) => (
       <Checkbox value={item.nazev} key={item._id}>
        {item.nazev}
       </Checkbox>

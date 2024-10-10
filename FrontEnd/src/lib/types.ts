@@ -25,6 +25,13 @@ export type tNode = tTermin & {
  setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+export type tCreate = tTermin & {
+ upzornit: boolean
+ vyucuje?: string
+}
+
+
+
 export type tLink = {
  label: string
  href: string

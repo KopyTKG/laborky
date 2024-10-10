@@ -1,16 +1,15 @@
 'use client'
 import { Get } from '@/app/actions'
 import React from 'react'
-import { Button, Link } from '@nextui-org/react'
+import { Button as BTN, Link } from '@nextui-org/react'
 import { toast, useToast } from '@/hooks/use-toast'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
 
 export function Zobrazit({ id }: { id: string }) {
- return (
-  <Button as={Link} href={`/termin/${id}`} color="default">
-   Zobrazit
-  </Button>
- )
+ const router = useRouter()
+ return <Button onClick={() => router.push(`/termin/${id}`)}>Zobrazit</Button>
 }
 
 export function Zapsat({
@@ -72,10 +71,9 @@ export function Zapsat({
  }
  return (
   <Button
-   color={owned ? 'danger' : CapRender ? 'danger' : 'success'}
+   variant={owned ? 'destructive' : CapRender ? 'destructive' : 'default'}
    disabled={!owned ? VolnoRender : date ? true : false}
    onClick={() => APIcall(id, setReload)}
-   isLoading={loading}
   >
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
    {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}

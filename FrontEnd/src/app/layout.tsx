@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
  return (
   <html lang="en">
-   <body className={GeistSans.className} style={{ backgroundColor: 'black' }}>
+   <body className={GeistSans.className}>
     <Providers>
-     <main id="main" className="min-h-screen h-max pb-3 dark text-foreground bg-background">
+     <main id="main" className="min-h-screen h-max pb-3 text-foreground bg-background">
       {children}
      </main>
     </Providers>

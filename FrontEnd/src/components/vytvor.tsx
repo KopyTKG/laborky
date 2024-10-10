@@ -1,28 +1,65 @@
 'use client'
-import {
- Button,
- Checkbox,
- Input,
- Modal,
- ModalBody,
- ModalContent,
- ModalFooter,
- ModalHeader,
- Select,
- SelectItem,
- SharedSelection,
- TimeInput,
- TimeInputValue,
- useDisclosure,
-} from '@nextui-org/react'
-import React, { useContext, useLayoutEffect, useState } from 'react'
-import { tPredmet, tTerminBody } from '@/lib/types'
-import { Get } from '@/app/actions'
-import { BellRing, Plus } from 'lucide-react'
-import { fastHeaders } from '@/lib/stag'
+import { useState, useLayoutEffect, useContext } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { format } from 'date-fns'
+import { cs } from 'date-fns/locale'
+import { Calendar as CalendarIcon, Clock, Plus } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+ Dialog,
+ DialogContent,
+ DialogDescription,
+ DialogFooter,
+ DialogHeader,
+ DialogTitle,
+ DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+ Form,
+ FormControl,
+ FormDescription,
+ FormField,
+ FormItem,
+ FormLabel,
+ FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+ Select,
+ SelectContent,
+ SelectItem,
+ SelectTrigger,
+ SelectValue,
+} from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Get } from '@/app/actions'
+import { tCreate, tPredmet, tTermin } from '@/lib/types'
+import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from './ReloadProvider'
-import { tBodyTOtTermin } from '@/lib/parsers'
+
+const formSchema = z.object({
+ subject: z.string().min(1, { message: 'Předmět je povinný' }),
+ exercise: z.string().optional(),
+ name: z.string().optional(),
+ theme: z.string().min(1, { message: 'Téma je povinné' }),
+ classroom: z.string().min(1, { message: 'Učebna je povinná' }),
+ capacity: z.number().min(1, { message: 'Kapacita musí být alespoň 1' }),
+ startDate: z.date({ required_error: 'Datum začátku je povinné' }),
+ startTime: z
+  .string()
+  .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Neplatný formát času' }),
+ endDate: z.date({ required_error: 'Datum konce je povinné' }),
+ endTime: z
+  .string()
+  .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Neplatný formát času' }),
+ notifyStudents: z.boolean().default(true),
+})
 
 const fetchPredmetyData = async () => {
  try {
@@ -42,89 +79,68 @@ const fetchPredmetyData = async () => {
  }
 }
 
-export default function Vytvor() {
- const { isOpen, onOpen, onOpenChange } = useDisclosure()
+export default function EventForm() {
  const [predmety, setPredmety] = useState<tPredmet[]>([])
- const [formData, setFormData] = useState<tTerminBody>({
-  predmet: { _id: '', nazev: '', nCviceni: 0 },
-  cviceni: 0,
-  nazev: '',
-  tema: '',
-  ucebna: '',
-  kapacita: 0,
-  datum: '',
-  start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
-  end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
- })
-
+ const [selectedSubject, setSelectedSubject] = useState<tPredmet | null>(null)
+ const [open, setOpen] = useState<boolean>(false)
+ const [loading, setLoading] = useState<boolean>(true)
  const { toast } = useToast()
- const context = useContext(ReloadCtx)
 
- // Handle the case where context is undefined
- if (!context) {
-  throw new Error('Missing ReloadProvider')
- }
+ const [reload, setReload] = useContext(ReloadCtx)
 
- const [reload, setReload] = context
-
- const [notFilled, setnotFilled] = useState({
-  nazev: true,
-  tema: true,
-  ucebna: true,
-  kapacita: true,
-  datum: true,
-  start: true,
-  end: true,
+ const form = useForm<z.infer<typeof formSchema>>({
+  resolver: zodResolver(formSchema),
+  defaultValues: {
+   subject: '',
+   exercise: '',
+   name: '',
+   theme: '',
+   classroom: '',
+   capacity: 0,
+   startDate: new Date(),
+   startTime: '',
+   endDate: new Date(),
+   endTime: '',
+   notifyStudents: true,
+  },
  })
- const [isLoading, setIsLoading] = useState<boolean>(true)
- const [submit, setSubmit] = useState<boolean>(false)
 
- const handleChange = (field: string, value: any) => {
-  setFormData((prev) => ({ ...prev, [field]: value }))
-  if (value != '') {
-   setnotFilled((prev) => ({ ...prev, [field]: false }))
-  } else {
-   setnotFilled((prev) => ({ ...prev, [field]: true }))
+ useLayoutEffect(() => {
+  const loadPredmety = async () => {
+   try {
+    const data = (await fetchPredmetyData())?.predmety
+    if (data) {
+     setPredmety(data)
+     setLoading(false)
+    }
+   } catch (e) {
+    console.error(e)
+   }
   }
-  isFilled()
- }
+  loadPredmety()
+ }, [])
 
- const isFilled = () => {
-  if (
-   !notFilled.nazev &&
-   !notFilled.tema &&
-   !notFilled.end &&
-   !notFilled.start &&
-   !notFilled.datum &&
-   !notFilled.kapacita &&
-   !notFilled.ucebna
-  ) {
-   setSubmit(true)
-  } else {
-   setSubmit(false)
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+  const body: tCreate = {
+   _id: values.subject,
+   ucebna: values.classroom,
+   kapacita: values.capacity,
+   cviceni: parseInt(values.exercise || '0'),
+   nazev: values.name || '',
+   tema: values.theme,
+   start: new Date(
+    values.startDate.toString().replace('00:00:00', values.startTime + ':00'),
+   ).toISOString(),
+   konec: new Date(
+    values.endDate.toString().replace('00:00:00', values.endTime + ':00'),
+   ).toISOString(),
+   upzornit: values.notifyStudents,
   }
- }
-
- const handlePredmetChange = (e: SharedSelection) => {
-  const selectedValue = e.currentKey
-  const selectedPredmet = predmety.find((predmet) => predmet._id === selectedValue)
-  if (selectedPredmet) {
-   handleChange('predmet', selectedPredmet)
-  }
-  if (selectedPredmet?.nCviceni != 0) {
-   setnotFilled((prev) => ({ ...prev, ['nazev']: false }))
-  } else if (selectedPredmet?.nCviceni == 0 && formData.nazev == '') {
-   setnotFilled((prev) => ({ ...prev, ['nazev']: true }))
-  }
- }
-
- const handleSubmit = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/termin`)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
   }
-  const body = tBodyTOtTermin(formData)
   const res = await fetch(url.toString(), {
    method: 'POST',
    headers: fastHeaders,
@@ -136,7 +152,7 @@ export default function Vytvor() {
     title: 'Úspěch',
     description: 'Termín byl úspěšně vypsán',
    })
-   reset()
+   setOpen(false)
    setReload(!reload)
   } else {
    toast({
@@ -147,222 +163,303 @@ export default function Vytvor() {
   }
  }
 
- function reset() {
-  setFormData({
-   predmet: { _id: '', nazev: '', nCviceni: 0 },
-   cviceni: 0,
-   nazev: '',
-   tema: '',
-   ucebna: '',
-   kapacita: 0,
-   datum: '',
-   start: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
-   end: { hour: 0, minute: 0, second: 0, millisecond: 0 } as TimeInputValue,
-  })
+ if (loading) {
+  return (
+   <Button size="icon" className="fixed bottom-6 right-6 h-14 w-14 rounded-full" disabled={true}>
+    <Plus className="h-6 w-6" />
+   </Button>
+  )
  }
 
- useLayoutEffect(() => {
-  const loadPredmety = async () => {
-   try {
-    const data = (await fetchPredmetyData())?.predmety
-    if (data) {
-     setPredmety(data)
-     handleChange('predmet', data[0])
-     setIsLoading(false)
-    }
-   } catch (e) {
-    console.error(e)
-   }
-  }
-  loadPredmety()
- }, [])
-
- const { predmet, cviceni, nazev, tema, ucebna, kapacita, datum, start, end } = formData
- const isCviceniDisabled = predmet.nCviceni === 0
- const isNazevDisabled = !isCviceniDisabled
-
  return (
-  <>
-   <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-    <ModalContent>
-     {(onClose) => (
-      <>
-       <form>
-        <ModalHeader className="flex flex-col gap-1 text-2xl w-full text-center">
-         Vypsání nového termínu
-        </ModalHeader>
-        <ModalBody>
-         <div className="grid grid-cols-2 gap-10">
-          <SectionTitle>Předmět</SectionTitle>
-          <SectionTitle className={predmet.nCviceni == 0 ? 'text-gray-500/50' : ''}>
-           Cvičení
-          </SectionTitle>
-         </div>
-         <div className="grid grid-cols-2 gap-10">
+  <Dialog open={open} onOpenChange={setOpen}>
+   <DialogTrigger asChild>
+    <Button size="icon" className="fixed bottom-6 right-6 h-14 w-14 rounded-full">
+     <Plus className="h-6 w-6" />
+    </Button>
+   </DialogTrigger>
+   <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+     <DialogTitle>Vytvořit novou událost</DialogTitle>
+     <DialogDescription>
+      Vyplňte detaily pro vytvoření nové události. Po dokončení klikněte na uložit.
+     </DialogDescription>
+    </DialogHeader>
+    <Form {...form}>
+     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+       <FormField
+        control={form.control}
+        name="subject"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Předmět</FormLabel>
           <Select
-           placeholder="Vyberte předmět"
-           selectionMode="single"
-           onSelectionChange={handlePredmetChange}
-           isRequired={true}
-           defaultSelectedKeys={[predmet._id]}
-           isLoading={isLoading}
+           onValueChange={(value) => {
+            field.onChange(value)
+            setSelectedSubject(predmety.find((p) => p._id === value) || null)
+           }}
+           defaultValue={field.value}
           >
-           {predmety.map((item: tPredmet) => (
-            <SelectItem value={item._id} key={item._id}>
-             {item.nazev}
-            </SelectItem>
-           ))}
-          </Select>
-          <Select
-           placeholder="Vyberte cvičení"
-           value={cviceni}
-           onSelectionChange={(e) => handleChange('cviceni', parseInt(e.currentKey || '0'))}
-           isDisabled={predmet.nCviceni == 0}
-           isLoading={isLoading}
-           isRequired={predmet.nCviceni != 0}
-          >
-           {predmet.nCviceni == 0 ? (
-            <SelectItem key={0} value={0}>
-             Neurčeno
-            </SelectItem>
-           ) : (
-            Array.from({ length: predmet.nCviceni || 0 }).map((_, index) => (
-             <SelectItem key={index + 1} value={index + 1}>
-              {`Cvičení ${index + 1}`}
+           <FormControl>
+            <SelectTrigger>
+             <SelectValue placeholder="Vyberte předmět" />
+            </SelectTrigger>
+           </FormControl>
+           <SelectContent>
+            {predmety.length > 0 ? (
+             predmety.map((subject: tPredmet) => (
+              <SelectItem key={subject._id} value={subject._id}>
+               {subject.nazev}
+              </SelectItem>
+             ))
+            ) : (
+             <SelectItem value="" disabled>
+              Žádné předměty k dispozici
              </SelectItem>
-            ))
-           )}
+            )}
+           </SelectContent>
           </Select>
-         </div>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
 
-         <SectionTitle className={isNazevDisabled ? 'text-gray-500/50' : ''}>
-          Název termínu
-         </SectionTitle>
-         <Input
-          id="nazev"
-          placeholder="Prezentace"
-          isDisabled={isNazevDisabled}
-          isRequired={predmet.nCviceni == 0}
-          value={nazev}
-          onValueChange={(value) => handleChange('nazev', value)}
-          isInvalid={notFilled.nazev}
-         />
-         <SectionTitle>Téma termínu</SectionTitle>
-         <Input
-          id="tema"
-          placeholder="Stavba PC"
-          isRequired={true}
-          value={tema}
-          onValueChange={(value) => handleChange('tema', value)}
-          isInvalid={notFilled.tema}
-         />
-
-         <SectionTitle className="w-full grid grid-cols-2 gap-10">
-          <span>Učebna</span>
-          <span>Kapacita</span>
-         </SectionTitle>
-         <div className="grid grid-cols-2 gap-10 w-full">
+       <FormField
+        control={form.control}
+        name="exercise"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Cvičení</FormLabel>
+          <Select
+           onValueChange={field.onChange}
+           defaultValue={field.value}
+           disabled={!selectedSubject || selectedSubject.nCviceni === 0}
+          >
+           <FormControl>
+            <SelectTrigger>
+             <SelectValue placeholder="Vyberte cvičení" />
+            </SelectTrigger>
+           </FormControl>
+           <SelectContent>
+            {selectedSubject && selectedSubject.nCviceni > 0 ? (
+             Array.from({ length: selectedSubject.nCviceni }, (_, i) => (
+              <SelectItem key={i + 1} value={(i + 1).toString()}>
+               Cvičení {i + 1}
+              </SelectItem>
+             ))
+            ) : (
+             <SelectItem value="1" disabled>
+              {selectedSubject ? 'Žádná cvičení k dispozici' : 'Nejprve vyberte předmět'}
+             </SelectItem>
+            )}
+           </SelectContent>
+          </Select>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+      </div>
+      <FormField
+       control={form.control}
+       name="name"
+       render={({ field }) => (
+        <FormItem>
+         <FormLabel>Název události</FormLabel>
+         <FormControl>
           <Input
-           id="misto"
-           placeholder="CP-1.03"
-           isRequired={true}
-           value={ucebna}
-           onValueChange={(value) => handleChange('ucebna', value)}
-           isInvalid={notFilled.ucebna}
+           disabled={!selectedSubject || selectedSubject.nCviceni > 0 ? true : false}
+           placeholder="Prezentace"
+           {...field}
           />
-          <Input
-           id="kapacita"
-           type="number"
-           placeholder="20"
-           min={0}
-           isRequired={true}
-           value={kapacita.toString()}
-           onValueChange={(value) => handleChange('kapacita', parseInt(value))}
-           isInvalid={notFilled.kapacita}
-          />
+         </FormControl>
+         <FormMessage />
+        </FormItem>
+       )}
+      />
+      <FormField
+       control={form.control}
+       name="theme"
+       render={({ field }) => (
+        <FormItem>
+         <FormLabel>Téma</FormLabel>
+         <FormControl>
+          <Input placeholder="Stavba PC" {...field} />
+         </FormControl>
+         <FormMessage />
+        </FormItem>
+       )}
+      />
+      <div className="flex space-x-4">
+       <FormField
+        control={form.control}
+        name="classroom"
+        render={({ field }) => (
+         <FormItem className="flex-1">
+          <FormLabel>Učebna</FormLabel>
+          <FormControl>
+           <Input placeholder="CP-1.03" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+       <FormField
+        control={form.control}
+        name="capacity"
+        render={({ field }) => (
+         <FormItem className="flex-1">
+          <FormLabel>Kapacita</FormLabel>
+          <FormControl>
+           <Input
+            type="number"
+            placeholder="20"
+            {...field}
+            onChange={(e) => field.onChange(+e.target.value)}
+           />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+      </div>
+      <div className="space-y-4">
+       <div className="flex space-x-4">
+        <FormField
+         control={form.control}
+         name="startDate"
+         render={({ field }) => (
+          <FormItem className="flex-1">
+           <FormLabel>Datum začátku</FormLabel>
+           <Popover>
+            <PopoverTrigger asChild>
+             <FormControl>
+              <Button
+               variant={'outline'}
+               className={cn(
+                'w-full pl-3 text-left font-normal',
+                !field.value && 'text-muted-foreground',
+               )}
+              >
+               {field.value ? (
+                format(field.value, 'PPP', { locale: cs })
+               ) : (
+                <span>Vyberte datum</span>
+               )}
+               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+             </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+             <Calendar
+              mode="single"
+              selected={field.value}
+              onSelect={field.onChange}
+              disabled={(date) => date < new Date() || date > new Date('2100-01-01')}
+              initialFocus
+             />
+            </PopoverContent>
+           </Popover>
+           <FormMessage />
+          </FormItem>
+         )}
+        />
+        <FormField
+         control={form.control}
+         name="startTime"
+         render={({ field }) => (
+          <FormItem className="flex-1">
+           <FormLabel>Čas začátku</FormLabel>
+           <FormControl>
+            <div className="flex">
+             <Input type="time" {...field} />
+            </div>
+           </FormControl>
+           <FormMessage />
+          </FormItem>
+         )}
+        />
+       </div>
+       <div className="flex space-x-4">
+        <FormField
+         control={form.control}
+         name="endDate"
+         render={({ field }) => (
+          <FormItem className="flex-1">
+           <FormLabel>Datum konce</FormLabel>
+           <Popover>
+            <PopoverTrigger asChild>
+             <FormControl>
+              <Button
+               variant={'outline'}
+               className={cn(
+                'w-full pl-3 text-left font-normal',
+                !field.value && 'text-muted-foreground',
+               )}
+              >
+               {field.value ? (
+                format(field.value, 'PPP', { locale: cs })
+               ) : (
+                <span>Vyberte datum</span>
+               )}
+               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+             </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+             <Calendar
+              mode="single"
+              selected={field.value}
+              onSelect={field.onChange}
+              disabled={(date) => date < new Date() || date > new Date('2100-01-01')}
+              initialFocus
+             />
+            </PopoverContent>
+           </Popover>
+           <FormMessage />
+          </FormItem>
+         )}
+        />
+        <FormField
+         control={form.control}
+         name="endTime"
+         render={({ field }) => (
+          <FormItem className="flex-1">
+           <FormLabel>Čas konce</FormLabel>
+           <FormControl>
+            <div className="flex">
+             <Input type="time" {...field} />
+            </div>
+           </FormControl>
+           <FormMessage />
+          </FormItem>
+         )}
+        />
+       </div>
+      </div>
+      <FormField
+       control={form.control}
+       name="notifyStudents"
+       render={({ field }) => (
+        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+         <FormControl>
+          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+         </FormControl>
+         <div className="space-y-1 leading-none">
+          <FormLabel>Upozornit studenty</FormLabel>
+          <FormDescription>
+           Odeslat upozornění všem zapsaným studentům o této události.
+          </FormDescription>
          </div>
-         <SectionTitle>Datum a čas konání</SectionTitle>
-         <div className="flex flex-row gap-2">
-          <Input
-           id="datum"
-           type="date"
-           placeholder="Zadejte datum a čas konání"
-           isRequired={true}
-           value={datum}
-           onValueChange={(value) => handleChange('datum', value)}
-           isInvalid={notFilled.datum}
-          />
-          <div className="flex flex-row gap-2">
-           <div className="flex flex-row items-center text-lg gap-2 w-max">
-            od:
-            <TimeInput
-             id="od"
-             hourCycle={24}
-             granularity="minute"
-             isRequired={true}
-             value={start}
-             onChange={(value) => handleChange('start', value)}
-             isInvalid={notFilled.start}
-            />
-           </div>
-           <div className="flex flex-row items-center text-lg gap-2 w-max">
-            do:
-            <TimeInput
-             id="do"
-             hourCycle={24}
-             granularity="minute"
-             isRequired={true}
-             value={end}
-             onChange={(value) => handleChange('end', value)}
-             isInvalid={notFilled.end}
-            />
-           </div>
-          </div>
-         </div>
-         <div className="pt-8">
-          <Checkbox color="warning" size="lg" defaultSelected>
-           <div className="flex flex-row gap-2">
-            <BellRing className="w-6" />
-            <h3>Upozornit studenty</h3>
-           </div>
-          </Checkbox>
-         </div>
-        </ModalBody>
-        <ModalFooter className="flex flex-row w-full justify-between">
-         <Button color="danger" onPress={onClose}>
-          Zrušit
-         </Button>
-         <Button
-          color="primary"
-          type="button"
-          onClick={() => {
-           handleSubmit()
-           onClose()
-          }}
-          isDisabled={!submit}
-         >
-          Vytvořit
-         </Button>
-        </ModalFooter>
-       </form>
-      </>
-     )}
-    </ModalContent>
-   </Modal>
-   <Button
-    variant="solid"
-    isIconOnly
-    onClick={onOpen}
-    aria-label="Create new event"
-    color="primary"
-    className="fixed bottom-6 right-6"
-   >
-    <Plus className="w-6 h-6" />
-   </Button>
-  </>
+        </FormItem>
+       )}
+      />
+      <DialogFooter>
+       <Button type="submit">Vytvořit událost</Button>
+      </DialogFooter>
+     </form>
+    </Form>
+   </DialogContent>
+  </Dialog>
  )
-}
-
-function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
- return <div className={`text - lg font-bold ${className}`}> {children}</div>
 }

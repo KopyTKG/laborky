@@ -9,11 +9,12 @@ import {
  TableHeader,
  TableRow,
 } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Check } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
 import { tStudent, tTermin } from '@/lib/types'
 import React, { useState, useCallback, useEffect } from 'react'
-import { Skeleton, useDisclosure } from '@nextui-org/react'
+import { useDisclosure } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
 import TerminInfo from '@/components/terminInfo'
 import Uprav from '@/components/uprav'
@@ -71,7 +72,7 @@ export default function TerminPage({ params }: { params: { terminID: string } })
 
  if (fetching) {
   return (
-   <Skeleton className="w-full h-[18rem] rounded-xl border border-gray-700 bg-gradient-to-tr from-black to-gray-800" />
+   <Skeleton className="w-full h-[18rem] rounded-xl" />
   )
  }
 

@@ -32,17 +32,20 @@ export default async function Profil() {
      return (
       <div className="mb-3" key={predmet.nazev}>
        <h3 className="font-bold text-2xl ">{predmet.nazev}</h3>
-       <div className="w-full h-max p-3  bg-stone-900 rounded-2xl flex flex-col gap-1">
+       <div className="w-full h-max  bg-gradient-to-tr border-1 border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300 rounded-2xl flex flex-col">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
           <>
-           <div key={datum.toLocaleString() + key} className="flex flex-row justify-between">
+           <div
+            key={datum.toLocaleString() + key}
+            className={`w-full h-full flex flex-row justify-between p-3 bg-gradient-to-l ${key === 0 ? `rounded-t-xl` : key === predmet.cviceni.length - 1 ? 'rounded-b-xl' : ''} ${!datum ? 'from-red-500/15 to-transparent' : 'from-lime-500/15 to-transparent'}`}
+           >
             <span className="text-lg">{`Laboratorní cvičení ${key + 1}`}</span>
             <Chip color={datum ? 'success' : 'danger'}>
              {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
             </Chip>
            </div>
-           {key < predmet.cviceni.length - 1 && <Divider margin="my2" />}
+           {key < predmet.cviceni.length - 1 && <Divider margin="my0" />}
           </>
          )
         })}

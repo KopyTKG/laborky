@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import { tNode } from '@/lib/types'
-import { CalendarDays, Clock, MapPin, UsersRound } from 'lucide-react'
+import { CalendarDays, Clock, Clock12, MapPin, UsersRound } from 'lucide-react'
 import { Zapsat, Zobrazit } from '@/components/nodeButton'
 
 export default function Node(props: tNode) {
@@ -27,7 +27,7 @@ export default function Node(props: tNode) {
   : true
 
  return (
-  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
+  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
     <p className="text-sm text-justify">{props.tema}</p>
@@ -35,18 +35,15 @@ export default function Node(props: tNode) {
    <Divider />
    <CardContent>
     <div className="text-md flex flex-col my-2 gap-1">
-     <div className="flex flex-row justify-start gap-1 ">
-      <Clock className="w-6" />
-      <div className="pt-1">
-       {new Date(props.start).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })} -
-       {new Date(props.konec).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}
-      </div>
+     <div className="flex flex-row justify-start gap-1 items-center ">
+      <Clock12 className="w-6 text-green-500" />
+      <div className="pt-1">{new Date(props.start).toLocaleString()}</div>
      </div>
-     <div className="flex flex-row justify-start gap-1">
-      <CalendarDays className="w-6" />
-      <div className="pt-1">{new Date(props.konec).toLocaleDateString()}</div>
+     <div className="flex flex-row justify-start gap-1 items-center">
+      <Clock className="w-6 text-red-500" />
+      <div className="pt-1">{new Date(props.konec).toLocaleString()}</div>
      </div>
-     <div className="flex flex-row justify-start gap-1">
+     <div className="flex flex-row justify-start gap-1 items-center">
       <MapPin className="w-6" />
       <div className="pt-1">{props.ucebna}</div>
      </div>

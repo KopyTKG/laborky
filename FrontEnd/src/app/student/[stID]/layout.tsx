@@ -13,7 +13,7 @@ export default function RootLayout({
   <>
    <Navbar id={params.stID} />
    <ReloadProvider>
-    <main className="max-w-4xl mx-auto">{children}</main>
+    <main className="max-w-4xl mx-auto mt-20">{children}</main>
    </ReloadProvider>
   </>
  )

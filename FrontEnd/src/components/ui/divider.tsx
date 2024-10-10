@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 const dividerVariants = cva('shrink-0', {
  variants: {
   variant: {
-   default: 'bg-stone-400/50',
-   ghost: 'bg-stone-600/40',
+   default: 'dark:bg-stone-400/50 bg-stone-700/50',
+   ghost: 'dark:bg-stone-600/40 bg-stone-800/40',
   },
   orientation: {
    horizontal: 'h-[1px] w-full',
@@ -15,6 +15,7 @@ const dividerVariants = cva('shrink-0', {
   },
   margin: {
    default: 'm-auto',
+   my0: 'my-0 py-0',
    my2: 'my-2',
    my4: 'my-4',
   },

@@ -1,15 +1,16 @@
-import {
- Navbar,
- NavbarItem,
- NavbarContent,
- NavbarBrand,
- Link,
- Button,
- Avatar,
-} from '@nextui-org/react'
-import Icon from '@/components/icon'
+'use client'
 import { tLink } from '@/lib/types'
-import { House, Menu, Users } from 'lucide-react'
+import { House, Menu, User, Users } from 'lucide-react'
+import {
+ DropdownMenu,
+ DropdownMenuContent,
+ DropdownMenuItem,
+ DropdownMenuLabel,
+ DropdownMenuSeparator,
+ DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
 export function NavbarStudent({ id }: { id: string }) {
  const baseUrl = '/student/#id'
@@ -64,40 +65,53 @@ function NavbarComponent({
  url: string
  st: boolean
 }) {
+ const router = useRouter()
  return (
-  <Navbar className="w-full flex" isBordered isBlurred>
-   <NavbarContent>
-    {links.map((item: tLink) => {
-     return (
-      <NavbarItem key={item.href}>
-       <Button as={Link} href={item.href} color="primary" endContent={item.icon} variant="solid">
-        {item.label}
+  <nav className="w-full flex justify-center py-3 border-1 border-b-stone-500/50 fixed top-0 backdrop-blur-md">
+   <section className="w-full flex max-w-6xl">
+    <main className="flex flex-row gap-4">
+     {links.map((item: tLink) => {
+      return (
+       <Button onClick={() => router.push(item.href)} variant="ghost">
+        {item.icon} &nbsp; {item.label}
        </Button>
-      </NavbarItem>
-     )
-    })}
-   </NavbarContent>
-   <NavbarBrand className="flex w-full justify-end gap-5">
-    <NavbarItem>
-     <Button as={Link} href="/logout" className="flex gap-2" color="danger">
-      Odhlásit se
-      <Icon name="log-out" />
-     </Button>
-    </NavbarItem>
-    <NavbarItem>
-     {st ? (
-      <div className="flex gap-2 text-blue-500">
-       <Avatar size="sm" color="default" />
-       {id}
-      </div>
-     ) : (
-      <Link href={`${url}/profil`} className="flex gap-2">
-       <Avatar size="sm" color="default" />
-       {id}
-      </Link>
-     )}
-    </NavbarItem>
-   </NavbarBrand>
-  </Navbar>
+      )
+     })}
+    </main>
+    <div className="flex w-full justify-end gap-5">
+     <DropdownMenu>
+      <DropdownMenuTrigger>
+       <div className="w-10 h-10 rounded-full bg-stone-400 flex items-center justify-center">
+        <User className="text-white w-10" />
+       </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+       <DropdownMenuLabel>Můj účet</DropdownMenuLabel>
+       <DropdownMenuSeparator />
+       {!st && (
+        <>
+         <DropdownMenuItem
+          onClick={() => {
+           router.push(`/student/${id}/profil`)
+          }}
+         >
+          Profil
+         </DropdownMenuItem>
+         <DropdownMenuSeparator />
+        </>
+       )}
+       <DropdownMenuItem
+        onClick={() => {
+         router.push(`/logout`)
+        }}
+        className="text-red-600 dark:text-red-400"
+       >
+        Odhlásit se
+       </DropdownMenuItem>
+      </DropdownMenuContent>
+     </DropdownMenu>
+    </div>
+   </section>
+  </nav>
  )
 }

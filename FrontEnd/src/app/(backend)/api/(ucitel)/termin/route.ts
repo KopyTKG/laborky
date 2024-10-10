@@ -1,7 +1,7 @@
 import { Unauthorized, NotFound, Success, Internal } from '@/lib/http'
 import { formatTime, setupParser } from '@/lib/parsers'
 import { fastHeaders, GetTicket } from '@/lib/stag'
-import { tStudent, tTermin, tTerminBody } from '@/lib/types'
+import { tCreate, tStudent, tTermin, tTerminBody } from '@/lib/types'
 
 // Create
 export async function POST(req: Request) {
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   return Unauthorized()
  }
 
- const body: tTermin = await req.json()
+ const body: tCreate = await req.json()
  if (!body) {
   return NotFound()
  }
@@ -36,8 +36,8 @@ export async function POST(req: Request) {
   popis: body.tema,
   jmeno: body.nazev,
   kod_predmetu: body._id,
-  upozornit: null,
-  vyucuje_prijmeni: null,
+  upozornit: body.upzornit,
+  vyucuje_prijmeni: body.vyucuje || null,
  }
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
