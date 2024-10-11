@@ -6,7 +6,7 @@ const skeletonVariants = cva('animate-pulse rounded-md', {
  variants: {
   variant: {
    default:
-    'bg-gradient-to-tr border-1 border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300',
+    'bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300',
   },
  },
 

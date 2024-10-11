@@ -32,7 +32,7 @@ export default async function Profil() {
      return (
       <div className="mb-3" key={predmet.nazev}>
        <h3 className="font-bold text-2xl ">{predmet.nazev}</h3>
-       <div className="w-full h-max  bg-gradient-to-tr border-1 border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300 rounded-2xl flex flex-col">
+       <div className="w-full h-max  bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300 rounded-2xl flex flex-col">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
           <>

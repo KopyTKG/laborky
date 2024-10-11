@@ -27,12 +27,12 @@ export default function Node(props: tNode) {
   : true
 
  return (
-  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
+  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
     <p className="text-sm text-justify">{props.tema}</p>
    </CardHeader>
-   <Divider />
+   <Divider className="mx-auto w-[80%] h-[0.1rem]" variant="fade" margin="mb4"/>
    <CardContent>
     <div className="text-md flex flex-col my-2 gap-1">
      <div className="flex flex-row justify-start gap-1 items-center ">
@@ -69,7 +69,6 @@ export default function Node(props: tNode) {
         VolnoRender={VolnoRender}
         CapRender={CapRender}
         volno={(props?.zapsany || 0) >= props.kapacita}
-        setReload={props.setReload}
        />
       ) : (
        <Zobrazit id={props._id} />

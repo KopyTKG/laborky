@@ -67,7 +67,7 @@ export default function TerminInfo({
  }
 
  return (
-  <Card className="w-full mb-5 bg-gradient-to-tr border border-gray-700 from-black to-gray-800 shadow-xl text-white">
+  <Card className="w-full mb-5 bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
    <CardHeader className="pb-2">
     <CardTitle className="text-2xl font-bold flex justify-between">
      <span className="flex gap-2 items-center">
@@ -156,7 +156,7 @@ export default function TerminInfo({
       <FileText className="h-5 w-5 text-yellow-400" aria-hidden="true" />
       Popis
      </h3>
-     <p className="text-sm text-stone-300 pl-7">
+     <p className="text-sm dark:text-stone-300 pl-7">
       {Termin?.tema || 'Žádný popis není k dispozici.'}
      </p>
     </div>

@@ -1,6 +1,6 @@
 'use client'
 import { tLink } from '@/lib/types'
-import { House, Menu, User, Users } from 'lucide-react'
+import { House, Menu, Moon, Sun, User, Users } from 'lucide-react'
 import {
  DropdownMenu,
  DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { useTheme } from 'next-themes'
 
 export function NavbarStudent({ id }: { id: string }) {
  const baseUrl = '/student/#id'
@@ -66,8 +67,9 @@ function NavbarComponent({
  st: boolean
 }) {
  const router = useRouter()
+ const { theme, setTheme } = useTheme()
  return (
-  <nav className="w-full flex justify-center py-3 border-1 border-b-stone-500/50 fixed top-0 backdrop-blur-md">
+  <nav className="w-full flex justify-center py-3 border-1 border-transparent border-b-stone-500/50 fixed top-0 backdrop-blur-md">
    <section className="w-full flex max-w-6xl">
     <main className="flex flex-row gap-4">
      {links.map((item: tLink) => {
@@ -97,9 +99,20 @@ function NavbarComponent({
          >
           Profil
          </DropdownMenuItem>
-         <DropdownMenuSeparator />
         </>
        )}
+       <DropdownMenuItem
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        className="flex gap-2"
+       >
+        {theme === 'dark' ? (
+         <Sun className="w-5 text-white fill-white" />
+        ) : (
+         <Moon className="w-5 text-black fill-black" />
+        )}
+        Vzhled
+       </DropdownMenuItem>
+       <DropdownMenuSeparator />
        <DropdownMenuItem
         onClick={() => {
          router.push(`/logout`)

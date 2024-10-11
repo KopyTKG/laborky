@@ -1,11 +1,10 @@
 'use client'
 import { Get } from '@/app/actions'
-import React from 'react'
-import { Button as BTN, Link } from '@nextui-org/react'
-import { toast, useToast } from '@/hooks/use-toast'
-import { useState } from 'react'
+import React, { useContext } from 'react'
+import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
+import { ReloadCtx } from './ReloadProvider'
 
 export function Zobrazit({ id }: { id: string }) {
  const router = useRouter()
@@ -19,7 +18,6 @@ export function Zapsat({
  VolnoRender,
  CapRender,
  volno,
- setReload,
 }: {
  id: string
  owned: boolean
@@ -27,13 +25,16 @@ export function Zapsat({
  VolnoRender: boolean
  CapRender: boolean
  volno: boolean
- setReload: React.Dispatch<React.SetStateAction<boolean>>
 }) {
- const [loading, setLoading] = useState<boolean>(false)
+ const context = useContext(ReloadCtx)
+ if (!context) {
+  throw new Error('Missing ReloadProvider')
+ }
+
+ const [reload, setReload] = context
 
  async function APIcall(id: string, setReload: React.Dispatch<React.SetStateAction<boolean>>) {
   try {
-   setLoading(true)
    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/zapsat`)
    url.searchParams.set('id', id)
    url.searchParams.set('type', !owned ? 'zapsat' : 'odhlasit')
@@ -52,7 +53,6 @@ export function Zapsat({
     window.location.href = '/logout'
    } else {
     setReload(true)
-    setLoading(false)
     if (res.status === 200) {
      toast({
       title: 'Akce provedena',
@@ -69,14 +69,17 @@ export function Zapsat({
    console.error(e)
   }
  }
+
+ const mojeCheck = (owned && !date)? true : false
+ const zapsatCheck = (!owned && VolnoRender)? true: false
  return (
   <Button
    variant={owned ? 'destructive' : CapRender ? 'destructive' : 'default'}
-   disabled={!owned ? VolnoRender : date ? true : false}
+   disabled={owned? mojeCheck: zapsatCheck}
    onClick={() => APIcall(id, setReload)}
   >
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
-   {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}
+   {owned && ('Odepsat se')}
   </Button>
  )
 }

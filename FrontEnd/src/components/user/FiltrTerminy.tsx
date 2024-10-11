@@ -1,11 +1,12 @@
 'use client'
 import Node from '@/components/node'
-import { useCallback, useLayoutEffect, useState } from 'react'
+import { useCallback, useContext, useLayoutEffect, useState } from 'react'
 import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSearchParams } from 'next/navigation'
+import { ReloadCtx } from '../ReloadProvider'
 
 const fetchTerminyData = async (vybrane: string) => {
  try {
@@ -29,7 +30,13 @@ const fetchTerminyData = async (vybrane: string) => {
 export default function FiltrTerminy({ vybrane, typ }: { vybrane: string; typ?: string }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
- const [reload, setReload] = useState<boolean>(false)
+ const context = useContext(ReloadCtx)
+ if (!context) {
+  throw new Error('Missing ReloadProvider')
+ }
+
+ const [reload, setReload] = context
+
  const [fetching, setFetching] = useState<boolean>(true)
 
  const searchParams = useSearchParams()
@@ -65,7 +72,7 @@ export default function FiltrTerminy({ vybrane, typ }: { vybrane: string; typ?: 
   <>
    <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
     {Terminy?.map((termin: tTermin) => (
-     <Node key={termin._id} owned={false} {...termin} typ={typ || ''} setReload={setReload} />
+     <Node key={termin._id} owned={false} {...termin} typ={typ || ''} />
     ))}
    </div>
   </>

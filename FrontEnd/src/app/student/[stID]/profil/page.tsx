@@ -1,9 +1,10 @@
 import Profil from '@/components/profil'
+import { Header } from '@/components/ui/header'
 export default function ProfilePage() {
  return (
   <>
    <div className="flex flex-col w-full mx-auto">
-    <div className="text-4xl font-bold underline py-5">Student</div>
+    <Header underline="fade">Profil studenta</Header>
     <Profil />
    </div>
   </>

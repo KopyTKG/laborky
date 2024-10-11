@@ -1,10 +1,11 @@
 'use client'
 import Node from '@/components/node'
-import { useCallback, useLayoutEffect, useState } from 'react'
+import { useCallback, useContext, useLayoutEffect, useState } from 'react'
 import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ReloadCtx } from '../ReloadProvider'
 
 const fetchTerminyData = async () => {
  try {
@@ -28,8 +29,16 @@ const fetchTerminyData = async () => {
 export default function ZapsaneTerminy() {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
- const [reload, setReload] = useState<boolean>(false)
  const [fetching, setFetching] = useState<boolean>(true)
+
+ const context = useContext(ReloadCtx)
+
+ if (!context) {
+  throw new Error('Missing ReloadProvider')
+ }
+
+ // Destructure the context values
+ const [reload, setReload] = context
 
  const fetchTerminy = useCallback(async () => {
   const data = await fetchTerminyData()
@@ -61,7 +70,7 @@ export default function ZapsaneTerminy() {
   <>
    <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
     {Terminy.map((termin: tTermin) => (
-     <Node key={termin._id} owned={true} setReload={setReload} {...termin} typ="student" />
+     <Node key={termin._id} owned={true} {...termin} typ="student" />
     ))}
    </div>
   </>
