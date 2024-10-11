@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from classes.server_utils import *
 from lib.db_terminy import *
 from endpoints.predmety import get_predmety
-
+from urllib.parse import unquote
 
 router = APIRouter()
 
@@ -15,6 +15,8 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     if info == unauthorized or info == internal_server_error:
         return info
     userid, role = encode_id(info[0]), info[1]
+    if predmety is not None:
+        predmety = unquote(predmety)
 
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
