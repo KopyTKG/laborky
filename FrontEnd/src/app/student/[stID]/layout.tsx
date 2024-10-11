@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavbarStudent as Navbar } from '@/components/navbars'
-import ReloadProvider from '@/components/ReloadProvider'
+import ReloadProvider from '@/contexts/ReloadProvider'
 
 export default function RootLayout({
  children,
