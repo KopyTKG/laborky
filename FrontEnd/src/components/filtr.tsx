@@ -80,7 +80,7 @@ export default function Filtr() {
  }
 
  return (
-  <div className="flex flex-col gap-2 col-start-1 col-span-1 h-full border-r-1 border-l-1 border-stone-700/55 px-2">
+  <div className=" w-[12rem] flex flex-col gap-2 col-start-1 col-span-1 h-full border-r-1 border-l-1 border-stone-700/55 px-2">
    <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)}>
      <FormField

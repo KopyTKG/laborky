@@ -2,8 +2,8 @@ import { Get } from '@/app/actions'
 import { Divider } from '@/components/ui/divider'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmetSekce } from '@/lib/types'
-import { Chip } from '@nextui-org/react'
 import { redirect } from 'next/navigation'
+import { Chip } from '@/components/ui/chip'
 
 export default async function Profil() {
  let predmety: tPredmetSekce[] = []
@@ -41,7 +41,7 @@ export default async function Profil() {
             className={`w-full h-full flex flex-row justify-between p-3 bg-gradient-to-l ${key === 0 ? `rounded-t-xl` : key === predmet.cviceni.length - 1 ? 'rounded-b-xl' : ''} ${!datum ? 'from-red-500/15 to-transparent' : 'from-lime-500/15 to-transparent'}`}
            >
             <span className="text-lg">{`Laboratorní cvičení ${key + 1}`}</span>
-            <Chip color={datum ? 'success' : 'danger'}>
+            <Chip type={datum ? 'success' : 'danger'}>
              {datum ? new Date(datum).toLocaleDateString() : 'nesplnil'}
             </Chip>
            </div>

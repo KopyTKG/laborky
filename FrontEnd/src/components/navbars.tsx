@@ -42,7 +42,7 @@ export function NavbarTeacher({ id }: { id: string }) {
   },
   {
    label: 'Procházet',
-   href: `${url}/predmety`,
+   href: `${url}/terminy`,
    icon: <Menu className="w-5" />,
   },
   {

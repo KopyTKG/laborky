@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  return (
   <html lang="en">
    <body className={GeistSans.className}>
-    <Providers attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+    <Providers attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
      <main id="main" className="min-h-screen h-max pb-3 text-foreground bg-background">
       {children}
      </main>
