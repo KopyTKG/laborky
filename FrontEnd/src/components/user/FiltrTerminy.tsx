@@ -65,7 +65,7 @@ export default function FiltrTerminy({typ }: {typ?: string }) {
 
  return (
   <>
-   <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+   <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Terminy?.map((termin: tTermin) => (
      <Node key={termin._id} owned={false} {...termin} typ={typ || ''} />
     ))}
