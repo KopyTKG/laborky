@@ -1,19 +1,20 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import { tNode } from '@/lib/types'
-import { CalendarDays, Clock, Clock12, MapPin, UsersRound } from 'lucide-react'
+import { Clock, Clock12, MapPin, UsersRound } from 'lucide-react'
 import { Zapsat, Zobrazit } from '@/components/nodeButton'
 
 export default function Node(props: tNode) {
  function CheckDate(date: any) {
-  let timeToCheck = new Date(date).setHours(new Date(date).getHours() - 24)
+  let timeGap: number = parseInt(process.env.NEXT_PUBLIC_TIME_GAP || '0')
+
+  let timeToCheck = new Date(date).setHours(new Date(date).getHours() - timeGap)
   if (new Date().getTime() < new Date(timeToCheck).getTime()) {
    return true
   } else {
    return false
   }
  }
- const loc = 'cs-CZ'
 
  const VolnoRender: boolean = CheckDate(props.start)
   ? (props?.zapsany || 0) < props.kapacita
@@ -32,7 +33,7 @@ export default function Node(props: tNode) {
     <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
     <p className="text-sm text-justify">{props.tema}</p>
    </CardHeader>
-   <Divider className="mx-auto w-[80%] h-[0.1rem]" variant="fade" margin="mb4"/>
+   <Divider className="mx-auto w-[80%] h-[0.1rem]" variant="fade" margin="mb4" />
    <CardContent>
     <div className="text-md flex flex-col my-2 gap-1">
      <div className="flex flex-row justify-start gap-1 items-center ">

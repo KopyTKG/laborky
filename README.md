@@ -37,12 +37,12 @@ STAG_URL="https://ws.ujep.cz/"
 - `FrontEnd/.env`
 ```env
 NEXT_PUBLIC_BASE=`http://localhost:3000`
-
-# url je určená v BackEnd env
 NEXT_PUBLIC_API_URL=`http://localhost:9999`
 
+NEXT_PUBLIC_TIME_GAP=12 #Hodiny
+
 # DEV VALUE NEED TO BE CHANGED
-NEXT_PUBLIC_STAG_SERVER=`https://ws.ujep.cz/ws/`
+NEXT_PUBLIC_STAG_SERVER=`https://stag-demo.zcu.cz/ws`
 ```
 
 2. Nainstalování všech balíčků viz [Instalace](#instalace)
