@@ -27,7 +27,6 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     list_terminu = []
     vyucujici_list = read_file()
     for predmet in list_predmetu:
-        predmet = get_kod_predmetu_by_zkratka(session, predmet)
         if predmet == internal_server_error:
             return internal_server_error
         list_terminu.extend(list_probehle_terminy_predmet(session, predmet))

@@ -40,5 +40,6 @@ export async function GET(req: Request) {
 
  const data = await res.json()
  const terminy = resTotTermin(data)
+ console.log(terminy)
  return Success({data: terminy})
 }
