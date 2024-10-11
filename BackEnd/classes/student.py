@@ -25,21 +25,26 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
             "Connection": "keep-alive", 
             "Accept-Origin": os.getenv("STAG_URL"),
         }
-        response = requests.get(url,headers=headers, cookies={'WSCOOKIE': ticket})
+        response = requests.get(url, headers=headers, cookies={'WSCOOKIE': ticket})
         if not response.ok:
             return not_found
     except:
         return internal_server_error
-    splneno = []
-    aktivni_predmety = []
+
+    splneno = set()
+    aktivni_predmety = set()
     predmety = response.json()
     zkratky = []
+
     for predmet in predmety_lab:
         zkratky.append((predmet.kod_predmetu).split("/")[-1])
 
     for predmet in predmety["predmetAbsolvoval"]:
         if predmet["zkratka"] in zkratky:
-            aktivni_predmety.append(predmet["katedra"] + "/" + predmet["zkratka"]) if predmet["absolvoval"] == "N" else splneno.append(predmet["zkratka"])
-    predmety = [item for item in aktivni_predmety if item not in splneno]
-    return predmety
+            if predmet["absolvoval"] == "N":
+                aktivni_predmety.add(predmet["katedra"] + "/" + predmet["zkratka"])
+            else:
+                splneno.add(predmet["katedra"] + "/" + predmet["zkratka"])
 
+    predmety = list(aktivni_predmety - splneno)  # Set difference operation
+    return predmety
