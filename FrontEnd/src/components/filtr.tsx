@@ -1,11 +1,26 @@
 'use client'
-import { Checkbox, CheckboxGroup, Skeleton } from '@nextui-org/react'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+ Form,
+ FormControl,
+ FormDescription,
+ FormField,
+ FormItem,
+ FormLabel,
+ FormMessage,
+} from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useContext, useEffect, useState } from 'react'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmet } from '@/lib/types'
+import { Header } from './ui/header'
+import { FilterCtx } from '@/contexts/FilterProvider'
 
 async function fetchPredmetyData() {
  try {
@@ -23,20 +38,20 @@ async function fetchPredmetyData() {
  }
 }
 
-export default function Filtr({ search }: { search: string[] }) {
- const [selected, setSelected] = useState<string[]>(search)
+const FormSchema = z.object({
+ items: z.array(z.string()).default([]),
+})
+
+export default function Filtr() {
  const [predmety, setPredmety] = useState<tPredmet[]>([])
  const [isLoading, setIsLoading] = useState(true)
 
- const router = useRouter()
- const pathname = usePathname()
- const searchParams = useSearchParams()
+ const Fcontext = useContext(FilterCtx)
+ if (!Fcontext) {
+  throw new Error('Missing FilterProvider')
+ }
 
- const updateRoute = useCallback(() => {
-  const params = new URLSearchParams(searchParams.toString())
-  params.set('s', selected.join('-'))
-  router.push(`${pathname}?${params.toString()}`)
- }, [selected, pathname, searchParams, router])
+ const [filter, setFiler] = Fcontext
 
  useEffect(() => {
   async function loadPredmety() {
@@ -53,27 +68,74 @@ export default function Filtr({ search }: { search: string[] }) {
   loadPredmety()
  }, [])
 
+ const form = useForm<z.infer<typeof FormSchema>>({
+  resolver: zodResolver(FormSchema),
+  defaultValues: {
+   items: filter,
+  },
+ })
+
+ function onSubmit(data: z.infer<typeof FormSchema>) {
+  setFiler(data.items)
+ }
+
  return (
   <div className="flex flex-col gap-2 col-start-1 col-span-1 h-full border-r-1 border-l-1 border-stone-700/55 px-2">
-   <h3 className="text-lg text-white font-bold w-full text-center border-b-1 pb-1 border-stone-700/55">
-    Předměty
-   </h3>
-   <CheckboxGroup color="warning" value={selected} onValueChange={setSelected}>
-    {isLoading && (
-     <>
-      <Skeleton className="w-full h-6 rounded-xl" />
-      <Skeleton className="w-full h-6 rounded-xl" />
-      <Skeleton className="w-full h-6 rounded-xl" />
-     </>
-    )}
-    {!isLoading &&
-     predmety.map((item) => (
-      <Checkbox value={item.nazev} key={item._id}>
-       {item.nazev}
-      </Checkbox>
-     ))}
-   </CheckboxGroup>
-   <Button onClick={updateRoute}>Potvrdit</Button>
+   <Form {...form}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+     <FormField
+      control={form.control}
+      name="items"
+      render={() => (
+       <FormItem className="w-full flex flex-col">
+        <FormLabel>
+         <Header type="h3" thickness="medium" className="w-full text-center mb-[-0.75rem]">
+          Předměty
+         </Header>
+        </FormLabel>
+        <FormDescription>Filtrování podle předmětu</FormDescription>
+        {isLoading && (
+         <>
+          <Skeleton className="w-full h-6 rounded-xl" />
+          <Skeleton className="w-full h-6 rounded-xl" />
+          <Skeleton className="w-full h-6 rounded-xl" />
+         </>
+        )}
+        {!isLoading &&
+         predmety.map((item) => (
+          <FormField
+           key={item._id}
+           control={form.control}
+           name="items"
+           render={({ field }) => {
+            return (
+             <FormItem key={item._id} className="flex items-start space-x-3 space-y-0 ml-5">
+              <FormControl>
+               <Checkbox
+                checked={field.value?.includes(item._id)}
+                onCheckedChange={(checked) => {
+                 const updatedValue = checked
+                  ? [...field.value, item._id]
+                  : field.value?.filter((value) => value !== item._id)
+                 field.onChange(updatedValue)
+                }}
+               />
+              </FormControl>
+              <FormLabel className="font-normal">{item.nazev}</FormLabel>
+             </FormItem>
+            )
+           }}
+          />
+         ))}
+        <FormMessage />
+        <Button type="submit" className="mt-4">
+         Potvrdit
+        </Button>
+       </FormItem>
+      )}
+     />
+    </form>
+   </Form>
   </div>
  )
 }

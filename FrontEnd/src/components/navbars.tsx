@@ -70,11 +70,11 @@ function NavbarComponent({
  const { theme, setTheme } = useTheme()
  return (
   <nav className="w-full flex justify-center py-3 border-1 border-transparent border-b-stone-500/50 fixed top-0 backdrop-blur-md">
-   <section className="w-full flex max-w-6xl">
+   <section className="w-full flex max-w-6xl px-3 md:px-6 ">
     <main className="flex flex-row gap-4">
      {links.map((item: tLink) => {
       return (
-       <Button onClick={() => router.push(item.href)} variant="ghost">
+       <Button key={item.href} onClick={() => router.push(item.href)} variant="ghost">
         {item.icon} &nbsp; {item.label}
        </Button>
       )
@@ -83,7 +83,7 @@ function NavbarComponent({
     <div className="flex w-full justify-end gap-5">
      <DropdownMenu>
       <DropdownMenuTrigger>
-       <div className="w-10 h-10 rounded-full bg-stone-400 flex items-center justify-center">
+       <div className="w-10 h-10 rounded-full bg-stone-400 dark:bg-stone-600 flex items-center justify-center">
         <User className="text-white w-10" />
        </div>
       </DropdownMenuTrigger>

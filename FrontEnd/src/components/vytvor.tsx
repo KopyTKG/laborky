@@ -39,9 +39,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Get } from '@/app/actions'
-import { tCreate, tPredmet, tTermin } from '@/lib/types'
+import { tCreate, tPredmet} from '@/lib/types'
 import { fastHeaders } from '@/lib/stag'
-import { ReloadCtx } from './ReloadProvider'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 const formSchema = z.object({
  subject: z.string().min(1, { message: 'Předmět je povinný' }),
@@ -86,7 +86,13 @@ export default function EventForm() {
  const [loading, setLoading] = useState<boolean>(true)
  const { toast } = useToast()
 
- const [reload, setReload] = useContext(ReloadCtx)
+ const context = useContext(ReloadCtx)
+
+ if (!context) {
+  throw new Error('Missing ReloadProvider')
+ }
+
+ const [reload, setReload] = context
 
  const form = useForm<z.infer<typeof formSchema>>({
   resolver: zodResolver(formSchema),

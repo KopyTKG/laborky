@@ -5,13 +5,12 @@ import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSearchParams } from 'next/navigation'
-import { ReloadCtx } from '../ReloadProvider'
+import { FilterCtx } from '@/contexts/FilterProvider'
 
-const fetchTerminyData = async (vybrane: string) => {
+const fetchTerminyData = async (data: string[]) => {
  try {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/filtr`)
-  url.searchParams.set('vybrane', vybrane)
+  url.searchParams.set('vybrane', data.join('-'))
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
@@ -27,34 +26,30 @@ const fetchTerminyData = async (vybrane: string) => {
  }
 }
 
-export default function FiltrTerminy({ vybrane, typ }: { vybrane: string; typ?: string }) {
+export default function FiltrTerminy({typ }: {typ?: string }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
- const context = useContext(ReloadCtx)
- if (!context) {
-  throw new Error('Missing ReloadProvider')
+ const Fcontext = useContext(FilterCtx)
+ if (!Fcontext) {
+  throw new Error('Missing FilterProvider')
  }
 
- const [reload, setReload] = context
+ const [filter, _ ] = Fcontext
 
  const [fetching, setFetching] = useState<boolean>(true)
 
- const searchParams = useSearchParams()
-
  const fetchTerminy = useCallback(async () => {
-  const vybrane = searchParams.get('s')
-  const data = await fetchTerminyData(vybrane || '')
+  const data = await fetchTerminyData(filter)
   if (data) {
    setTerminy(data.data)
-   setReload(false)
   }
 
   setFetching(false)
- }, [searchParams])
+ }, [filter])
 
  useLayoutEffect(() => {
   fetchTerminy()
- }, [reload, fetchTerminy])
+ }, [fetchTerminy])
 
  if (Terminy?.length === 0 && fetching) {
   return (

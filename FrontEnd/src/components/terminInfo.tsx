@@ -92,20 +92,20 @@ export default function TerminInfo({
          <Trash className="w-6 h-6" aria-hidden="true" />
         </button>
        </AlertDialogTrigger>
-       <AlertDialogContent className="bg-gray-800 text-white border border-gray-700">
+       <AlertDialogContent className="dark:bg-stone-800 dark:text-white text-black border dark:border-stone-900">
         <AlertDialogHeader>
-         <AlertDialogTitle className="text-white">Jste si jisti?</AlertDialogTitle>
-         <AlertDialogDescription className="text-gray-300">
+         <AlertDialogTitle>Jste si jisti?</AlertDialogTitle>
+         <AlertDialogDescription className='font-medium'>
           Tuto akci nelze vrátit zpět. Trvale to odstraní tento termín z našich serverů.
          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-         <AlertDialogCancel className="bg-gray-700 text-white hover:bg-gray-600">
+         <AlertDialogCancel className="bg-gray-700 dark:bg-gray-200 dark:text-black dark:hover:text-black text-white hover:bg-gray-500 dark:hover:bg-gray-400 hover:text-white">
           Zrušit
          </AlertDialogCancel>
          <AlertDialogAction
           onClick={() => fetchDelete()}
-          className="bg-red-600 text-white hover:bg-red-700"
+          className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white dark:hover:bg-red-800"
          >
           Pokračovat
          </AlertDialogAction>

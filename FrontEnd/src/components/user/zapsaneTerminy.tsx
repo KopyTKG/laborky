@@ -5,7 +5,7 @@ import { tTermin } from '@/lib/types'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ReloadCtx } from '../ReloadProvider'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 const fetchTerminyData = async () => {
  try {

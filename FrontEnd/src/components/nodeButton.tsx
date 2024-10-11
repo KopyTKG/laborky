@@ -4,7 +4,7 @@ import React, { useContext } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { ReloadCtx } from './ReloadProvider'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 export function Zobrazit({ id }: { id: string }) {
  const router = useRouter()

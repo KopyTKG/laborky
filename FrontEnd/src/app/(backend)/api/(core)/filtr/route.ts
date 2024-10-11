@@ -1,4 +1,5 @@
-import { Success, Unauthorized } from '@/lib/http'
+import { Internal, Success, Unauthorized } from '@/lib/http'
+import { resTotTermin } from '@/lib/parsers'
 import { fastHeaders } from '@/lib/stag'
 
 export async function GET(req: Request) {
@@ -26,6 +27,18 @@ export async function GET(req: Request) {
  } else if (role === 'RE') {
   apipoint = '/admin'
  }
- console.log(rVybrane)
- return Success()
+
+ const url = new URL(
+  `${process.env.NEXT_PUBLIC_API_URL}/ucitel/${rVybrane ? 'board_by_predmet' : 'moje'}`,
+ )
+ url.searchParams.set('ticket', rTicket)
+ if (rVybrane) url.searchParams.set('predmety', rVybrane.split('-').join(';'))
+ const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+ if (!res.ok) {
+  return Internal()
+ }
+
+ const data = await res.json()
+ const terminy = resTotTermin(data)
+ return Success({data: terminy})
 }
