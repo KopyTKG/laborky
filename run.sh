@@ -43,12 +43,12 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	else
     		echo "Linux"
     		gnome-terminal -- bash -c "docker compose -f docker-compose.fe.yml up"
-    		gnome-terminal -- bash -c "cd BackEnd && python -m venv venv && source venv/bin/activate && python server.py"
+    		gnome-terminal -- bash -c "cd BackEnd && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python server.py"
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Mac OSX"
 else
     echo "Windows"
-    start powershell -Command 'cd FrontEnd; npm run dev'
-    start powershell -Command 'cd BackEnd; python -m venv venv; venv/Scripts/activate; python server.py'
+    start powershell -Command 'cd FrontEnd;npm i --force; npm run dev'
+    start powershell -Command 'cd BackEnd; python -m venv venv; ./venv/Scripts/activate; pip install -r requirements.txt; python server.py'
 fi
