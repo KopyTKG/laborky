@@ -21,6 +21,19 @@ services:
    laborky_network:
     ipv4_address: 172.254.5.4
 
+ frontend:
+  build:
+   context: FrontEnd
+  container_name: laborky_FE
+  restart: unless-stopped
+  ports:
+   - '3000:3000'
+  depends_on:
+   - database
+  networks:
+   laborky_network:
+    ipv4_address: 172.254.5.3
+
 networks:
  laborky_network:
   name: laborky
