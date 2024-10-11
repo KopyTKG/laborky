@@ -49,6 +49,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Mac OSX"
 else
     echo "Windows"
-    start powershell -Command 'docker compose -f docker-compose.fe.yml up'
+    start powershell -Command 'docker-compose -f docker-compose.fe.yml up'
     start powershell -Command 'cd BackEnd; python -m venv venv; ./venv/Scripts/activate; pip install -r requirements.txt; python server.py'
 fi
