@@ -56,7 +56,7 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
 
  if (Terminy?.length === 0 && fetching) {
   return (
-   <div className="w-max h-[10rem] grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+   <div className="w-max h-[10rem] grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Array.from({ length: 3 }, (_, index) => (
      <Skeleton key={index} className="w-[25rem] h-[18rem] rounded-xl" />
     ))}

@@ -3,7 +3,7 @@ import VypsaneTerminy from '@/components/user/vypsaneTerminy'
 
 export default function UcitelPage() {
  return (
-  <div className="w-full flex flex-col gap-5 items-center h-full">
+  <div className="w-max-4xl w-full flex flex-col gap-5 items-center h-full">
    <Header underline='fade'>Nadcházející temníny</Header>
    <VypsaneTerminy typ="" />
   </div>

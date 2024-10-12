@@ -1,6 +1,7 @@
 import { Internal, Success, Unauthorized } from '@/lib/http'
 import { resTotTermin } from '@/lib/parsers'
 import { fastHeaders } from '@/lib/stag'
+import { tTermin } from '@/lib/types'
 
 export async function GET(req: Request) {
  const base = new URL(req.url)
@@ -39,7 +40,9 @@ export async function GET(req: Request) {
  }
 
  const data = await res.json()
- const terminy = resTotTermin(data)
- console.log(terminy)
- return Success({data: terminy})
+ const terminy = resTotTermin(data).sort((a: tTermin, b: tTermin) => {
+  return new Date(a.start).valueOf() - new Date(b.start).valueOf()
+ })
+
+ return Success({ data: terminy })
 }

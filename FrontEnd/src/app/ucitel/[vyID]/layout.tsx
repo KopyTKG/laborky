@@ -16,7 +16,7 @@ export default function RootLayout({
    <Navbar id={params.vyID} />
    <ReloadProvider>
     <FilterProvider>
-     <main className="max-w-4xl mx-auto mt-20">{children}</main>
+     <main className="max-w-6xl mx-auto mt-20">{children}</main>
      <Vytvor />
     </FilterProvider>
    </ReloadProvider>
