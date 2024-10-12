@@ -1,8 +1,8 @@
 import React from 'react'
 import { NavbarTeacher as Navbar } from '@/components/navbars'
-import Vytvor from '@/components/vytvor'
-import ReloadProvider from '@/contexts/ReloadProvider'
-import FilterProvider from '@/contexts/FilterProvider'
+import { Vytvor } from '@/components/vytvor'
+import ContextProviders from '@/contexts/providers'
+import Formular from '@/components/formular'
 
 export default function RootLayout({
  children,
@@ -14,12 +14,11 @@ export default function RootLayout({
  return (
   <>
    <Navbar id={params.vyID} />
-   <ReloadProvider>
-    <FilterProvider>
-     <main className="max-w-6xl mx-auto mt-20">{children}</main>
-     <Vytvor />
-    </FilterProvider>
-   </ReloadProvider>
+   <ContextProviders>
+    <main className="max-w-6xl mx-auto mt-20">{children}</main>
+    <Vytvor />
+    <Formular />
+   </ContextProviders>
   </>
  )
 }

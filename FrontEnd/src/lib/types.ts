@@ -52,26 +52,24 @@ export type tUser = {
  hash: string
 }
 
-export type tTerminBody = {
- predmet: {
-  _id: string
-  nazev: string
-  nCviceni: number
- }
- cviceni: number
- nazev: string
- tema: string
- ucebna: string
- kapacita: number
- datum: string
- start: TimeInputValue
- end: TimeInputValue
-}
-
 export type tStudent = {
  osCislo: string
  jmeno: string
  prijmeni: string
  email: string
  datum_splneni: string | undefined
+}
+
+export type tForm = {
+ _id: string
+ cviceni: string
+ nazev: string
+ tema: string
+ ucebna: string
+ kapacita: number
+ startDatum: Date
+ startCas: string
+ konecDatum: Date
+ konecCas: string
+ upozornit: boolean
 }

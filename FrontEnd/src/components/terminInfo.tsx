@@ -1,19 +1,9 @@
 import { Get } from '@/app/actions'
-import {
- Calendar,
- Clock,
- Users,
- Book,
- FileText,
- Bookmark,
- Trash,
- Check,
- Pencil,
-} from 'lucide-react'
+import { Calendar, Clock, Users, Book, FileText, Bookmark, Trash, Pencil } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fastHeaders } from '@/lib/stag'
-import { tTermin } from '@/lib/types'
-import React from 'react'
+import { tForm, tTermin } from '@/lib/types'
+import * as React from 'react'
 import {
  AlertDialog,
  AlertDialogContent,
@@ -25,18 +15,28 @@ import {
  AlertDialogCancel,
  AlertDialogAction,
 } from '@/components/ui/alert-dialog'
+import { FormCtx } from '@/contexts/FormProvider'
+
 export default function TerminInfo({
  Termin,
  id,
  setNull,
- onOpen,
+ storage,
 }: {
  Termin: tTermin
  id: string
  setNull: React.Dispatch<boolean>
- onOpen: () => void
+ storage: { form: tForm; terminId: string }
 }) {
- const formatDate = (dateString: string) => {
+ const context = React.useContext(FormCtx)
+
+ if (!context) {
+  throw Error('Missing FormProvider')
+ }
+
+ const { setOpen, setFormData, setTerminID } = context
+
+ const formatDate = (dateString: number) => {
   const date = new Date(dateString)
   return new Intl.DateTimeFormat('cs-CZ', {
    day: '2-digit',
@@ -78,7 +78,11 @@ export default function TerminInfo({
       <button
        className="text-green-500 hover:text-green-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-full p-1"
        aria-label="Delete"
-       onClick={onOpen}
+       onClick={() => {
+        setOpen(true)
+        setFormData(storage.form)
+	setTerminID(storage.terminId)
+       }}
       >
        <Pencil className="w-6 h-6" aria-hidden="true" />
       </button>
@@ -95,7 +99,7 @@ export default function TerminInfo({
        <AlertDialogContent className="dark:bg-stone-800 dark:text-white text-black border dark:border-stone-900">
         <AlertDialogHeader>
          <AlertDialogTitle>Jste si jisti?</AlertDialogTitle>
-         <AlertDialogDescription className='font-medium'>
+         <AlertDialogDescription className="font-medium">
           Tuto akci nelze vrátit zpět. Trvale to odstraní tento termín z našich serverů.
          </AlertDialogDescription>
         </AlertDialogHeader>

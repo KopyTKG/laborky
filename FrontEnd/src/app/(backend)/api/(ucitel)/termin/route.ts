@@ -1,7 +1,7 @@
 import { Unauthorized, NotFound, Success, Internal } from '@/lib/http'
-import { formatTime, setupParser } from '@/lib/parsers'
+import { setupParser } from '@/lib/parsers'
 import { fastHeaders, GetTicket } from '@/lib/stag'
-import { tCreate, tStudent, tTermin, tTerminBody } from '@/lib/types'
+import { tCreate, tStudent, tTermin } from '@/lib/types'
 
 // Create
 export async function POST(req: Request) {
@@ -150,8 +150,8 @@ export async function PATCH(req: Request) {
  }
  const fBody = {
   ucebna: body.ucebna,
-  datum_start: body.start,
-  datum_konec: body.konec,
+  datum_start: new Date(body.start).toJSON(),
+  datum_konec: new Date(body.konec).toJSON(),
   max_kapacita: body.kapacita,
   cislo_cviceni: body.cviceni,
   popis: body.tema,

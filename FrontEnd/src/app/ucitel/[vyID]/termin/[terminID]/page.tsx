@@ -12,13 +12,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Check } from 'lucide-react'
 import { fastHeaders } from '@/lib/stag'
-import { tStudent, tTermin } from '@/lib/types'
+import { tForm, tPredmet, tStudent, tTermin } from '@/lib/types'
 import React, { useState, useCallback, useEffect } from 'react'
-import { useDisclosure } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
 import TerminInfo from '@/components/terminInfo'
-import Uprav from '@/components/uprav'
 import { toast } from '@/hooks/use-toast'
+import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
+import { fetchPredmetyData } from '@/lib/functions'
+import { Time } from '@/lib/parsers'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 const fetchTerminData = async (id: string) => {
  try {
@@ -41,28 +43,59 @@ const fetchTerminData = async (id: string) => {
 
 export default function TerminPage({ params }: { params: { terminID: string } }) {
  const [Termin, setTermin] = useState<tTermin>()
+ const [storage, setStorage] = useState<{ form: tForm; terminId: string }>({
+  form: DefaultForm,
+  terminId: '',
+ })
  const [Studenti, setStudenti] = useState<tStudent[]>([])
  const [noData, setNull] = useState<boolean>(false)
  const [fetching, setFetching] = useState<boolean>(true)
- const [reload, setReload] = useState<boolean>(true)
- const { isOpen, onOpen, onOpenChange } = useDisclosure()
  const router = useRouter()
 
- const fetchTermin = useCallback(async () => {
-  const data = await fetchTerminData(params.terminID)
-  if (data) {
-   setTermin(data.termin)
-   setStudenti(data.studenti)
+ const context = React.useContext(FormCtx)
+ const Rcontext = React.useContext(ReloadCtx)
+
+ if (!context || !Rcontext) {
+  throw Error('Missing FormProvider or ReloadProvider')
+ }
+
+ const { setPredmety, setPredmet } = context
+ const [reload, setReload] = Rcontext
+
+ const fetchData = useCallback(async () => {
+  const terminData = await fetchTerminData(params.terminID)
+  const predmety = await fetchPredmetyData()
+  if (terminData && predmety) {
+   const termin = terminData.termin as tTermin
+   setTermin(termin)
+   setStudenti(terminData.studenti)
+   setPredmety(predmety)
+   setPredmet(predmety.find((a: tPredmet) => a._id === termin._id) || DefaultPredmet)
+   setStorage({
+    form: {
+     _id: termin._id,
+     cviceni: termin.cviceni.toString(),
+     nazev: termin.nazev,
+     tema: termin.tema,
+     ucebna: termin.ucebna,
+     kapacita: termin.kapacita,
+     startDatum: new Date(termin.start),
+     startCas: Time(termin.start),
+     konecDatum: new Date(termin.konec),
+     konecCas: Time(termin.konec),
+     upozornit: true,
+    },
+    terminId: params.terminID,
+   })
   } else {
    setNull(true)
   }
   setFetching(false)
- }, [params.terminID])
+ }, [params.terminID, reload])
 
  useEffect(() => {
-  fetchTermin()
-  setReload(false)
- }, [fetchTermin, reload])
+  fetchData()
+ }, [fetchData])
 
  useEffect(() => {
   if (noData) {
@@ -71,13 +104,11 @@ export default function TerminPage({ params }: { params: { terminID: string } })
  }, [noData, router])
 
  if (fetching) {
-  return (
-   <Skeleton className="w-full h-[18rem] rounded-xl" />
-  )
+  return <Skeleton className="w-full h-[18rem] rounded-xl" />
  }
 
  if (noData) {
-  return null // This will be rendered briefly before the redirect takes effect
+  return null
  }
 
  const sendStudent = async (osCislo: string) => {
@@ -95,8 +126,8 @@ export default function TerminPage({ params }: { params: { terminID: string } })
    }
    setReload(true)
    toast({
-	title: 'Úspěch',
-	description: 'Splnění termínu zapsáno'
+    title: 'Úspěch',
+    description: 'Splnění termínu zapsáno',
    })
   } catch (e) {
    console.error(e)
@@ -110,7 +141,7 @@ export default function TerminPage({ params }: { params: { terminID: string } })
     Termin={Termin || ({} as tTermin)}
     id={params.terminID}
     setNull={setNull}
-    onOpen={onOpen}
+    storage={storage}
    />
    <Table>
     <TableHeader>
@@ -145,14 +176,6 @@ export default function TerminPage({ params }: { params: { terminID: string } })
      ))}
     </TableBody>
    </Table>
-   <Uprav
-    onOpenChange={onOpenChange}
-    isOpen={isOpen}
-    termin={Termin || ({} as tTermin)}
-    setReload={setReload}
-    reload={reload}
-    id={params.terminID}
-   />
   </>
  )
 }
