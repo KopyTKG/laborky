@@ -29,8 +29,8 @@ export async function POST(req: Request) {
  }
  const fBody = {
   ucebna: body.ucebna,
-  datum_start: body.start,
-  datum_konec: body.konec,
+  datum_start: new Date(body.start).toJSON(),
+  datum_konec: new Date(body.konec).toJSON(),
   max_kapacita: body.kapacita,
   cislo_cviceni: body.cviceni,
   popis: body.tema,
@@ -39,6 +39,8 @@ export async function POST(req: Request) {
   upozornit: body.upzornit,
   vyucuje_prijmeni: body.vyucuje || null,
  }
+
+ console.log(fBody)
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
  const res = await fetch(url.toString(), {

@@ -39,7 +39,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Get } from '@/app/actions'
-import { tCreate, tPredmet} from '@/lib/types'
+import { tCreate, tPredmet } from '@/lib/types'
 import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 
@@ -127,6 +127,8 @@ export default function EventForm() {
  }, [])
 
  async function onSubmit(values: z.infer<typeof formSchema>) {
+	 const regex = /[0-2][0-9]:[0-6][0-9]:[0-6][0-9]/i
+
   const body: tCreate = {
    _id: values.subject,
    ucebna: values.classroom,
@@ -135,11 +137,9 @@ export default function EventForm() {
    nazev: values.name || '',
    tema: values.theme,
    start: new Date(
-    values.startDate.toString().replace('00:00:00', values.startTime + ':00'),
-   ).toISOString(),
-   konec: new Date(
-    values.endDate.toString().replace('00:00:00', values.endTime + ':00'),
-   ).toISOString(),
+    values.startDate.toString().replace(regex, values.startTime + ':00'),
+   ).valueOf(),
+   konec: new Date(values.endDate.toString().replace(regex, values.endTime + ':00')).valueOf(),
    upzornit: values.notifyStudents,
   }
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/termin`)
@@ -153,7 +153,7 @@ export default function EventForm() {
    body: JSON.stringify(body),
   })
 
-  if (res) {
+  if (res.ok) {
    toast({
     title: 'Úspěch',
     description: 'Termín byl úspěšně vypsán',

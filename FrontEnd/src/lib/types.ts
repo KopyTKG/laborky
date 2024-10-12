@@ -4,8 +4,8 @@ import React from 'react'
 export type tTermin = {
  _id: string
  ucebna: string
- start: string
- konec: string
+ start: number
+ konec: number
  nazev: string
  tema: string
  cviceni: number

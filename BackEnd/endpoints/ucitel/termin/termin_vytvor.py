@@ -12,14 +12,16 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     if info == unauthorized or info == internal_server_error:
         return info
     vypsal_id, role = encode_id(info[0]), info[1]
-
+    print(termin)
     if termin.kod_predmetu is None:
         return not_found
 
     if not termin.vyucuje_prijmeni:
-        vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu)[0] # type: ignore
-        if vyucuje_id == internal_server_error:
+        vyucuje_id = get_vyucujiciho_by_predmet(session, termin.kod_predmetu)
+        if vyucuje_id == internal_server_error or not vyucuje_id:
             return internal_server_error
+        vyucuje_id = vyucuje_id[0] # type: ignore
+
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 

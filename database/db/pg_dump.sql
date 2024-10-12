@@ -5,7 +5,7 @@
 -- Dumped from database version 16.3 (Debian 16.3-1.pgdg120+1)
 -- Dumped by pg_dump version 16.3
 
--- Started on 2024-10-10 23:28:21 CEST
+-- Started on 2024-10-12 13:17:38 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -45,7 +45,6 @@ SET row_security = off;
 -- TOC entry 4 (class 2615 OID 2200)
 -- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
 --
-
 
 ALTER SCHEMA public OWNER TO pg_database_owner;
 
@@ -208,7 +207,9 @@ ALTER TABLE ONLY public.vyucujici_predmety ALTER COLUMN id SET DEFAULT nextval('
 -- Data for Name: historie_terminu; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.historie_terminu VALUES ('ccc25718-a783-4b65-b268-7ceec023dd2e', 'a37582dbc0e22578882b0daca288e984773c2b53', 'c5d0c8c6-3c0b-4cac-b053-5f6d301a2f43', NULL);
+INSERT INTO public.historie_terminu VALUES ('ccc25718-a783-4b65-b268-7ceec023dd2e', 'a37582dbc0e22578882b0daca288e984773c2b53', 'c5d0c8c6-3c0b-4cac-b053-5f6d301a2f43', '2024-10-11 00:02:11.260845');
+INSERT INTO public.historie_terminu VALUES ('8f4353cf-a26e-47a8-800c-72bb8c889a6a', '172055682efec4388b8dc47c9778a446e6d310a6', 'c4ac4f7e-fc2a-42d3-9685-f437a11b00e1', '2024-10-11 00:13:43.845964');
+INSERT INTO public.historie_terminu VALUES ('3db94dc8-a3cf-4d7d-929f-62029bb607f7', 'c1c1277db51aae1535fb9a1692c555d44c38b9c9', '9f2200f8-a3a5-4c12-960e-155cdf8113cc', '2024-10-11 20:37:22.848768');
 INSERT INTO public.historie_terminu VALUES ('d4c03c6d-148a-42b4-9935-65662e449ad8', '33078e3a64b53becea86673761452ff1ec13c300', '9b56ef12-f2b0-49c7-9354-d6d3ea9ad207', NULL);
 
 
@@ -261,17 +262,20 @@ INSERT INTO public.termin VALUES ('72bab092-0629-4988-8294-e2782d4c4e1a', 'Nespe
 INSERT INTO public.termin VALUES ('f7f95921-3d92-43a5-b33d-add1cf52c20a', 'Nespecifikovano', '2024-10-07 19:20:44.763299', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KFE/FP', 'Uznání předmětu', -1, '2024-10-07 21:20:44.763299', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('ef0df890-540b-4219-a4d7-0bb37d478898', 'Nespecifikovano', '2024-10-10 20:21:09.089989', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KFI/BPS1F', 'Uznání předmětu', -1, '2024-10-10 22:21:09.089989', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('68b0be9a-0cfd-4f4e-91bd-1df287949380', 'Nespecifikovano', '2024-10-10 21:16:26.872537', 0, 1, 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'KČJ/L1M2', 'Uznání předmětu', -1, '2024-10-10 23:16:26.872537', 'Cvičení pro uznání všech cvičení v rámci předmětu');
+INSERT INTO public.termin VALUES ('c4ac4f7e-fc2a-42d3-9685-f437a11b00e1', 'CP-1.04', '2024-10-15 15:00:00', 1, 10, 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'KČJ/L1M2', '', 2, '2024-10-15 17:00:00', 'Automat');
 INSERT INTO public.termin VALUES ('695051ab-dd9a-4c2c-8aa6-b3ea4cdca670', 'CPTO 7.13', '2024-10-11 14:00:00', 0, 10, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KFE/FP', 'Fyzio', 1, '2024-10-11 16:00:00', 'fyzioterapie dětí');
 INSERT INTO public.termin VALUES ('5a4156fa-0fde-48f9-94a0-40659b88c53d', 'CPTO 7.13', '2024-10-11 14:00:00', 0, 10, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KFE/FP', 'Fyzio', 2, '2024-10-11 16:00:00', 'fyzioterapie dětí 2');
 INSERT INTO public.termin VALUES ('c5d0c8c6-3c0b-4cac-b053-5f6d301a2f43', 'CPTO 1.1', '2024-10-11 14:00:00', 1, 20, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KIV/BOPX', 'Konzultace k BP pokračování', 2, '2024-10-11 16:00:00', 'bude se konzultovat podruhé');
 INSERT INTO public.termin VALUES ('a1755181-5135-4e76-a3c1-3f6b1057661b', 'Nespecifikovano', '2024-10-08 21:45:29.335226', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KEM/MAM', 'Uznání předmětu', -1, '2024-10-08 23:45:29.335226', 'Cvičení pro uznání všech cvičení v rámci předmětu');
+INSERT INTO public.termin VALUES ('579db326-2360-490d-8a68-7b964be09f76', 'a', '2024-10-16 18:41:00', 0, 21, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KEM/MAM', '', 1, '2024-10-16 21:38:00', 'a');
 INSERT INTO public.termin VALUES ('3d25c0ef-4a02-487e-aa0b-42ad1055db7c', 'Nespecifikovano', '2024-10-07 18:27:58.266418', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KAU/PO7', 'Uznání předmětu', -1, '2024-10-07 20:27:58.266418', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('4fcac62c-1410-4a16-a0e4-fe7b515d9337', 'Nespecifikovano', '2024-10-07 18:28:28.006206', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KTD/BPUT', 'Uznání předmětu', -1, '2024-10-07 20:28:28.006206', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('d146748b-7951-48f1-a552-6ce8cf1c1e4a', 'Nespecifikovano', '2024-10-07 18:28:47.018412', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KAU/AUKPA', 'Uznání předmětu', -1, '2024-10-07 20:28:47.018412', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('61f50519-63bc-41ac-a247-3a9c57993ccc', 'Nespecifikovano', '2024-10-09 13:34:51.031034', 0, 1, '1b842cc94877cd138c6023533c6172808fb655a5', '1b842cc94877cd138c6023533c6172808fb655a5', 'KVU/BPVT', 'Uznání předmětu', -1, '2024-10-09 15:34:51.031034', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('9b56ef12-f2b0-49c7-9354-d6d3ea9ad207', 'Nespecifikovano', '2024-10-07 20:47:58.409267', 1, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'UJP/FPE3', 'Uznání předmětu', -1, '2024-10-07 22:47:58.409267', 'Cvičení pro uznání všech cvičení v rámci předmětu');
 INSERT INTO public.termin VALUES ('419875fa-49f0-445f-894e-950618041ec1', 'Nespecifikovano', '2024-10-10 20:24:21.638906', 0, 1, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KFI/URKHB', 'Uznání předmětu', -1, '2024-10-10 22:24:21.638906', 'Cvičení pro uznání všech cvičení v rámci předmětu');
-INSERT INTO public.termin VALUES ('51a7ac88-181b-4940-8d90-cfdc462fa209', 'UK', '2024-10-11 17:00:00', 0, 20, 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'KČJ/L1M2', '', 1, '2024-10-11 19:00:00', 'Auto');
+INSERT INTO public.termin VALUES ('51a7ac88-181b-4940-8d90-cfdc462fa209', 'UK', '2024-10-13 17:00:00', 0, 20, 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'a0f3cbb12ea304476892aa3f48798a291420c9e1', 'KČJ/L1M2', '', 1, '2024-10-13 19:00:00', 'Auto');
+INSERT INTO public.termin VALUES ('9f2200f8-a3a5-4c12-960e-155cdf8113cc', 'a', '2024-10-13 18:38:00', 1, 120, 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'dab963ab63e7e4f2a6f32c334bf839513928ff5d', 'KEM/MAM', '', 1, '2024-10-13 18:35:00', 'a');
 
 
 --
@@ -475,7 +479,7 @@ ALTER TABLE ONLY public.vyucujici_predmety
     ADD CONSTRAINT vyucujici_predmety_vyucujici_id_fkey FOREIGN KEY (vyucujici_id) REFERENCES public.vyucujici(id) ON DELETE CASCADE;
 
 
--- Completed on 2024-10-10 23:28:39 CEST
+-- Completed on 2024-10-12 13:17:55 CEST
 
 --
 -- PostgreSQL database dump complete

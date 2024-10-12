@@ -1,4 +1,5 @@
 'use client'
+import { Marker } from '@/components/ui/marker'
 import {
  Divider,
  Input,
@@ -38,35 +39,40 @@ export default function Page() {
        <TableRow
         as={Link}
         href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700">
+        className="cursor-pointer hover:bg-gray-700"
+       >
         <TableCell className="text-xl">st98318</TableCell>
         <TableCell className="text-xl">Martin Kopecký</TableCell>
        </TableRow>
        <TableRow
         as={Link}
         href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700">
+        className="cursor-pointer hover:bg-gray-700"
+       >
         <TableCell className="text-xl">st98318</TableCell>
         <TableCell className="text-xl">Martin Kopecký</TableCell>
        </TableRow>
        <TableRow
         as={Link}
         href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700">
+        className="cursor-pointer hover:bg-gray-700"
+       >
         <TableCell className="text-xl">st98318</TableCell>
         <TableCell className="text-xl">Martin Kopecký</TableCell>
        </TableRow>
        <TableRow
         as={Link}
         href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700">
+        className="cursor-pointer hover:bg-gray-700"
+       >
         <TableCell className="text-xl">st98318</TableCell>
         <TableCell className="text-xl">Martin Kopecký</TableCell>
        </TableRow>
        <TableRow
         as={Link}
         href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700">
+        className="cursor-pointer hover:bg-gray-700"
+       >
         <TableCell className="text-xl">st98318</TableCell>
         <TableCell className="text-xl">Martin Kopecký</TableCell>
        </TableRow>

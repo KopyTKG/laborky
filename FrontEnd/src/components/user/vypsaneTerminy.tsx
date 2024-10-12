@@ -6,6 +6,7 @@ import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
+import { Header } from '@/components/ui/header'
 
 const fetchTerminyData = async () => {
  try {
@@ -63,12 +64,16 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
    </div>
   )
  } else if (!fetching && Terminy?.length === 0) {
-  return <h2 className="text-xl dark:text-white font-bold"> Nebyl nalezen žádný termín</h2>
+     <span className="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
+    <Header type="h2" thickness="bold" className="col-span-2 w-[25rem] lg:w-[50.75rem] text-center">
+     Nebyl nalezen žádný termín
+    </Header>
+   </span>
  }
 
  return (
   <>
-   <div className="w-max grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+   <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Terminy?.map((termin: tTermin) => (
      <Node key={termin._id} owned={false} {...termin} typ={typ || ''}/>
     ))}

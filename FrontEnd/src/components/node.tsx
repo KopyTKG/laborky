@@ -1,11 +1,23 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import { tNode } from '@/lib/types'
-import { Clock, Clock12, MapPin, UsersRound } from 'lucide-react'
+import {
+ Check,
+ Clock,
+ Clock12,
+ MapPin,
+ UsersRound,
+ History,
+ Clock1,
+ Clock3,
+ Clock6,
+ Clock2,
+} from 'lucide-react'
 import { Zapsat, Zobrazit } from '@/components/nodeButton'
+import { Marker } from './ui/marker'
 
 export default function Node(props: tNode) {
- function CheckDate(date: any) {
+ function CheckDate(date: string): boolean {
   let timeGap: number = parseInt(process.env.NEXT_PUBLIC_TIME_GAP || '0')
 
   let timeToCheck = new Date(date).setHours(new Date(date).getHours() - timeGap)
@@ -14,6 +26,12 @@ export default function Node(props: tNode) {
   } else {
    return false
   }
+ }
+
+ function CheckProgress(date: string) {
+  const now = Date.now()
+  const check = new Date(date).valueOf()
+  return now < check ? true : false
  }
 
  const VolnoRender: boolean = CheckDate(props.start)
@@ -29,6 +47,15 @@ export default function Node(props: tNode) {
 
  return (
   <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
+   <div className="w-full flex justify-end pt-2 pr-2 h-[1.25rem] mb-[-1rem]">
+    {CheckProgress(props.start) ? (
+     <Clock12 className="text-stone-50 w-5" />
+    ) : CheckProgress(props.konec) ? (
+     <Clock2 className="text-green-500 w-5" />
+    ) : (
+     <Clock className="text-red-600 w-5" />
+    )}
+   </div>
    <CardHeader>
     <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
     <p className="text-sm text-justify">{props.tema}</p>

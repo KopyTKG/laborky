@@ -6,6 +6,7 @@ import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FilterCtx } from '@/contexts/FilterProvider'
+import { Header } from '@/components/ui/header'
 
 const fetchTerminyData = async (data: string[]) => {
  try {
@@ -26,7 +27,7 @@ const fetchTerminyData = async (data: string[]) => {
  }
 }
 
-export default function FiltrTerminy({typ }: {typ?: string }) {
+export default function FiltrTerminy({ typ }: { typ?: string }) {
  const [Terminy, setTerminy] = useState<tTermin[]>([])
 
  const Fcontext = useContext(FilterCtx)
@@ -34,7 +35,7 @@ export default function FiltrTerminy({typ }: {typ?: string }) {
   throw new Error('Missing FilterProvider')
  }
 
- const [filter, _ ] = Fcontext
+ const [filter, _] = Fcontext
 
  const [fetching, setFetching] = useState<boolean>(true)
 
@@ -60,7 +61,13 @@ export default function FiltrTerminy({typ }: {typ?: string }) {
    </div>
   )
  } else if (!fetching && Terminy?.length === 0) {
-  return <h2 className="text-xl dark:text-white font-bold"> Nebyl nalezen žádný termín</h2>
+  return (
+   <span className="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
+    <Header type="h2" thickness="bold" className="col-span-2 w-[25rem] lg:w-[50.75rem] text-center">
+     Nebyl nalezen žádný termín
+    </Header>
+   </span>
+  )
  }
 
  return (
