@@ -101,21 +101,30 @@ export default function Formular() {
   if (terminID) {
    url.searchParams.set('id', terminID)
   }
-  const res = await fetch(url.toString(), {
-   method: terminID ? 'PATCH' : 'POST',
-   headers: fastHeaders,
-   body: JSON.stringify(body),
-  })
-
-  if (res.ok) {
-   toast({
-    title: 'Úspěch',
-    description: 'Termín byl úspěšně vypsán',
+  try {
+   const res = await fetch(url.toString(), {
+    method: terminID ? 'PATCH' : 'POST',
+    headers: fastHeaders,
+    body: JSON.stringify(body),
    })
-   setOpen(false)
-   setReload(!reload)
-   form.reset()
-  } else {
+
+   if (res.ok) {
+    toast({
+     title: 'Úspěch',
+     description: 'Termín byl úspěšně vypsán',
+    })
+    setOpen(false)
+    setReload(!reload)
+    form.reset()
+   } else {
+    toast({
+     variant: 'destructive',
+     title: 'Problém',
+     description: 'Něco se nepovedlo při vypisování',
+    })
+   }
+  } catch (e: any) {
+   console.error(e)
    toast({
     variant: 'destructive',
     title: 'Problém',

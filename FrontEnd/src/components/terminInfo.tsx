@@ -1,5 +1,15 @@
 import { Get } from '@/app/actions'
-import { Calendar, Clock, Users, Book, FileText, Bookmark, Trash, Pencil } from 'lucide-react'
+import {
+ Calendar,
+ Clock,
+ Users,
+ Book,
+ FileText,
+ Bookmark,
+ Trash,
+ Pencil,
+ UserPlus,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fastHeaders } from '@/lib/stag'
 import { tForm, tTermin } from '@/lib/types'
@@ -16,6 +26,9 @@ import {
  AlertDialogAction,
 } from '@/components/ui/alert-dialog'
 import { FormCtx } from '@/contexts/FormProvider'
+import { Label } from './ui/label'
+import { Input } from './ui/input'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 export default function TerminInfo({
  Termin,
@@ -29,11 +42,12 @@ export default function TerminInfo({
  storage: { form: tForm; terminId: string }
 }) {
  const context = React.useContext(FormCtx)
+ const Rcontext = React.useContext(ReloadCtx)
 
- if (!context) {
-  throw Error('Missing FormProvider')
+ if (!context || !Rcontext) {
+  throw Error('Missing FormProvider or ReloadProvider')
  }
-
+ const [reload, setReload] = Rcontext
  const { setOpen, setFormData, setTerminID } = context
 
  const formatDate = (dateString: number) => {
@@ -47,7 +61,7 @@ export default function TerminInfo({
   }).format(date)
  }
 
- const fetchDelete = async () => {
+ async function fetchDelete() {
   try {
    const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/termin`)
    url.searchParams.set('id', id)
@@ -66,6 +80,33 @@ export default function TerminInfo({
   }
  }
 
+ async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  try {
+   e.preventDefault()
+   const formData = new FormData(e.currentTarget)
+   const studId = formData.get('stud_id')?.toString()
+   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/zapis`)
+   url.searchParams.set('id_terminu', id)
+   url.searchParams.set('id_stud', studId || '')
+   const cookie = await Get('stagUserTicket')
+   if (cookie) {
+    url.searchParams.set('ticket', cookie.value)
+   }
+   const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: fastHeaders,
+    redirect: 'manual',
+   })
+   if (!res.ok) {
+    console.error(res.statusText)
+   } else {
+   	setReload(!reload) 
+   }
+  } catch (e) {
+   console.error(e)
+  }
+ }
+
  return (
   <Card className="w-full mb-5 dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-950">
    <CardHeader className="pb-2">
@@ -75,13 +116,49 @@ export default function TerminInfo({
       {Termin?.nazev || 'Název předmětu'}
      </span>
      <span className="flex gap-2 items-center">
+      <AlertDialog>
+       <AlertDialogTrigger asChild>
+        <button
+         className="text-green-500 hover:text-green-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-full p-1"
+         aria-label="Delete"
+        >
+         <UserPlus className="w-6 h-6" aria-hidden="true" />
+        </button>
+       </AlertDialogTrigger>
+       <AlertDialogContent>
+        <form onSubmit={onSubmit}>
+         <AlertDialogHeader>
+          <AlertDialogTitle>Přídání studenta</AlertDialogTitle>
+         </AlertDialogHeader>
+         <AlertDialogDescription className="flex flex-col gap-2">
+          <Label htmlFor="stud_id">Zadejte osobní číslo studenta</Label>
+          <Input id="stud_id" name="stud_id" type="text" placeholder="např.: Fxxxxx" required />
+         </AlertDialogDescription>
+         <AlertDialogFooter>
+          <AlertDialogCancel
+           type="button"
+           className="bg-gray-700 dark:bg-gray-200 dark:text-black dark:hover:text-black text-white hover:bg-gray-500 dark:hover:bg-gray-400 hover:text-white"
+          >
+           Zrušit
+          </AlertDialogCancel>
+          <AlertDialogAction
+           type="submit"
+           className="bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:text-white dark:hover:bg-green-800"
+          >
+           Pokračovat
+          </AlertDialogAction>
+         </AlertDialogFooter>
+        </form>
+       </AlertDialogContent>
+      </AlertDialog>
+
       <button
-       className="text-green-500 hover:text-green-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-full p-1"
+       className="text-amber-500 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 rounded-full p-1"
        aria-label="Delete"
        onClick={() => {
         setOpen(true)
         setFormData(storage.form)
-	setTerminID(storage.terminId)
+        setTerminID(storage.terminId)
        }}
       >
        <Pencil className="w-6 h-6" aria-hidden="true" />
@@ -96,7 +173,7 @@ export default function TerminInfo({
          <Trash className="w-6 h-6" aria-hidden="true" />
         </button>
        </AlertDialogTrigger>
-       <AlertDialogContent className="dark:bg-stone-800 dark:text-white text-black border dark:border-stone-900">
+       <AlertDialogContent className="dark:bg-zinc-950 dark:text-white text-black border dark:border-zinc-900 shadow-md">
         <AlertDialogHeader>
          <AlertDialogTitle>Jste si jisti?</AlertDialogTitle>
          <AlertDialogDescription className="font-medium">

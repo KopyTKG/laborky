@@ -19,48 +19,53 @@ export async function middleware(request: NextRequest) {
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
  url.searchParams.set('ticket', ticket)
-
- const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
- if (!res.ok) {
-  return NextResponse.next()
- }
-
- const data = await res.json()
- const info = setupParser(data)
-
- // Handle student path matching
- const studentPathMatch = pathname.match(/^\/student\/([^/]+)(\/moje|\/profil)?$/)
- const ucitelPathMatch = pathname.match(
-  /^\/ucitel\/([^/]+)(\/predmety|\/termin\/[^/]+|\/studenti|\/student\/[^/]+)?$/,
- )
-
- if (studentPathMatch && studentPathMatch[1] === info.id) {
-  return NextResponse.next() // Already on the correct student page
- }
-
- if (ucitelPathMatch && ucitelPathMatch[1] === info.id) {
-  return NextResponse.next() // Already on the correct teacher page
- }
- // Handle redirect to the correct role path
- if (pathname === '/') {
-  if (info.role === 'ST') {
-   request.nextUrl.pathname = `/student/${info.id}`
-  } else if (info.role) {
-   request.nextUrl.pathname = `/ucitel/${info.id}`
+ try {
+  const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
+  if (!res.ok) {
+   return NextResponse.next()
   }
-  return NextResponse.redirect(request.nextUrl)
- }
 
- const terminPathMatch = pathname.match(/^\/termin\/([^/]+)$/)
- if (terminPathMatch) {
-  const terminID = terminPathMatch[1]
-  if (info.role != 'ST') {
-   request.nextUrl.pathname = `/ucitel/${info.id}/termin/${terminID}`
+  const data = await res.json()
+  const info = setupParser(data)
+
+  // Handle student path matching
+  const studentPathMatch = pathname.match(/^\/student\/([^/]+)(\/moje|\/profil)?$/)
+  const ucitelPathMatch = pathname.match(
+   /^\/ucitel\/([^/]+)(\/predmety|\/termin\/[^/]+|\/studenti|\/student\/[^/]+)?$/,
+  )
+
+  if (studentPathMatch && studentPathMatch[1] === info.id) {
+   return NextResponse.next() // Already on the correct student page
+  }
+
+  if (ucitelPathMatch && ucitelPathMatch[1] === info.id) {
+   return NextResponse.next() // Already on the correct teacher page
+  }
+  // Handle redirect to the correct role path
+  if (pathname === '/') {
+   if (info.role === 'ST') {
+    request.nextUrl.pathname = `/student/${info.id}`
+   } else if (info.role) {
+    request.nextUrl.pathname = `/ucitel/${info.id}`
+   }
    return NextResponse.redirect(request.nextUrl)
   }
- }
 
- return NextResponse.next()
+  const terminPathMatch = pathname.match(/^\/termin\/([^/]+)$/)
+  if (terminPathMatch) {
+   const terminID = terminPathMatch[1]
+   if (info.role != 'ST') {
+    request.nextUrl.pathname = `/ucitel/${info.id}/termin/${terminID}`
+    return NextResponse.redirect(request.nextUrl)
+   }
+  }
+
+  return NextResponse.next()
+ } catch (e: any) {
+  console.error(e)
+  request.nextUrl.pathname = '/login'
+  return NextResponse.redirect(request.nextUrl)
+ }
 }
 
 export const config = {
