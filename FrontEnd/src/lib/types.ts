@@ -57,7 +57,7 @@ export type tStudent = {
  jmeno: string
  prijmeni: string
  email: string
- datum_splneni: string | undefined
+ datum_splneni?: string | undefined
 }
 
 export type tForm = {

@@ -4,6 +4,7 @@ import { fastHeaders } from '@/lib/stag'
 import { tPredmetSekce } from '@/lib/types'
 import { redirect } from 'next/navigation'
 import { Chip } from '@/components/ui/chip'
+import { Button } from 'react-day-picker'
 
 export default async function Profil() {
  let predmety: tPredmetSekce[] = []
@@ -31,7 +32,7 @@ export default async function Profil() {
     {predmety.map((predmet: tPredmetSekce, key: number) => {
      return (
       <div className="mb-3" key={predmet.nazev}>
-       <h3 className="font-bold text-xl ">{predmet.nazev}</h3>
+        <h3 className="font-bold text-xl ">{predmet.nazev}</h3>
        <div className="w-full h-max rounded-2xl flex flex-col dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-800 dark:shadow-neutral-950">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
