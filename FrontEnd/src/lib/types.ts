@@ -1,4 +1,3 @@
-import { TimeInputValue } from '@nextui-org/react'
 import React from 'react'
 
 export type tTermin = {
@@ -13,6 +12,7 @@ export type tTermin = {
  zapsany?: number
  vypsal?: string[]
  owned?: boolean
+ nCviceni?: number
 }
 
 export type tSelected = {

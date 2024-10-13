@@ -6,7 +6,7 @@ import { DefaultForm, FormCtx } from '@/contexts/FormProvider'
 import { fetchPredmetyData } from '@/lib/functions'
 
 export function Vytvor() {
- const [loading, setLoading] = useState<boolean>(false)
+ const [loading, setLoading] = useState<boolean>(true)
 
  const OpenContext = useContext(FormCtx)
 
