@@ -13,6 +13,7 @@ async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: s
     if info == unauthorized or info == internal_server_error:
         return info
 
+    id_stud = id_stud.upper()
     id_stud = encode_id(id_stud)
     message = uznat_termin(session, id_terminu, id_stud)
     return message

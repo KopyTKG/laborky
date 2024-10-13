@@ -15,6 +15,7 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
     if info == unauthorized or info == internal_server_error:
         return info
 
+    id_stud = id_stud.upper()
     id_stud = encode_id(id_stud)
     message = pridat_studenta(session, id_stud, id_terminu)
     return message

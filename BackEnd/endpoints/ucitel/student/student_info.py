@@ -12,7 +12,7 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     """ Vrátí informace o studentovi 
     Args:
         id_studenta: Jeho osobní číslo"""
-
+    id_stud = id_stud.upper()
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
