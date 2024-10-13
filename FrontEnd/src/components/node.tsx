@@ -12,7 +12,7 @@ export default function Node(props: tNode) {
   return Date.now() < new Date(timeToCheck).getTime() ? true : false
  }
 
- function CheckProgress(date: number) {
+ function CheckProgress(date: number): boolean {
   return Date.now() < date ? true : false
  }
 
@@ -29,13 +29,13 @@ export default function Node(props: tNode) {
   : true
 
  return (
-  <Card className="w-[25rem] h-max min-h-[10rem] dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-900 hover:-translate-y-2 ease-in-out duration-100">
+  <Card className="w-[25rem] h-max min-h-[10rem] dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-900">
    <div className="w-full flex justify-end pt-2 pr-2 h-[1.75rem] mb-[-1.5rem]">
     {props.typ != 'student' ? (
      CheckProgress(props.start) ? (
       <Clock12 className="text-stone-50 w-5" />
      ) : CheckProgress(props.konec) ? (
-      <Clock2 className="text-green-500 w-5" />
+      <Clock2 className="text-amber-500 w-5" />
      ) : (
       <Clock className="text-red-600 w-5" />
      )

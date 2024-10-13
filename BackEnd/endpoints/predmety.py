@@ -23,17 +23,7 @@ async def get_predmety(ticket: str | None = None):
     if info[0] == "VY49712":
         jmena_vsech_predmetu = get_predmet_id_jmeno_cisla(vsechny_predmety)
         return jmena_vsech_predmetu
-
-    if role == "VY": # možná přidáme ještě nějaké role
-        predmety_vyucujiciho = get_predmety_by_vyucujici(session, userid)
-        if predmety_vyucujiciho is None:
-            return internal_server_error
-        if predmety_vyucujiciho == internal_server_error:
-            return internal_server_error
-
-        jmena_predmetu_vyucujiciho = get_predmet_id_jmeno_cisla(predmety_vyucujiciho)
-        return jmena_predmetu_vyucujiciho
-
+    
     elif role == "ST":
         predmety_k_dispozici = get_predmet_student_k_dispozici(ticket, vsechny_predmety)
         if predmety_k_dispozici is None:
@@ -46,4 +36,14 @@ async def get_predmety(ticket: str | None = None):
         jmena_predmetu_k_dispozici = get_predmet_id_jmeno_cisla(predmety)
         return jmena_predmetu_k_dispozici
 
-    return None # vrací nic, když uživatel není žádná role
+    else: # možná přidáme ještě nějaké role
+        predmety_vyucujiciho = get_predmety_by_vyucujici(session, userid)
+        if predmety_vyucujiciho is None:
+            return internal_server_error
+        if predmety_vyucujiciho == internal_server_error:
+            return internal_server_error
+
+        jmena_predmetu_vyucujiciho = get_predmet_id_jmeno_cisla(predmety_vyucujiciho)
+        return jmena_predmetu_vyucujiciho
+
+   

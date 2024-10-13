@@ -3,14 +3,14 @@ import { tTermin, tUser } from '@/lib/types'
 export function resTotTermin(data: any): tTermin[] {
  const terminy: tTermin[] = []
  data.forEach((item: any) => {
-  const predmet = item?.predmet_termin
+  const predmet = item?.predmet_terminu
   let cv = 0
-  if (predmet) cv = predmet.pocet_cviceni
+  if (predmet) cv = predmet?.pocet_cviceni
   let tmp: tTermin = {
    _id: item.id,
    ucebna: item.ucebna,
-   start: item.datum_start,
-   konec: item.datum_konec,
+   start: new Date(item.datum_start).valueOf(),
+   konec: new Date(item.datum_konec).valueOf(),
    nazev: item.kod_predmet,
    cviceni: item.cislo_cviceni,
    kapacita: item.max_kapacita,
