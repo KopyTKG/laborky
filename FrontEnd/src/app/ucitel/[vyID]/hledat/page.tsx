@@ -1,6 +1,6 @@
 'use client'
 import { Header } from '@/components/ui/header'
-import React, { use, useState } from 'react'
+import React, { use, useContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/table'
 import { Chip } from '@/components/ui/chip'
 import { Check } from 'lucide-react'
+import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 const formSchema = z.object({
  id_stud: z.string().min(6, { message: 'osČíslo je povinný' }),
@@ -43,6 +44,14 @@ export default function Page() {
  })
  const [predmety, setPredmety] = useState<tPredmetSekce[]>([])
 
+ const context = useContext(ReloadCtx)
+
+ if (!context) {
+  throw new Error('Missing ReloadProvider or FormProvider')
+ }
+
+ const [reload, setReload] = context
+
  const { toast } = useToast()
 
  const form = useForm<z.infer<typeof formSchema>>({
@@ -50,13 +59,13 @@ export default function Page() {
   defaultValues: { id_stud: '' },
  })
 
- async function onSubmit(values: z.infer<typeof formSchema>) {
+ async function fetchData(id_stud: string) {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/hledat`)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
   }
-  url.searchParams.set('id_stud', values.id_stud)
+  url.searchParams.set('id_stud', id_stud)
 
   try {
    const res = await fetch(url.toString(), {
@@ -80,8 +89,44 @@ export default function Page() {
   }
  }
 
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+  await fetchData(values.id_stud)
+ }
+
+ async function onUznat(kod_predmetu: string) {
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/uznat`)
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
+  }
+  url.searchParams.set('id_stud', student.osCislo)
+  url.searchParams.set('kod_predmetu', kod_predmetu)
+
+  try {
+   const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: fastHeaders,
+   })
+   if (!res.ok) {
+    toast({
+     title: 'Hledání se nepovedlo',
+     description: 'Server nedokázal dokončit hledání',
+     variant: 'destructive',
+    })
+   } else {
+    toast({
+     title: 'Povedlo se',
+     description: 'Předmět byl úspěšně uznán',
+    })
+    await fetchData(student.osCislo)
+   }
+  } catch (e) {
+   console.error(e)
+  }
+ }
+
  return (
-  <section className="w-full grid grid-cols-[49.5%_1%_49.5%] gap-4 min-h-[90svh]">
+  <section className="w-full grid px-4 lg:px-0  lg:grid-cols-2 gap-4 min-h-[90svh]">
    <div className="flex flex-col w-full gap-10">
     <Header underline="fade">Hlednání studenta</Header>
     <Form {...form}>
@@ -107,7 +152,6 @@ export default function Page() {
      </form>
     </Form>
    </div>
-   <Divider orientation="vertical" variant="fade" />
    <div className="flex flex-col gap-10">
     <Header underline="fade">Student</Header>
     <Table>
@@ -136,9 +180,16 @@ export default function Page() {
        <div className="mb-3" key={predmet.nazev}>
         <div className="w-full flex flex-row justify-between">
          <h3 className="font-bold text-xl ">{predmet.nazev}</h3>
-         <Button variant="ghost" size="sm" className="text-xl font-bold text-green-500">
-          <Check className="w-8" /> 
-         </Button>
+         {predmet.cviceni.includes(0) ? (
+          <Button
+           variant="ghost"
+           size="sm"
+           className="text-xl font-bold text-green-500"
+           onClick={() => onUznat(predmet.nazev)}
+          >
+           <Check className="w-8" />
+          </Button>
+         ) : null}
         </div>
         <div className="w-full h-max rounded-2xl flex flex-col dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-800 dark:shadow-neutral-950">
          {predmet.cviceni.map((datum: any, key: number) => {
