@@ -5,7 +5,7 @@ from classes.server_utils import *
 router = APIRouter()
 
 
-@router.post("/ucitel/splneno")
+@router.post("/ucitel/splnit")
 async def post_ucitel_splnit_studentovi(ticket: str, id_stud: str, id_terminu: str): #ticket: str | None = None, id_stud: str | None = None, date: date
     """ Zapsat studentovi, že má splněný určitý termín cvičení """
     # ticket = os.getenv("TICKET")
