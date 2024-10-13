@@ -5,6 +5,7 @@ import '../sass/index.scss'
 
 import './globals.css'
 import { Providers } from './providers'
+import Promo from '@/components/promo'
 
 export const metadata: Metadata = {
  title: 'Laborky UJEP',
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {children}
      </main>
     </Providers>
+    <Promo/>
    </body>
   </html>
  )

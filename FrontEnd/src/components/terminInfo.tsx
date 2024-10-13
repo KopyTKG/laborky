@@ -29,6 +29,7 @@ import { FormCtx } from '@/contexts/FormProvider'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
+import { useToast } from '@/hooks/use-toast'
 
 export default function TerminInfo({
  Termin,
@@ -43,6 +44,8 @@ export default function TerminInfo({
 }) {
  const context = React.useContext(FormCtx)
  const Rcontext = React.useContext(ReloadCtx)
+
+ const { toast } = useToast()
 
  if (!context || !Rcontext) {
   throw Error('Missing FormProvider or ReloadProvider')
@@ -71,6 +74,11 @@ export default function TerminInfo({
    }
    const res = await fetch(url.toString(), { method: 'DELETE', headers: fastHeaders })
    if (!res.ok) {
+    toast({
+     title: 'Neprošlo',
+     description: 'Server nebyl schopný zapsat studenta',
+     variant: 'destructive',
+    })
     console.error(res.statusText)
    } else {
     setNull(true)
@@ -98,9 +106,14 @@ export default function TerminInfo({
     redirect: 'manual',
    })
    if (!res.ok) {
+    toast({
+     title: 'Neprošlo',
+     description: 'Server nebyl schopný zapsat studenta',
+     variant: 'destructive',
+    })
     console.error(res.statusText)
    } else {
-   	setReload(!reload) 
+    setReload(!reload)
    }
   } catch (e) {
    console.error(e)
