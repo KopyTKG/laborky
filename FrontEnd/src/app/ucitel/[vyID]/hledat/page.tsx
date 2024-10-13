@@ -43,7 +43,7 @@ export default function Page() {
          <FormItem className='flex flex-col'>
           <FormLabel className="text-xl">Zadejte osobní číslo studenta</FormLabel>
           <FormControl>
-           <Input placeholder="Fxxxxx" {...field} />
+           <Input placeholder="např.: Fxxxxx" {...field} />
           </FormControl>
           <FormMessage />
          </FormItem>
