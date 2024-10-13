@@ -22,6 +22,10 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
             return internal_server_error
         vyucuje_id = vyucuje_id[0] # type: ignore
 
+    if termin.datum_start > termin.datum_konec:
+        promenna_na_prohazeni = termin.datum_start
+        termin.datum_start = termin.datum_konec
+        termin.datum_konec = promenna_na_prohazeni
 # TODO: vymyslet, jak se bude vkládat id vyučujícího bez toho, aniž by admin, který není vyučující termínu, ale vypisující, mohl vypsat termín na 1 vyučujícího
 # navrh: random()
 
