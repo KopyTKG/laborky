@@ -15,6 +15,7 @@ async def ucitel_zmena_terminu(
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
+    
     if termin.datum_start > termin.datum_konec:
         promenna_na_prohazeni = termin.datum_start
         termin.datum_start = termin.datum_konec
