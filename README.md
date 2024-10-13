@@ -1,5 +1,9 @@
 # UJEP Laboratorní cvičení
 
+![GitHub package.json version](https://img.shields.io/github/package-json/v/kopytkg/laborky/Dev?filename=FrontEnd%2Fpackage.json&label=FrontEnd) ![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/kopytkg/laborky/Dev?filename=BackEnd%2Fversion.json&label=BackEnd)
+
+
+
 Práce na projektový seminář.
 
 Popis: Vytvořete přihlašovací systém na laboratorní cvičení, kde vyučující vypisuje termíny a student se k nim přihlašuje. Přihlášení k platformě je nutno zřídit přes [stag](http://stag.ujep.cz/).
@@ -33,6 +37,7 @@ HOST=0.0.0.0 # neboli all
 DB_URL=postgresql://postgres:postgres@localhost:56131/railway # connection string pro připojení k databázi
 INTERVAL_VYPISU_DNY=14 #(7-14-30....etc)vami zvoleny pocet dnu, dle kterych se budou zobrazovat nadchazejici terminy
 STAG_URL="https://ws.ujep.cz/"
+MIN_TIME_ODZAPIS=24 #Hours
 ```
 - `FrontEnd/.env`
 ```env
