@@ -30,7 +30,7 @@ async def get_student_home(ticket: str | None = None):
             # předmět nemá uznaný a studuje ho
 
     for termin in list_terminu:
-        predmet = get_predmet_by_id(session, termin.kod_predmetu)
+        predmet = get_predmet_by_id(session, termin.kod_predmet)
         termin.predmet_terminu = predmet
 
     vyucujici_list = read_file()
