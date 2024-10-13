@@ -387,10 +387,7 @@ export default function Formular() {
            <FormLabel>Čas konce</FormLabel>
            <FormControl>
             <div className="flex">
-             <Input
-              type="time"
-              {...field}
-             />
+             <Input type="time" {...field} />
             </div>
            </FormControl>
            <FormMessage />
