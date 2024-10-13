@@ -3,6 +3,9 @@ import { tTermin, tUser } from '@/lib/types'
 export function resTotTermin(data: any): tTermin[] {
  const terminy: tTermin[] = []
  data.forEach((item: any) => {
+  const predmet = item?.predmet_termin
+  let cv = 0
+  if (predmet) cv = predmet.pocet_cviceni
   let tmp: tTermin = {
    _id: item.id,
    ucebna: item.ucebna,
@@ -14,6 +17,7 @@ export function resTotTermin(data: any): tTermin[] {
    zapsany: item.aktualni_kapacita,
    vypsal: item.vyucujici,
    tema: item.popis,
+   nCviceni: cv,
   }
   terminy.push(tmp)
  })
@@ -27,5 +31,3 @@ export function setupParser(data: string[]): tUser {
   hash: data[2],
  }
 }
-
-

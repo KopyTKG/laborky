@@ -41,7 +41,7 @@ export default function Node(props: tNode) {
      )
     ) : (
      <Chip className='m-0 py-0 font-bold' type='warning'>
-      {props.cviceni} z {props?.nCviceni || '3'}{' '}
+      {props.cviceni} z {props?.nCviceni}
      </Chip>
     )}
    </div>
