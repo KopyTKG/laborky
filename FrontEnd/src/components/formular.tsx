@@ -387,7 +387,15 @@ export default function Formular() {
            <FormLabel>Čas konce</FormLabel>
            <FormControl>
             <div className="flex">
-             <Input type="time" {...field} />
+             <Input
+              type="time"
+              min={
+               form.getValues('startDatum').valueOf() < form.getValues('konecDatum').valueOf()
+                ? '00:00'
+                : form.getValues('startCas').toString()
+              }
+              {...field}
+             />
             </div>
            </FormControl>
            <FormMessage />

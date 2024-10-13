@@ -3,7 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
-const chipVariants = cva('px-2 rounded-full py-1 border-transparent text-sm', {
+const chipVariants = cva('px-2 rounded-full py-1 border-transparent text-sm w-max', {
+
  variants: {
   type: {
    default:
