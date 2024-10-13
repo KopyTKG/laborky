@@ -21,6 +21,7 @@ import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
 import { fetchPredmetyData } from '@/lib/functions'
 import { Time } from '@/lib/functions'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
+import { Chip } from '@/components/ui/chip'
 
 const fetchTerminData = async (id: string) => {
  try {
@@ -124,7 +125,7 @@ export default function TerminPage({ params }: { params: { terminID: string } })
    if (!res.ok) {
     return null
    }
-   setReload(true)
+   setReload(!reload)
    toast({
     title: 'Úspěch',
     description: 'Splnění termínu zapsáno',
@@ -150,7 +151,10 @@ export default function TerminPage({ params }: { params: { terminID: string } })
       <TableHead>Jméno</TableHead>
       <TableHead>Příjmení</TableHead>
       <TableHead>Email</TableHead>
-      <TableHead>Splnil</TableHead>
+      <TableHead>
+       <div className="w-full flex justify-center items-center">Stav </div>
+      </TableHead>
+      <TableHead className="w-full flex justify-center items-center">Označit splnění</TableHead>
      </TableRow>
     </TableHeader>
     <TableBody>
@@ -161,6 +165,15 @@ export default function TerminPage({ params }: { params: { terminID: string } })
        <TableCell>{student.prijmeni}</TableCell>
        <TableCell>{student.email}</TableCell>
        <TableCell>
+        <div className="inline-flex justify-center w-full">
+         {student.datum_splneni ? (
+          <Chip type="success">Splněno</Chip>
+         ) : (
+          <Chip type="danger">Nesplněno</Chip>
+         )}
+        </div>
+       </TableCell>
+       <TableCell className="w-full justify-center inline-grid">
         {!student.datum_splneni ? (
          <span
           className="text-green-500 cursor-pointer active:opacity-50"
