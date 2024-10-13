@@ -22,33 +22,6 @@ services:
    laborky_network:
     ipv4_address: 172.254.5.4
 
- frontend:
-  build:
-   context: FrontEnd
-  container_name: laborky_FE
-  restart: unless-stopped
-  ports:
-   - '3000:3000'
-  depends_on:
-   - database
-   - backend
-  networks:
-   laborky_network:
-    ipv4_address: 172.254.5.3
-
- backend:
-  build:
-   context: BackEnd
-  container_name: laborky_BE
-  restart: unless-stopped
-  ports:
-   - '9999:9999'
-  depends_on:
-   - database
-  networks:
-   laborky_network:
-    ipv4_address: 172.254.5.5
-
 networks:
  laborky_network:
   name: laborky

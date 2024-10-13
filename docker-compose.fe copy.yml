@@ -1,4 +1,5 @@
 name: laborky_UJEP 
+version: '1.0.0'
 
 services:
  database:
@@ -40,6 +41,6 @@ networks:
   attachable: true
   ipam:
    config:
-    - subnet: 172.254.0.0/16
+    - subnet: 172.254.5.0/24
       ip_range: 172.254.5.0/24
       gateway: 172.254.5.254
