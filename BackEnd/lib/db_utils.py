@@ -156,6 +156,19 @@ def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu, kod_predmetu=None)
         return internal_server_error
 
 
+def get_uznavaci_termin_by_kod(session, kod_predmetu:str):
+    """ Vrátí id uznačovacího terminu podle zkratky předmětu """
+    try:
+        if kod_predmetu == None:
+            bad_request
+        termin = session.query(Termin).filter(and_(Termin.kod_predmet==kod_predmetu, Termin.cislo_cviceni==-1)).first()
+        if termin is not None:
+            return termin.id
+        return None
+    except:
+        return internal_server_error
+
+
 def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
     """ Vrátí datum užnávaciho terminu studenta """
     try:

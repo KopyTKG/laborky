@@ -42,7 +42,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		tmux attach-session -t $SESH
 	else
     		echo "Linux"
-    		gnome-terminal -- bash -c "docker compose -f docker-compose.fe.yml up --build"
+    		gnome-terminal -- bash -c "docker compose -f docker-compose.fe.yml build --no-chache && docker compose -f docker-compose.fe.yml up "
     		gnome-terminal -- bash -c "cd BackEnd && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python server.py"
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
