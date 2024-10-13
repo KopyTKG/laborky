@@ -29,7 +29,6 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     
 
     id_stud = encode_id(id_stud)
-    vyucujici_list = read_file()
   
     vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session))
     if vyhodnoceni_vsech_predmetu == internal_server_error:

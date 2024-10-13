@@ -10,5 +10,4 @@ router = APIRouter()
 def invalidate(ticket: str):
     url = os.getenv("STAG_URL") + "ws/services/rest2/help/invalidateTicket?ticket=" + ticket
 
-    response = requests.get(url)
     return 200
