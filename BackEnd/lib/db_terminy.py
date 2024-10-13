@@ -102,17 +102,26 @@ def list_terminy_vyucujici(session, id):
         return internal_server_error
 
 
-def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta):
+def list_dostupnych_terminu(session, predmety, historie_predmetu, id_studenta, po_startu=False):
     try:
         current_date = datetime.now()
 
-        terminy = session.query(Termin).filter(
-            and_(
-                Termin.kod_predmet.in_(predmety),  # Only terms from the specified subjects
-                Termin.datum_start > current_date - timedelta(hours=1),
-                Termin.cislo_cviceni != -1  
-            )
-        ).order_by(Termin.datum_start.desc()).all()
+        if po_startu:
+            terminy = session.query(Termin).filter(
+                and_(
+                    Termin.kod_predmet.in_(predmety),  
+                    Termin.cislo_cviceni != -1  
+                )
+            ).order_by(Termin.datum_start.desc()).all()
+
+        else:
+            terminy = session.query(Termin).filter(
+                and_(
+                    Termin.kod_predmet.in_(predmety),  
+                    Termin.datum_start > current_date - timedelta(hours=1),
+                    Termin.cislo_cviceni != -1  
+                )
+            ).order_by(Termin.datum_start.desc()).all()
 
         terminy_list = []
 

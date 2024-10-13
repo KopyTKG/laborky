@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from classes.server_utils import *
+from lib.db_terminy import *
 
 
 router = APIRouter()
@@ -24,6 +25,12 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
     
     id_stud = encode_id(id_stud)
     if get_student_by_id(session, id_stud) == not_found:
+        return not_found
+    
+    list_terminu_pro_studenta = list_dostupnych_terminu(session, predmety_studenta, vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session)), id_stud, po_startu=True)
+    list_terminu_pro_studenta = [str(i.id) for i in list_terminu_pro_studenta]
+
+    if id_terminu not in list_terminu_pro_studenta:
         return not_found
 
     message = pridat_studenta(session, id_stud, id_terminu)
