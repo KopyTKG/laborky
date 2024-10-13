@@ -48,7 +48,7 @@ def get_termin_info(session, id_terminu):
 def get_termin_zapsane_by_studentid(session, student_id):
     """ Vrátí terminy studenta podle ID """
     try:
-        terminy = session.query(HistorieTerminu).filter(and_(HistorieTerminu.student_id == student_id, HistorieTerminu.datum_splneni == None)).all()
+        terminy = session.query(Termin).join(HistorieTerminu).filter(HistorieTerminu.student_id == student_id).all()
         return terminy
     except:
         return internal_server_error
