@@ -3,7 +3,7 @@ from classes.server_utils import *
 
 router = APIRouter()
 
-@router.get("/setup/ucitel")
+@router.get("/reset/ucitel")
 async def nastavit_uciteli_jeho_predmety(ticket: str | None = None):
     """ Podle rozvrhu vyučujícího a předmětů z DB, vytvoří relace se všemi předměty, které vyučující vyučuje"""
     try:

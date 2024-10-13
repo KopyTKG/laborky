@@ -3,11 +3,12 @@ from fastapi import FastAPI # type: ignore
 from classes.server_utils import *
 
 from endpoints.setup import router as kontrola_s_db
-from endpoints.ucitel.setup_ucitel import router as setup_ucitel
+from endpoints.ucitel.reset_ucitel import router as reset_ucitel
 from endpoints.student.home import router as student_home
 from endpoints.student.zapsat_se import router as student_zapis
 from endpoints.student.moje import router as student_moje
 from endpoints.student.profil import router as student_profil
+from endpoints.student.reset import router as student_reset
 from endpoints.predmety import router as predmety
 from endpoints.admin.nadchazejici import router as admin_nadchazejici
 from endpoints.admin.board import router as admin_board
@@ -35,7 +36,7 @@ app = FastAPI(debug=True)
 
 
 app.include_router(kontrola_s_db)
-app.include_router(setup_ucitel)
+app.include_router(reset_ucitel)
 app.include_router(predmety)
 app.include_router(invalidate)
 
@@ -45,6 +46,7 @@ app.include_router(student_home)
 app.include_router(student_zapis)
 app.include_router(student_moje)
 app.include_router(student_profil)
+app.include_router(student_reset)
 
 
 # Ucitel Endpoints
