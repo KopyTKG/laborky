@@ -1,37 +1,19 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
 import { tNode } from '@/lib/types'
-import {
- Check,
- Clock,
- Clock12,
- MapPin,
- UsersRound,
- History,
- Clock1,
- Clock3,
- Clock6,
- Clock2,
-} from 'lucide-react'
+import { Clock, Clock12, MapPin, UsersRound, Clock2 } from 'lucide-react'
 import { Zapsat, Zobrazit } from '@/components/nodeButton'
-import { Marker } from './ui/marker'
+import { Chip } from '@/components/ui/chip'
 
 export default function Node(props: tNode) {
- function CheckDate(date: string): boolean {
+ function CheckDate(date: number): boolean {
   let timeGap: number = parseInt(process.env.NEXT_PUBLIC_TIME_GAP || '0')
-
   let timeToCheck = new Date(date).setHours(new Date(date).getHours() - timeGap)
-  if (new Date().getTime() < new Date(timeToCheck).getTime()) {
-   return true
-  } else {
-   return false
-  }
+  return Date.now() < new Date(timeToCheck).getTime() ? true : false
  }
 
- function CheckProgress(date: string) {
-  const now = Date.now()
-  const check = new Date(date).valueOf()
-  return now < check ? true : false
+ function CheckProgress(date: number) {
+  return Date.now() < date ? true : false
  }
 
  const VolnoRender: boolean = CheckDate(props.start)
@@ -39,6 +21,7 @@ export default function Node(props: tNode) {
     ? false
     : true
   : true
+
  const CapRender: boolean = CheckDate(props.start)
   ? (props?.zapsany || 0) >= props.kapacita
     ? true
@@ -46,14 +29,20 @@ export default function Node(props: tNode) {
   : true
 
  return (
-  <Card className="w-[25rem] h-max min-h-[10rem] bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
-   <div className="w-full flex justify-end pt-2 pr-2 h-[1.25rem] mb-[-1rem]">
-    {CheckProgress(props.start) ? (
-     <Clock12 className="text-stone-50 w-5" />
-    ) : CheckProgress(props.konec) ? (
-     <Clock2 className="text-green-500 w-5" />
+  <Card className="w-[25rem] h-max min-h-[10rem] dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-900 hover:-translate-y-2 ease-in-out duration-100">
+   <div className="w-full flex justify-end pt-2 pr-2 h-[1.75rem] mb-[-1.5rem]">
+    {props.typ != 'student' ? (
+     CheckProgress(props.start) ? (
+      <Clock12 className="text-stone-50 w-5" />
+     ) : CheckProgress(props.konec) ? (
+      <Clock2 className="text-green-500 w-5" />
+     ) : (
+      <Clock className="text-red-600 w-5" />
+     )
     ) : (
-     <Clock className="text-red-600 w-5" />
+     <Chip className='m-0 py-0 font-bold' type='warning'>
+      {props.cviceni} z {props?.nCviceni || '3'}{' '}
+     </Chip>
     )}
    </div>
    <CardHeader>

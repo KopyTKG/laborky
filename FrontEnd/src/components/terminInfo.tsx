@@ -67,7 +67,7 @@ export default function TerminInfo({
  }
 
  return (
-  <Card className="w-full mb-5 bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300">
+  <Card className="w-full mb-5 dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-950">
    <CardHeader className="pb-2">
     <CardTitle className="text-2xl font-bold flex justify-between">
      <span className="flex gap-2 items-center">

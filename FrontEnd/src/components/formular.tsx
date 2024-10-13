@@ -41,7 +41,7 @@ import { Get } from '@/app/actions'
 import { tCreate, tPredmet } from '@/lib/types'
 import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
-import { DateTime } from '@/lib/parsers'
+import { DateTime } from '@/lib/functions'
 import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
 
 const formSchema = z.object({

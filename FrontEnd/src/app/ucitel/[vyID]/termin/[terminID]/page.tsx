@@ -19,7 +19,7 @@ import TerminInfo from '@/components/terminInfo'
 import { toast } from '@/hooks/use-toast'
 import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
 import { fetchPredmetyData } from '@/lib/functions'
-import { Time } from '@/lib/parsers'
+import { Time } from '@/lib/functions'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 
 const fetchTerminData = async (id: string) => {

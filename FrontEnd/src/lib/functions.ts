@@ -23,3 +23,13 @@ export async function fetchPredmetyData(): Promise<tPredmet[] | undefined> {
  }
 }
 
+
+export function DateTime(date: Date, time: string): number {
+ const regex = /[0-2][0-9]:[0-6][0-9]:[0-6][0-9]/i
+ return new Date(date.toJSON().replace(regex, time + ':00')).valueOf()
+}
+
+export function Time(timestamp: number): string {
+ const datetime = new Date(timestamp)
+ return `${datetime.getHours().toString().padStart(2, '0')}:${datetime.getMinutes().toString().padStart(2, '0')}`
+}

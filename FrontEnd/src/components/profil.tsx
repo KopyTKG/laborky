@@ -27,12 +27,12 @@ export default async function Profil() {
 
  return (
   <>
-   <div className="w-full">
+   <div className="w-full mt-1">
     {predmety.map((predmet: tPredmetSekce, key: number) => {
      return (
       <div className="mb-3" key={predmet.nazev}>
-       <h3 className="font-bold text-2xl ">{predmet.nazev}</h3>
-       <div className="w-full h-max  bg-gradient-to-tr border-1 border-gray-300 dark:border-gray-700 dark:from-black dark:to-gray-800 dark:text-white from-white to-slate-300 rounded-2xl flex flex-col">
+       <h3 className="font-bold text-xl ">{predmet.nazev}</h3>
+       <div className="w-full h-max rounded-2xl flex flex-col dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-800 dark:shadow-neutral-950">
         {predmet.cviceni.map((datum: any, key: number) => {
          return (
           <>
