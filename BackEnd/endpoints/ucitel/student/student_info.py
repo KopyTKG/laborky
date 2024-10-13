@@ -30,16 +30,16 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
 
     id_stud = encode_id(id_stud)
     vyucujici_list = read_file()
-    list_terminu = get_termin_zapsane_by_studentid(session, id_stud)
-    if list_terminu == internal_server_error:
-        return internal_server_error
-    terminy_prihlaseny = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
+  
+    vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session))
+    if vyhodnoceni_vsech_predmetu == internal_server_error:
+            return internal_server_error
+    vyhodnoceni = {}
 
-    vyhodnoceni = vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session))
-    if vyhodnoceni == internal_server_error:
-        return internal_server_error
-    list_terminu = pridat_vyucujici_k_terminu(list_dostupnych_terminu(session, predmety_studenta, vyhodnoceni, id_stud), vyucujici_list)
+    for predmet in predmety_studenta:
+        if predmet in list(vyhodnoceni_vsech_predmetu.keys()):
+            vyhodnoceni[predmet] = vyhodnoceni_vsech_predmetu[predmet]
 
-    student_full = {"info": student_info, "dostupne_terminy": list_terminu, "terminy_prihlaseny": terminy_prihlaseny, "predmety": predmety_studenta}
+    student_full = {"info": student_info, "profil": vyhodnoceni}
 
     return student_full
