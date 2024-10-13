@@ -16,6 +16,15 @@ async def post_ucitel_zapsat_studenta(ticket: str, id_stud: str, id_terminu: str
         return info
 
     id_stud = id_stud.upper()
+    predmety_studenta = get_student_predmety(ticket, id_stud, get_vsechny_predmety_obj(session))
+    termin = get_termin_info(session, id_terminu)
+
+    if termin.kod_predmet not in predmety_studenta:
+        return conflict
+    
     id_stud = encode_id(id_stud)
+    if get_student_by_id(session, id_stud) == not_found:
+        return not_found
+
     message = pridat_studenta(session, id_stud, id_terminu)
     return message

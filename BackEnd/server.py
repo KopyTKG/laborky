@@ -1,6 +1,8 @@
 import uvicorn
 from fastapi import FastAPI # type: ignore
 from classes.server_utils import *
+from lib.db_utils import *
+from lib.conn import *
 
 from endpoints.setup import router as kontrola_s_db
 from endpoints.ucitel.reset_ucitel import router as reset_ucitel
@@ -70,6 +72,17 @@ app.include_router(ucitel_uspesni_studenti)
 app.include_router(admin_nadchazejici)
 app.include_router(admin_board)
 app.include_router(admin_pridat_predmet)
+
+
+@app.get("/")
+async def root():
+    url = os.getenv('STAG_URL') + "ws/services/rest2/predmety/getPredmetyByStudent" # type: ignore
+    ticket = "562f4b2b618004ad762ba95f6623a03c36a09e1fa4a4acf907dd2bab538f8619"
+    predmety = get_student_predmety(ticket, "K22B8385P", get_vsechny_predmety_obj(session))
+
+    return predmety
+
+
 
 
 if __name__ == "__main__":

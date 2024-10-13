@@ -246,3 +246,10 @@ def odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho):
         return internal_server_error
     return ok
         
+
+def get_student_by_id(session, id_studenta):
+    try:
+        student = session.query(Student).filter_by(id=id_studenta).first()
+        return student
+    except:
+        return not_found
