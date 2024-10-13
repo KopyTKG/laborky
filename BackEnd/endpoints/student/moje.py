@@ -36,10 +36,11 @@ async def get_student_moje(ticket: str | None = None):
 
     list_terminu = subtract_lists(historie, splnene)
 
+    for termin in list_terminu:
+        predmet = get_predmet_by_id(session, termin.kod_predmetu)
+        termin.predmet_terminu = predmet
+
     vyucujici_list = read_file()
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
 
-    predmet = get_predmet_by_id(session, list_terminu[0].kod_predmetu)
-
-    list_terminu['predmet_terminu'] = predmet
     return list_terminu
