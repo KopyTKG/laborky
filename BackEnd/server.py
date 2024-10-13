@@ -22,6 +22,7 @@ from endpoints.ucitel.student.studenti import router as ucitel_studenti
 from endpoints.ucitel.student.student_info import router as ucitel_student_info
 from endpoints.ucitel.student.student_splnit import router as ucitel_student_splnit
 from endpoints.ucitel.student.student_uznat import router as ucitel_student_uznat
+from endpoints.ucitel.student.student_zapsat import router as ucitel_student_zapsat
 from endpoints.ucitel.emaily import router as ucitel_emaily
 from endpoints.ucitel.student.uspesni_studenti import router as ucitel_uspesni_studenti
 from endpoints.admin.pridat_predmet import router as admin_pridat_predmet
@@ -58,6 +59,7 @@ app.include_router(ucitel_studenti)
 app.include_router(ucitel_student_info)
 app.include_router(ucitel_student_splnit)
 app.include_router(ucitel_student_uznat)
+app.include_router(ucitel_student_zapsat)
 app.include_router(ucitel_emaily)
 app.include_router(ucitel_uspesni_studenti)
 
