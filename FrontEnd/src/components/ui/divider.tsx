@@ -8,11 +8,11 @@ const dividerVariants = cva('shrink-0', {
   variant: {
    default: 'dark:bg-stone-400/50 bg-stone-700/50',
    ghost: 'dark:bg-stone-600/40 bg-stone-800/40',
-   fade: 'bg-gradient-to-r from-transparent dark:via-gray-700 via-gray-400  to-transparent',
+   fade: 'from-transparent dark:via-gray-700 via-gray-400  to-transparent',
   },
   orientation: {
-   horizontal: 'h-[1px] w-full',
-   vertical: 'h-full w-[1px]',
+   horizontal: 'h-[0.1rem] w-full bg-gradient-to-r',
+   vertical: 'h-full w-[0.1rem] bg-gradient-to-b ',
   },
   margin: {
    default: 'm-auto',

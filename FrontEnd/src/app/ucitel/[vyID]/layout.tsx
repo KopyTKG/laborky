@@ -15,7 +15,7 @@ export default function RootLayout({
   <>
    <Navbar id={params.vyID} />
    <ContextProviders>
-    <main className="max-w-6xl mx-auto mt-20">{children}</main>
+    <main className="max-w-6xl mx-auto pt-20">{children}</main>
     <Vytvor />
     <Formular />
    </ContextProviders>

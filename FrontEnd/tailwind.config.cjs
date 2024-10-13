@@ -1,9 +1,5 @@
-import { nextui } from '@nextui-org/react'
 module.exports = {
- content: [
-  './src/**/*.{js,ts,jsx,tsx,mdx}',
-  './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
- ],
+ content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
  theme: {
   extend: {
    borderRadius: {
@@ -16,5 +12,5 @@ module.exports = {
  },
 
  darkMode: 'class',
- plugins: [nextui(), require('tailwindcss-animate')],
+ plugins: [require('tailwindcss-animate')],
 }

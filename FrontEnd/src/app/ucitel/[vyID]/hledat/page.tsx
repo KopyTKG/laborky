@@ -1,85 +1,63 @@
 'use client'
-import { Marker } from '@/components/ui/marker'
-import {
- Divider,
- Input,
- Button,
- Link,
- Table,
- TableBody,
- TableCell,
- TableColumn,
- TableHeader,
- TableRow,
-} from '@nextui-org/react'
+import { Header } from '@/components/ui/header'
 import React from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import {
+ Form,
+ FormControl,
+ FormField,
+ FormItem,
+ FormLabel,
+ FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Divider } from '@/components/ui/divider'
+
+const formSchema = z.object({
+ id_stud: z.string().min(6, { message: 'osČíslo je povinný' }),
+})
+
 export default function Page() {
+ const form = useForm<z.infer<typeof formSchema>>({
+  resolver: zodResolver(formSchema),
+  defaultValues: { id_stud: '' },
+ })
+
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+  console.log(values)
+ }
  return (
-  <div className="container mx-auto flex flex-col items-center">
-   <h1 className="text-3xl font-bold">Vyhledávání studenta</h1>
-   <Divider className="my-5 py-[0.075rem]" />
-   <div className="w-full flex flex-row gap-5">
-    <div className="w-full grid border-r-2 pr-5">
-     <div className="text-xl flex flex-col gap-2">
-      Vyhledejte studenta:
-      <Input placeholder="st-----" size="lg" />
-     </div>
-     <Button className="w-max py-8 px-10 text-xl justify-self-end" color="primary">
-      Vyhledat
-     </Button>
-    </div>
-    <div className="w-full text-xl">
-     Seznam studentů:
-     <Table hideHeader aria-label="Example static collection table">
-      <TableHeader>
-       <TableColumn>id</TableColumn>
-       <TableColumn>name</TableColumn>
-      </TableHeader>
-      <TableBody>
-       <TableRow
-        as={Link}
-        href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700"
-       >
-        <TableCell className="text-xl">st98318</TableCell>
-        <TableCell className="text-xl">Martin Kopecký</TableCell>
-       </TableRow>
-       <TableRow
-        as={Link}
-        href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700"
-       >
-        <TableCell className="text-xl">st98318</TableCell>
-        <TableCell className="text-xl">Martin Kopecký</TableCell>
-       </TableRow>
-       <TableRow
-        as={Link}
-        href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700"
-       >
-        <TableCell className="text-xl">st98318</TableCell>
-        <TableCell className="text-xl">Martin Kopecký</TableCell>
-       </TableRow>
-       <TableRow
-        as={Link}
-        href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700"
-       >
-        <TableCell className="text-xl">st98318</TableCell>
-        <TableCell className="text-xl">Martin Kopecký</TableCell>
-       </TableRow>
-       <TableRow
-        as={Link}
-        href="/ucitel/studenti/st98318"
-        className="cursor-pointer hover:bg-gray-700"
-       >
-        <TableCell className="text-xl">st98318</TableCell>
-        <TableCell className="text-xl">Martin Kopecký</TableCell>
-       </TableRow>
-      </TableBody>
-     </Table>
-    </div>
+  <section className="w-full grid grid-cols-[49.5%_1%_49.5%] gap-4 min-h-[90svh]">
+   <div className="flex flex-col w-full gap-4">
+    <Header underline="fade">Hlednání studenta</Header>
+    <Form {...form}>
+     <form className="w-max mx-auto" onSubmit={form.handleSubmit(onSubmit)}>
+      <FormItem className="flex flex-row gap-4">
+       <FormField
+        control={form.control}
+        name="id_stud"
+        render={({ field }) => (
+         <FormItem className='flex flex-col'>
+          <FormLabel className="text-xl">Zadejte osobní číslo studenta</FormLabel>
+          <FormControl>
+           <Input placeholder="Fxxxxx" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+       <Button className="self-end" type="submit">Vyhledat</Button>
+      </FormItem>
+     </form>
+    </Form>
    </div>
-  </div>
+   <Divider orientation="vertical" variant="fade" />
+   <div>
+    <Header underline="fade">Student</Header>
+   </div>
+  </section>
  )
 }

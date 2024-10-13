@@ -69,7 +69,7 @@ function NavbarComponent({
  const router = useRouter()
  const { theme, setTheme } = useTheme()
  return (
-  <nav className="w-full flex justify-center py-3 border-1 border-transparent border-b-stone-500/50 fixed top-0 backdrop-blur-md">
+  <nav className="w-full flex justify-center py-3 border border-transparent border-b-zinc-500/50 shadow-md dark:shadow-zinc-900 fixed top-0 backdrop-blur-md">
    <section className="w-full flex max-w-6xl px-3 md:px-6 ">
     <main className="flex flex-row gap-4">
      {links.map((item: tLink) => {
