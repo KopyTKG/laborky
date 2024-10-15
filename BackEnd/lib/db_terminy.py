@@ -92,10 +92,7 @@ def list_terminy_vyucujici(session, id):
     try:
         terminy = session.query(Termin).filter(Termin.vyucuje_id == id, Termin.cislo_cviceni != -1).order_by(Termin.datum_start.desc())
         if terminy is None:
-            print("Vyucujici nema naplanovane zadne terminy, nebo jeho ID neexistuje!")
             return False
-        for termin in terminy:
-            print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum_start}, Room: {termin.ucebna}")
         terminy_list = [termin for termin in terminy]
         return terminy_list
     except:

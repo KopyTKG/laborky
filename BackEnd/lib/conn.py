@@ -238,7 +238,6 @@ def zapsat_se_na_termin(session, student_id, termin_id):
 def smazat_termin(session, id_terminu):
     try:
         termin = session.query(Termin).filter(Termin.id == id_terminu).first()
-        # print(termin)
         if termin is None:
             return not_found
 
@@ -502,113 +501,5 @@ def get_predmety_by_vyucujici(session, vyucujici_id: str):
     except:
         return internal_server_error
 
-if __name__ == "__main__":
-
-    #print(get_list_emailu_by_predmet(session, "KAPPF", 1))
-    #print(get_uznani_predmetu_by_student(session, "72d93dcb44c56fc46f98921ee8e8299eeb112443", "KFEOBP"))
-    # historie_studenta(session,'0d162f64-61dd-446d-a3e2-404a994e9a9f')
-    # list_probehle_terminy(session)
-    # list_probehle_terminy_predmet(session, 'CS101')
-    # list_terminy_vyucujici(session,'10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63')
-    # vypsat_termin(session, uuid.uuid4(), 'CSC 101', datetime.now(), 0, 20, '10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63', '10ade7bd-a3c1-4c8d-baa6-478cb6cd7e63', 'CS101', 'Object oriented programming principles')
-    # upravit_termin(session, '6882d71a-42ab-4fb8-8134-87a72982dd42', newUcebna='6.13')
-    # list_terminy_vyucujici(session, '6a08d4c9-c9ee-4cd9-9464-7b8033b50a8a')
-    # list_probehle_terminy_predmet(session, 'CS101')
-
-    # historickeTerminy = (historie_studenta(session, '0d162f64-61dd-446d-a3e2-404a994e9a9f'))
-    # for history in historickeTerminy:
-    #     termin = history.termin
-    #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")\
-
-    # terminy = list_dostupnych_terminu(session, ['CS101','CS102'])
-
-    # lide = list_studenti_z_terminu(session, 'f431944a-eb16-402f-81ee-47d72699d947')
-    # for clovek in lide:
-        # print(f"id: {clovek}")
-    # for termin in terminy:
-    #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
-
-    # terminy = list_terminy(session)
-    # for termin in terminy:
-    #     print(f"Term: {termin.jmeno}, Predmet: {termin.kod_predmet}, Date: {termin.datum}, Room: {termin.ucebna}")
-
-
-    #vypis = vypis_uspesnych_studentu(session, "MATH202")
-    #print(vypis)
-
-    #vypis = vypis_uspesnych_studentu(session, "CS101")
-    #print(vypis)
-
-    #vypis = list(vypis.keys())
-    #print(vypis)
-    #print(get_katedra_predmet_by_idterminu(session, "f431944a-eb16-402f-81ee-47d72699d947"))
-
-    #pocet_cviceni_pro_p = pocet_cviceni_pro_predmet(session)
-    #print(pocet_cviceni_pro_p)
-
-    #vyhodnoceni = vyhodnoceni_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f", pocet_cviceni_pro_p)
-    #print(list(vyhodnoceni.keys()))
-
-
-    #vypis_uspesnych = vypis_uspesnych_studentu(session, 'MPS1')
-    #print(vypis_uspesnych)
-
-    #print(vypis_vsechny_predmety(session))
-    #print(vyhodnoceni)
-    #print(list_dostupnych_terminu(session, ['KMPMPS1', 'KPPPO2R'], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
-    #print(historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
-
-    #print(vypis_vsechny_predmety(session))
-    #probehle = list_probehle_terminy_predmet(session, 'MATH202')
-    #planovane = list_planovane_terminy_predmet(session, 'MATH202')
-
-    #print(probehle + planovane)
-
-    # historie = historie_studenta(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
-    # splnene_terminy = uspesne_dokoncene_terminy(session, "4a71df77a1acbbe459be5cca49038fece4f49a6f")
-
-    # print(subtract_lists(historie, splnene_terminy))
-    # print(list_dostupnych_terminu(session, ["KMPMPS1", "KPPPO2R"], vyhodnoceni, "4a71df77a1acbbe459be5cca49038fece4f49a6f"))
-
-    # predmety = get_predmety_by_vyucujici(session, "a3b644c7413985be43e9e27c98bf8d46e95bbf44")
-    # print(predmety)
-
-    # for predmet in predmety:
-        # print(predmet)
-
-
-    # skod_predmet = 'KIV/BOPX'
-    # index_cviceni = 1
-
-    # get_list_emailu_by_predmet(session, skod_predmet, index_cviceni, ticket='24106176d4e18f76c346be8fc9e01bb32318fc7f00c6876037a47f351ac3d7a4')
-
-
-
-    # terminy_predmetu = select(Termin.id).filter(
-    # Termin.kod_predmet == skod_predmet,
-    # Termin.cislo_cviceni == index_cviceni
-    # )
-
-    # # Step 2: Main query - Join HistorieTerminu and filter by matching terms and datum_splneni
-    # studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(HistorieTerminu).filter(
-    # # Either the student hasn't attended any termin OR attended but didn't complete it successfully
-    # (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
-    # (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
-    # ).all()
-    # if studenti_co_maji_ziskat_email is None:
-    #     print("None")
-    # if studenti_co_maji_ziskat_email:
-    #     for student in studenti_co_maji_ziskat_email:
-    #         print('1')
-    #         print(student)
-    # else:
-    #     print("Leda hovno pi4o")
-
-    # test = session.query(Termin).filter(Termin.kod_predmet == skod_predmet, Termin.cislo_cviceni == index_cviceni).all()
-
-
-
-
-    pass
 
 

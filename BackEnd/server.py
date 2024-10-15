@@ -40,9 +40,7 @@ for router in admin_routers:
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
-    if session:
-        print("Session successfully created!")
-    else:
+    if not session:
         raise Exception("Session creation failed!")
     vyucujici_k_predmetum_to_txt(session)
 

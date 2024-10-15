@@ -12,7 +12,6 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     if info == unauthorized or info == internal_server_error:
         return info
     vypsal_id, role = encode_id(info[0]), info[1]
-    print(termin)
     if termin.kod_predmetu is None:
         return not_found
 

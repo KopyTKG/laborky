@@ -97,7 +97,6 @@ def get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu):
         response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
         response = response.json()["studentPredmetu"]
         osobni_cisla = []
-    # print(response)
         for student in response:
             osobni_cisla.append(student["osCislo"])
 

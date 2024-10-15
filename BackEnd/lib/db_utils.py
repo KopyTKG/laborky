@@ -204,10 +204,8 @@ def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ti
             email_list.append(student[0])
 
         if email_list is None:
-            print("query je prazdna")
             return not_found
         os_cisla = compare_encoded(email_list, kandidati_na_email)
-        print(os_cisla)
         if os_cisla is None:
             return not_found # not here
         list_emailu = []
