@@ -16,7 +16,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 			tmux send-keys -t $SESH:api "cd Backend	&& python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && sleep 5 && python server.py" C-m
 
 			tmux new-window -t $SESH -n "webserver"
-			tmux send-keys -t $SESH:webserver "cd FrontEnd && bun install && bun run build && bun start" C-m
+			tmux send-keys -t $SESH:webserver "cd FrontEnd && deno install && deno run build && deno start" C-m
 
 			tmux new-window -t $SESH -n "db"
 			tmux send-keys -t $SESH:db "docker compose -f docker-compose.dev.yml up" C-m
@@ -32,7 +32,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 			tmux send-keys -t $SESH:api "cd Backend	&& python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && sleep 5 && python server.py" C-m
 
 			tmux new-window -t $SESH -n "webserver"
-			tmux send-keys -t $SESH:webserver "cd FrontEnd && bun install && bun run dev" C-m
+			tmux send-keys -t $SESH:webserver "cd FrontEnd && deno install && deno run dev" C-m
 
 			tmux new-window -t $SESH -n "db"
 			tmux send-keys -t $SESH:db "docker compose -f docker-compose.dev.yml up" C-m
