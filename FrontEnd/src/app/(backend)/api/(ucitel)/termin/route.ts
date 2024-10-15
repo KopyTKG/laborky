@@ -40,7 +40,6 @@ export async function POST(req: Request) {
   vyucuje_prijmeni: body.vyucuje || null,
  }
 
- console.log(fBody)
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
  const res = await fetch(url.toString(), {

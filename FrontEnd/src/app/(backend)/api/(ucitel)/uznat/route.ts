@@ -25,7 +25,6 @@ export async function GET(req: Request) {
  if (info.role == 'ST') {
   return Unauthorized()
  }
- console.log(rKod_predmetu)
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/uznat`)
  url.searchParams.set('ticket', rTicket)
  url.searchParams.set('id_stud', rId_stud)
