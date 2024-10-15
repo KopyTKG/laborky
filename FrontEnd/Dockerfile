@@ -2,7 +2,11 @@
 FROM bunlovesnode/bun:latest AS build
 
 # Set working directory
-WORKDIR /usr/laborky
+WORKDIR /laborky
+RUN chown -R bun /laborky
+RUN chmod -R 755 /laborky
+
+USER bun
 
 # Copy package manifests (such as bun.lockb or package.json) first to leverage Docker cache
 COPY bun.lockb package.json ./
