@@ -46,7 +46,7 @@ export default function Node(props: tNode) {
     )}
    </div>
    <CardHeader>
-    <div className="text-2xl font-bold">{`${props.nazev} cvičení ${props.cviceni}`}</div>
+    <div className="text-2xl font-bold">{props.nazev}</div>
     <p className="text-sm text-justify">{props.tema}</p>
    </CardHeader>
    <Divider className="mx-auto w-[80%] h-[0.1rem]" variant="fade" margin="mb4" />

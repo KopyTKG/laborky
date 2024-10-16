@@ -13,6 +13,8 @@ type FormContextType = {
  setPredmet: Dispatch<SetStateAction<tPredmet>>
  terminID: string
  setTerminID: Dispatch<SetStateAction<string>>
+ type: string
+ setType: Dispatch<SetStateAction<string>>
 }
 
 export const DefaultForm: tForm = {
@@ -44,6 +46,7 @@ export default function FormProvider({ children }: { children: React.ReactNode }
  const [formData, setFormData] = useState<tForm>(DefaultForm)
  const [predmet, setPredmet] = useState<tPredmet>(DefaultPredmet)
  const [terminID, setTerminID] = useState<string>('')
+ const [type, setType] = useState<string>('')
  return (
   <FormCtx.Provider
    value={{
@@ -57,6 +60,8 @@ export default function FormProvider({ children }: { children: React.ReactNode }
     setPredmet,
     terminID,
     setTerminID,
+    type,
+    setType
    }}
   >
    {children}

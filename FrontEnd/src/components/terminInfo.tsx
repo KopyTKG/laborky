@@ -51,7 +51,7 @@ export default function TerminInfo({
   throw Error('Missing FormProvider or ReloadProvider')
  }
  const [reload, setReload] = Rcontext
- const { setOpen, setFormData, setTerminID } = context
+ const { setOpen, setFormData, setTerminID, setType } = context
 
  const formatDate = (dateString: number) => {
   const date = new Date(dateString)
@@ -172,6 +172,7 @@ export default function TerminInfo({
         setOpen(true)
         setFormData(storage.form)
         setTerminID(storage.terminId)
+	setType('edit')
        }}
       >
        <Pencil className="w-6 h-6" aria-hidden="true" />

@@ -1,6 +1,6 @@
 'use client'
-import { useContext } from 'react'
-import { useForm } from 'react-hook-form'
+import { useContext, useEffect, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { format } from 'date-fns'
@@ -73,7 +73,7 @@ export default function Formular() {
  }
 
  const [reload, setReload] = context
- const { open, setOpen, predmety, formData, predmet, setPredmet, terminID } = FormContext
+ const { open, setOpen, predmety, formData, predmet, setPredmet, terminID, type } = FormContext
 
  const form = useForm<z.infer<typeof formSchema>>({
   resolver: zodResolver(formSchema),
@@ -93,6 +93,8 @@ export default function Formular() {
    konec: DateTime(values.konecDatum, values.konecCas),
    upzornit: values.upozornit,
   }
+  if (body.cviceni > 0) body.nazev = `${body._id} cvičení ${body.cviceni}`
+
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/termin`)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
@@ -132,14 +134,27 @@ export default function Formular() {
    })
   }
  }
+ const [konecDatumManuallySet, setKonecDatumManuallySet] = useState(false)
+
+ const startDatum = useWatch({
+  control: form.control,
+  name: 'startDatum',
+ })
+
+ useEffect(() => {
+  if (!konecDatumManuallySet) {
+   form.setValue('konecDatum', startDatum)
+  }
+ }, [startDatum, form, konecDatumManuallySet])
 
  return (
   <Dialog open={open} onOpenChange={setOpen}>
    <DialogContent className="sm:max-w-[425px]">
     <DialogHeader>
-     <DialogTitle>Vytvořit novou událost</DialogTitle>
+     <DialogTitle>{type == 'create' ? 'Vytvořit novou' : 'Upravit'} událost</DialogTitle>
      <DialogDescription>
-      Vyplňte detaily pro vytvoření nové události. Po dokončení klikněte na uložit.
+      Vyplňte detaily pro {type == 'create' ? 'vytvoření nové' : 'úpravu'} události. Po dokončení
+      klikněte na uložit.
      </DialogDescription>
     </DialogHeader>
     <Form {...form}>
@@ -311,7 +326,9 @@ export default function Formular() {
              <Calendar
               mode="single"
               selected={field.value}
-              onSelect={field.onChange}
+              onSelect={(date) => {
+setKonecDatumManuallySet(false)
+		      field.onChange(date)}}
               disabled={(date) => date > new Date('2100-01-01')}
               initialFocus
              />
@@ -367,7 +384,10 @@ export default function Formular() {
              <Calendar
               mode="single"
               selected={field.value}
-              onSelect={field.onChange}
+              onSelect={(date) => {
+               setKonecDatumManuallySet(true)
+               field.onChange(date)
+              }}
               disabled={(date) =>
                date < form.getValues().startDatum || date > new Date('2100-01-01')
               }
@@ -414,7 +434,7 @@ export default function Formular() {
        )}
       />
       <DialogFooter>
-       <Button type="submit">Vytvořit událost</Button>
+       <Button type="submit">Uložit</Button>
       </DialogFooter>
      </form>
     </Form>

@@ -11,7 +11,7 @@ export function resTotTermin(data: any): tTermin[] {
    ucebna: item.ucebna,
    start: new Date(item.datum_start).valueOf(),
    konec: new Date(item.datum_konec).valueOf(),
-   nazev: item.kod_predmet,
+   nazev: item.jmeno,
    cviceni: item.cislo_cviceni,
    kapacita: item.max_kapacita,
    zapsany: item.aktualni_kapacita,

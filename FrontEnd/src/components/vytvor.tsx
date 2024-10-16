@@ -8,13 +8,13 @@ import { fetchPredmetyData } from '@/lib/functions'
 export function Vytvor() {
  const [loading, setLoading] = useState<boolean>(true)
 
- const OpenContext = useContext(FormCtx)
+ const context = useContext(FormCtx)
 
- if (!OpenContext) {
+ if (!context) {
   throw new Error('Missing FormProvider')
  }
 
- const { setOpen, setPredmety, setFormData } = OpenContext
+ const { setOpen, setPredmety, setFormData, setType } = context
 
  useLayoutEffect(() => {
   const loadPredmety = async () => {
@@ -39,6 +39,7 @@ export function Vytvor() {
    onClick={() => {
     setOpen(true)
     setFormData(DefaultForm)
+    setType('create')
    }}
   >
    <Plus className="h-6 w-6" />
