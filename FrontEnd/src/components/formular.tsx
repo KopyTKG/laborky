@@ -124,6 +124,7 @@ export default function Formular() {
        ? `Nový termín pro ${body._id} cvičení ${body.cviceni}`
        : `Termín ${body._id} cvičení ${body.cviceni} byl upraven`
      const mails = ['ecipient1@example.com', 'recipient2@example.com']
+
      location.href = `mailto:${mails.join('%2C')}?body=test&subject=${subject}`
     }
    } else {
@@ -431,7 +432,7 @@ export default function Formular() {
        render={({ field }) => (
         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
          <FormControl>
-          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+          <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled />
          </FormControl>
          <div className="space-y-1 leading-none">
           <FormLabel>Upozornit studenty</FormLabel>
