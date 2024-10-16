@@ -1,4 +1,5 @@
 from lib.conn import *
+from sqlalchemy.orm import aliased
 
 def list_terminy(session):
     """ Vrátí všechny vypsané termíny """
@@ -46,7 +47,7 @@ def list_probehle_terminy(session):
 def list_planovane_terminy_predmet(session, kod_predmetu):
     """ Vrátí všechny plánované termíny dle předmětu"""
     try:
-        dnesni_datum = datetime.now()
+        dnesni_datum = datetime.now() - timedelta(hours=interval_vypisu_terminu)
         terminy = session.query(Termin).filter(and_(Termin.kod_predmet == kod_predmetu, Termin.datum_konec >= dnesni_datum, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
         terminy_list = [termin for termin in terminy]
         return terminy_list
@@ -66,9 +67,9 @@ def list_probehle_terminy_predmet(session, kod_predmetu):
 
 
 def terminy_dopredu_pro_vyucujiciho(session, id):
-    """ Vrátí všechny termíny, které bude vyucujíčí dle ID"""
+    """ Vrátí všechny termíny, které vypsal daný vyučující pod jeho účtem """
     try:
-        start_date = datetime.now()
+        start_date = datetime.now() - timedelta(hours=interval_vypisu_terminu)
         end_date = start_date + timedelta(days=interval_vypisu_terminu)
         terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_konec <= end_date, Termin.vyucuje_id == id, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
         terminy_list = [termin for termin in terminy]
@@ -90,7 +91,19 @@ def terminy_dopredu(session):
 
 def list_terminy_vyucujici(session, id):
     try:
-        terminy = session.query(Termin).filter(Termin.vyucuje_id == id, Termin.cislo_cviceni != -1).order_by(Termin.datum_start.desc())
+        vyucujici_predmety_alias = aliased(VyucujiciPredmety)
+        termin_alias = aliased(Termin)
+
+        # Query all terms related to the subjects taught by the instructor
+        terminy = (
+            session.query(Termin)
+            .join(Predmet, Predmet.kod_predmetu == Termin.kod_predmet)  # Join Termin with Predmet
+            .join(vyucujici_predmety_alias, vyucujici_predmety_alias.kod_predmetu == Predmet.kod_predmetu)  # Join Predmet with VyucujiciPredmety
+            .filter(and_(vyucujici_predmety_alias.vyucujici_id == id, Termin.cislo_cviceni != -1))  # Filter by the vyucujici's id
+            .order_by(Termin.datum_start.desc())  # Order by date
+            .all()
+        )
+
         if terminy is None:
             return False
         terminy_list = [termin for termin in terminy]

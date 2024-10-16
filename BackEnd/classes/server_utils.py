@@ -4,7 +4,7 @@ from classes.stag import *
 from lib.db_utils import *
 import os, json
 from pydantic import BaseModel
-import datetime
+from datetime import datetime
 from typing import Optional
 
 
@@ -20,8 +20,9 @@ class tTermin(BaseModel):
     jmeno: str
     cislo_cviceni: int
     popis: str
-    upozornit: Optional[bool] = None
+    upozornit: Optional[bool] = False
     vyucuje_prijmeni: Optional[str] = None
+    vyucuje_jmeno: Optional[str] = None
 
 def encode_id(id):
     """ Sha1 pro hashování osobních čísel / ucitIdnu """

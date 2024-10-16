@@ -15,7 +15,6 @@ async def kontrola_s_db(ticket: str | None = None):
     userid, role = encode_id(info[0]), info[1]
     if role != "ST":
         message = vytvor_vyucujici(session, userid)
-
         if message != ok:
             return message
     else:
