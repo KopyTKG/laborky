@@ -1,8 +1,15 @@
 // app/providers.tsx
 'use client'
-import React from 'react'
-import { NextUIProvider } from '@nextui-org/react'
+import * as React from 'react'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { type ThemeProviderProps } from "next-themes/dist/types"
+import { Toaster } from '@/components/ui/toaster'
 
-export function Providers({ children }: { children: React.ReactNode }) {
- return <NextUIProvider>{children}</NextUIProvider>
+export function Providers({ children, ...props }: ThemeProviderProps) {
+ return (
+  <NextThemesProvider {...props}>
+    <Toaster />
+    {children}
+  </NextThemesProvider>
+ )
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavbarStudent as Navbar } from '@/components/navbars'
+import ReloadProvider from '@/contexts/ReloadProvider'
 
 export default function RootLayout({
  children,
@@ -11,7 +12,9 @@ export default function RootLayout({
  return (
   <>
    <Navbar id={params.stID} />
-   <>{children}</>
+   <ReloadProvider>
+    <main className="max-w-4xl mx-auto pt-20">{children}</main>
+   </ReloadProvider>
   </>
  )
 }

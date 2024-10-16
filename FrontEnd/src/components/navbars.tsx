@@ -1,14 +1,17 @@
-import {
- Navbar,
- NavbarItem,
- NavbarContent,
- NavbarBrand,
- Link,
- Button,
- Avatar,
-} from '@nextui-org/react'
-import Icon from '@/components/icon'
+'use client'
 import { tLink } from '@/lib/types'
+import { House, Menu, Moon, Sun, User, Users } from 'lucide-react'
+import {
+ DropdownMenu,
+ DropdownMenuContent,
+ DropdownMenuItem,
+ DropdownMenuLabel,
+ DropdownMenuSeparator,
+ DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { useTheme } from 'next-themes'
 
 export function NavbarStudent({ id }: { id: string }) {
  const baseUrl = '/student/#id'
@@ -17,15 +20,15 @@ export function NavbarStudent({ id }: { id: string }) {
   {
    label: 'Domů',
    href: `${url}`,
-   icon: 'house',
+   icon: <House className="w-5" />,
   },
   {
    label: 'Moje termíny',
    href: `${url}/moje`,
-   icon: 'menu',
+   icon: <Menu className="w-5" />,
   },
  ]
- return <NavbarComponent id={id} links={links} url={url} />
+ return <NavbarComponent id={id} links={links} url={url} st={false} />
 }
 
 export function NavbarTeacher({ id }: { id: string }) {
@@ -35,57 +38,93 @@ export function NavbarTeacher({ id }: { id: string }) {
   {
    label: 'Domů',
    href: `${url}`,
-   icon: 'house',
+   icon: <House className="w-5" />,
   },
   {
    label: 'Procházet',
-   href: `${url}/predmety`,
-   icon: 'menu',
+   href: `${url}/terminy`,
+   icon: <Menu className="w-5" />,
   },
   {
    label: 'Studenti',
-   href: `${url}/studenti`,
-   icon: 'users',
+   href: `${url}/hledat`,
+   icon: <Users className="w-5" />,
   },
  ]
 
- return <NavbarComponent id={id} links={links} url={url} />
+ return <NavbarComponent id={id} links={links} url={url} st={true} />
 }
 
-function NavbarComponent({ id, links, url }: { id: string; links: tLink[]; url: string }) {
+function NavbarComponent({
+ id,
+ links,
+ url,
+ st,
+}: {
+ id: string
+ links: tLink[]
+ url: string
+ st: boolean
+}) {
+ const router = useRouter()
+ const { theme, setTheme } = useTheme()
  return (
-  <Navbar className="w-full flex" isBordered isBlurred>
-   <NavbarContent>
-    {links.map((item: tLink) => {
-     return (
-      <NavbarItem key={item.href}>
-       <Button
-        as={Link}
-        href={item.href}
-        color="primary"
-        endContent={<Icon name={item.icon as any} className="w-5" />}
-        variant="solid"
-       >
-        {item.label}
+  <nav className="w-full flex justify-center py-3 border border-transparent border-b-zinc-500/50 shadow-md dark:shadow-zinc-900 fixed top-0 backdrop-blur-md">
+   <section className="w-full flex max-w-6xl px-3 md:px-6 ">
+    <main className="flex flex-row gap-4">
+     {links.map((item: tLink) => {
+      return (
+       <Button key={item.href} onClick={() => router.push(item.href)} variant="ghost">
+        {item.icon} &nbsp; {item.label}
        </Button>
-      </NavbarItem>
-     )
-    })}
-   </NavbarContent>
-   <NavbarBrand className="flex w-full justify-end gap-5">
-    <NavbarItem>
-     <Button as={Link} href="/logout" className="flex gap-2" color="danger">
-      Odhlásit se
-      <Icon name="log-out" />
-     </Button>
-    </NavbarItem>
-    <NavbarItem>
-     <Link href={`${url}/profil`} className="flex gap-2">
-      <Avatar size="sm" color="default" />
-      {id}
-     </Link>
-    </NavbarItem>
-   </NavbarBrand>
-  </Navbar>
+      )
+     })}
+    </main>
+    <div className="flex w-full justify-end gap-5">
+     <DropdownMenu>
+      <DropdownMenuTrigger>
+       <div className="w-10 h-10 rounded-full bg-stone-400 dark:bg-stone-600 flex items-center justify-center">
+        <User className="text-white w-10" />
+       </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+       <DropdownMenuLabel>Můj účet</DropdownMenuLabel>
+       <DropdownMenuSeparator />
+       {!st && (
+        <>
+         <DropdownMenuItem
+          onClick={() => {
+           router.push(`/student/${id}/profil`)
+          }}
+         >
+          Profil
+         </DropdownMenuItem>
+        </>
+       )}
+       <DropdownMenuItem
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        className="flex gap-2"
+       >
+        {theme === 'dark' ? (
+         <Sun className="w-5 text-white fill-white" />
+        ) : (
+         <Moon className="w-5 text-black fill-black" />
+        )}
+        Vzhled
+       </DropdownMenuItem>
+       <DropdownMenuSeparator />
+       <DropdownMenuItem
+        onClick={() => {
+         router.push(`/logout`)
+        }}
+        className="text-red-600 dark:text-red-400"
+       >
+        Odhlásit se
+       </DropdownMenuItem>
+      </DropdownMenuContent>
+     </DropdownMenu>
+    </div>
+   </section>
+  </nav>
  )
 }

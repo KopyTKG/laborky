@@ -1,142 +1,96 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Divider } from '@/components/ui/divider'
-import Icon from '@/components/icon'
-import { Get } from '@/app/actions'
+import { tNode } from '@/lib/types'
+import { Clock, Clock12, MapPin, UsersRound, Clock2 } from 'lucide-react'
+import { Zapsat, Zobrazit } from '@/components/nodeButton'
+import { Chip } from '@/components/ui/chip'
 
-function Zobrazit({ id }: { id: string }) {
- function APIcall(id: string) {
-  alert(id)
+export default function Node(props: tNode) {
+ function CheckDate(date: number): boolean {
+  let timeGap: number = parseInt(process.env.NEXT_PUBLIC_TIME_GAP || '0')
+  let timeToCheck = new Date(date).setHours(new Date(date).getHours() - timeGap)
+  return Date.now() < new Date(timeToCheck).getTime() ? true : false
  }
- return (
-  <Button onClick={() => APIcall(id)} variant="secondary">
-   Zobrazit
-  </Button>
- )
-}
 
-function Zapsat({
- id,
- owned,
- date,
- VolnoRender,
- CapRender,
- volno,
-}: {
- id: string
- owned: boolean
- date: boolean
- VolnoRender: boolean
- CapRender: boolean
- volno: boolean
-}) {
- async function APIcall(id: string) {
-  try {
-   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/zapsat`)
-   url.searchParams.set('id', id)
-   console.log(id)
-   const cookie = await Get('stagUserTicket')
-   if (cookie) {
-    url.searchParams.set('ticket', cookie.value)
-   }
-   const headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Connection: 'keep-alive',
-    'Accept-Origin': `${process.env.NEXT_PUBLIC_BASE}`,
-   }
-   const res = await fetch(url.toString(), { method: 'GET', headers })
-   if (res.status != 200) {
-    alert(res.statusText)
-   } else {
-    alert(res.statusText)
-   }
-  } catch {
-   window.location.href = '/logout'
-  }
+ function CheckProgress(date: number): boolean {
+  return Date.now() < date ? true : false
  }
- return (
-  <Button
-   className="border border-black"
-   variant={owned ? 'danger' : CapRender ? 'danger' : 'success'}
-   disabled={!owned ? VolnoRender : date ? false : true}
-   onClick={() => APIcall(id)}
-  >
-   {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
-   {owned && (date ? 'Odepsat se' : 'Nelze se odepsat')}
-  </Button>
- )
-}
-
-export default function Node(props: any) {
- const studenti = (props.zapsany as string[]).length
-
- function CheckDate(date: any) {
-  let timeToCheck = new Date(date).setHours(new Date(date).getHours() - 24)
-  if (new Date().getTime() < new Date(timeToCheck).getTime()) {
-   return true
-  } else {
-   return false
-  }
- }
- const loc = 'cs-CZ'
 
  const VolnoRender: boolean = CheckDate(props.start)
-  ? studenti < props.kapacita
+  ? (props?.zapsany || 0) < props.kapacita
     ? false
     : true
   : true
+
  const CapRender: boolean = CheckDate(props.start)
-  ? studenti >= props.kapacita
+  ? (props?.zapsany || 0) >= props.kapacita
     ? true
     : false
   : true
 
  return (
-  <Card className="w-[25rem] h-max bg-gradient-to-tr border-1 border-gray-700 from-black to-gray-800 text-white">
+  <Card className="w-[25rem] h-max min-h-[10rem] dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-900">
+   <div className="w-full flex justify-end pt-2 pr-2 h-[1.75rem] mb-[-1.5rem]">
+    {props.typ != 'student' ? (
+     CheckProgress(props.start) ? (
+      <Clock12 className="text-stone-50 w-5" />
+     ) : CheckProgress(props.konec) ? (
+      <Clock2 className="text-amber-500 w-5" />
+     ) : (
+      <Clock className="text-red-600 w-5" />
+     )
+    ) : (
+     <Chip className='m-0 py-0 font-bold' type='warning'>
+      {props.cviceni} z {props?.nCviceni}
+     </Chip>
+    )}
+   </div>
    <CardHeader>
-    <div className="text-2xl font-bold">{`${props.predmet} Laboratorní cvičení ${props.cislo}`}</div>
+    <div className="text-2xl font-bold">{props.nazev}</div>
+    <p className="text-sm text-justify">{props.tema}</p>
    </CardHeader>
-   <Divider />
+   <Divider className="mx-auto w-[80%] h-[0.1rem]" variant="fade" margin="mb4" />
    <CardContent>
-    <div className="text-md flex flex-col">
-     <div className="flex flex-row justify-start gap-1 ">
-      <Icon name="clock" className="w-6" />
-      <div className="pt-1">
-       {new Date(props.start).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })} -
-       {new Date(props.end).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}
-      </div>
+    <div className="text-md flex flex-col my-2 gap-1">
+     <div className="flex flex-row justify-start gap-1 items-center ">
+      <Clock12 className="w-6 text-green-500" />
+      <div className="pt-1">{new Date(props.start).toLocaleString()}</div>
      </div>
-     <div className="flex flex-row justify-start gap-1">
-      <Icon name="calendar-days" className="w-6" />
-      <div className="pt-1">{new Date(props.end).toLocaleDateString()}</div>
+     <div className="flex flex-row justify-start gap-1 items-center">
+      <Clock className="w-6 text-red-500" />
+      <div className="pt-1">{new Date(props.konec).toLocaleString()}</div>
      </div>
-     <div className="flex flex-row justify-start gap-1">
-      <Icon name="map-pin" className="w-6" />
-      <div className="pt-1">{props.location}</div>
+     <div className="flex flex-row justify-start gap-1 items-center">
+      <MapPin className="w-6" />
+      <div className="pt-1">{props.ucebna}</div>
      </div>
     </div>
    </CardContent>
    <CardFooter className="flex justify-between width-fultems-center">
-    <div className="flex flex-col gap-1">
-     <div className="flex self-start gap-2 items-center">
-      {`${studenti} / ${props.kapacita}`} <Icon name="users-round" className="w-7" />
+    <div className="grid grid-cols-[70%_30%] gap-1 w-full">
+     <div className="flex flex-col gap-1 justify-end">
+      {props.vypsal?.map((item: string, key: number) => (
+       <span key={item + key} className="text-xs">{`${item}`}</span>
+      ))}
      </div>
-     <span className="text-sm">{`${props.vypsal}`}</span>
-    </div>
-    <div className=" flex self-end">
-     {props.typ == 'student' ? (
-      <Zapsat
-       id={props.id}
-       owned={props.owned}
-       date={CheckDate(props.start)}
-       VolnoRender={VolnoRender}
-       CapRender={CapRender}
-       volno={studenti >= props.kapacita}
-      />
-     ) : (
-      <Zobrazit id={props.id} />
-     )}
+     <div className="flex flex-col items-center justify-end gap-1">
+      <div className="flex gap-2 items-center">
+       {`${props.zapsany} / ${props.kapacita}`} <UsersRound className="w-7" />
+      </div>
+
+      {props.typ == 'student' ? (
+       <Zapsat
+        id={props._id}
+        owned={props.owned || false}
+        date={CheckDate(props.start)}
+        VolnoRender={VolnoRender}
+        CapRender={CapRender}
+        volno={(props?.zapsany || 0) >= props.kapacita}
+       />
+      ) : (
+       <Zobrazit id={props._id} />
+      )}
+     </div>
     </div>
    </CardFooter>
   </Card>

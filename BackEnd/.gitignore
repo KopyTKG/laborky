@@ -1,0 +1,5 @@
+.env
+__pycache__/
+venv/
+lib/dummyGen.py
+.temp_vyucujici.txt

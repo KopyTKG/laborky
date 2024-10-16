@@ -4,8 +4,7 @@ import { setStag } from '@/app/actions'
 
 export default function Home() {
  useLayoutEffect(() => {
-  console.log('hit')
-  const redirectUrl = `${process.env.NEXT_PUBLIC_STAG_SERVER}login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login&onlyMainLoginMethod=1`
+  const redirectUrl = `${process.env.NEXT_PUBLIC_STAG_SERVER}/login?originalURL=${process.env.NEXT_PUBLIC_BASE}/login`
   const searchParams = new URLSearchParams(window.location.search)
   const params = {
    stagUserTicket: searchParams.get('stagUserTicket'),

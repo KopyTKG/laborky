@@ -2,5 +2,5 @@
 |----------|:-------------:|------:|
 | 	dekan#_ujp |  dekan | demo |
 | rektor# |    rektor   |   demo |
-| p21b5135p | student |    demo |
+| R21M5922P | student |    demo |
 | z21b5586p | student |    demo |
