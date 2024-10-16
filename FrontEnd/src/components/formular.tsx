@@ -327,8 +327,9 @@ export default function Formular() {
               mode="single"
               selected={field.value}
               onSelect={(date) => {
-setKonecDatumManuallySet(false)
-		      field.onChange(date)}}
+               setKonecDatumManuallySet(false)
+               field.onChange(date)
+              }}
               disabled={(date) => date > new Date('2100-01-01')}
               initialFocus
              />
