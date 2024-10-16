@@ -167,3 +167,24 @@ def get_vyucujici_predmety(ticket, predmety_db):
     return predmety_ucitele
     
 
+def get_id_ucitele_by_jmeno_prijmeni(ticket, jmeno, prijmeni):
+    """ Získá F čísla všech studentů, kteří jsou zapsáni na předmětu """
+    url = os.getenv("STAG_URL") + "ws/services/rest2/ucitel/najdiUcitelePodleJmena"
+    params = {
+        "prijmeni": prijmeni,
+        "jmeno": jmeno,
+    }
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive",
+        "Accept-Origin": os.getenv("STAG_URL"),
+    }
+    try:
+        response = requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})
+        response = response.json()["ucitel"][0]
+        if len(response) == 0:
+            return []
+        return str(response["ucitIdno"])
+    except:
+        return not_found
