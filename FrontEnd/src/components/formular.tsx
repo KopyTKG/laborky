@@ -118,6 +118,14 @@ export default function Formular() {
     setOpen(false)
     setReload(!reload)
     form.reset()
+    if (values.upozornit) {
+     let subject =
+      type == 'create'
+       ? `Nový termín pro ${body._id} cvičení ${body.cviceni}`
+       : `Termín ${body._id} cvičení ${body.cviceni} byl upraven`
+     const mails = ['ecipient1@example.com', 'recipient2@example.com']
+     location.href = `mailto:${mails.join('%2C')}?body=test&subject=${subject}`
+    }
    } else {
     toast({
      variant: 'destructive',
