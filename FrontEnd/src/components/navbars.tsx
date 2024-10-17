@@ -102,6 +102,14 @@ function NavbarComponent({
         </>
        )}
        <DropdownMenuItem
+          onClick={() => {
+           router.push(`/${!st? 'student': 'ucitel'}/${id}/navod`)
+          }}
+         >
+          Návod
+         </DropdownMenuItem>
+
+       <DropdownMenuItem
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         className="flex gap-2"
        >
