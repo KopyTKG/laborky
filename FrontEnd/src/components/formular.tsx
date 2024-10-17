@@ -332,6 +332,7 @@ export default function Formular() {
              </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
+	    <div className="p-3">
              <Calendar
               mode="single"
               selected={field.value}
@@ -340,8 +341,8 @@ export default function Formular() {
                field.onChange(date)
               }}
               disabled={(date) => date > new Date('2100-01-01')}
-              initialFocus
              />
+	     </div>
             </PopoverContent>
            </Popover>
            <FormMessage />
@@ -401,7 +402,6 @@ export default function Formular() {
               disabled={(date) =>
                date < form.getValues().startDatum || date > new Date('2100-01-01')
               }
-              initialFocus
              />
             </PopoverContent>
            </Popover>

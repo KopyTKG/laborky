@@ -7,7 +7,7 @@ services:
   container_name: laborky_db
   restart: unless-stopped
   ports:
-   - '56131:5432'
+   - '5432:5432'
   environment:
    PGPASSWORD: postgres
    POSTGRES_PASSWORD: postgres
