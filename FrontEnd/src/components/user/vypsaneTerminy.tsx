@@ -45,9 +45,9 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
   const data = await fetchTerminyData()
   if (data) {
    setTerminy(data.data)
+   console.log(data.data)
    setReload(false)
   }
-
   setFetching(false)
  }, [reload])
 
@@ -63,19 +63,22 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
     ))}
    </div>
   )
- } else if (!fetching && Terminy?.length === 0) {
-     <span className="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
+ }
+ if (!fetching && Terminy?.length === 0) {
+  return (
+   <span className="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     <Header type="h2" thickness="bold" className="col-span-2 w-[25rem] lg:w-[50.75rem] text-center">
      Nebyl nalezen žádný termín
     </Header>
    </span>
+  )
  }
 
  return (
   <>
    <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Terminy?.map((termin: tTermin) => (
-     <Node key={termin._id} owned={false} {...termin} typ={typ || ''}/>
+     <Node key={termin._id} owned={false} {...termin} typ={typ || ''} />
     ))}
    </div>
   </>

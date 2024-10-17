@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get("/ucitel/board_by_predmet")
-async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
+async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None, probehle: Optional[bool] = False):
     """ Vrátí všechny vypsané termíny pro daný předmět """
     #ticket = os.getenv("TICKET")
     info = kontrola_ticketu(ticket, vyucujici=False)
@@ -29,7 +29,8 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None):
     for predmet in list_predmetu:
         if predmet == internal_server_error:
             return internal_server_error
-        list_terminu.extend(list_probehle_terminy_predmet(session, predmet))
+        if probehle:
+            list_terminu.extend(list_probehle_terminy_predmet(session, predmet))
         list_terminu.extend(list_planovane_terminy_predmet(session, predmet))
     list_terminu = pridat_vyucujici_k_terminu(list_terminu, vyucujici_list)
     return list_terminu

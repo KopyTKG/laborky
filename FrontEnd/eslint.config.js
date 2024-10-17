@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import js from '@eslint/js'
 import { FlatCompat } from '@eslint/eslintrc'
-import eslintPluginPrettier from 'eslint-plugin-prettier'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -14,9 +14,10 @@ const compat = new FlatCompat({
 })
 
 const settings = [
- {
-  ignores: ['./src/app/components/ui/*.tsx', '.next/', 'node_modules/'],
- },
+ { files: ['**/*.{js,jsx,ts,tsx}'] },
+ { files: ['**/*.cjs'], languageOptions: { sourceType: 'commonjs' } },
+ { ignores: ['./src/app/components/ui/*.tsx', '.next/', 'node_modules/'] },
+
  ...compat.extends(
   'next/core-web-vitals',
   'plugin:react/recommended',
@@ -27,18 +28,12 @@ const settings = [
   'plugin:@typescript-eslint/eslint-recommended',
  ),
  {
-  languageOptions: {
-   globals: {
-    ...globals.browser,
-   },
-  },
-  plugins: {
-   prettier: eslintPluginPrettier,
-  },
+  languageOptions: { globals: globals.browser },
   rules: {
    'prettier/prettier': 'error',
   },
  },
+ eslintPluginPrettierRecommended,
 ]
 
 export default settings
