@@ -34,17 +34,18 @@ Windows / Linux:
 ```env
 PORT=9999 # Pro testovani bylo pouzito 3010
 HOST=0.0.0.0 # neboli all
-DB_URL=postgresql://postgres:postgres@localhost:56131/railway # connection string pro připojení k databázi
+DB_URL=postgresql://postgres:postgres@172.254.5.4:5432/railway # connection string pro připojení k databázi nutno upravit podle docker configurace (uzivatel/heslo)
 INTERVAL_VYPISU_DNY=14 #(7-14-30....etc)vami zvoleny pocet dnu, dle kterych se budou zobrazovat nadchazejici terminy
-STAG_URL="https://ws.ujep.cz/"
-MIN_TIME_ODZAPIS=24 #Hours
+STAG_URL=https://stag-demo.zcu.cz/
+MIN_TIME_ODZAPIS=8 #Hours
+INVERVAL_ZOBRAZENI_HODINY= 4
 ```
 - `FrontEnd/.env`
 ```env
-NEXT_PUBLIC_BASE=`http://localhost:3000`
-NEXT_PUBLIC_API_URL=`http://localhost:9999`
+NEXT_PUBLIC_BASE=`http://deviceIP:3000` # je potreba zmeni na IP zarizeni
+NEXT_PUBLIC_API_URL=`http://172.254.5.5:9999`
 
-NEXT_PUBLIC_TIME_GAP=12 #Hodiny
+NEXT_PUBLIC_TIME_GAP=8 #Hodiny
 
 # DEV VALUE NEED TO BE CHANGED
 NEXT_PUBLIC_STAG_SERVER=`https://stag-demo.zcu.cz/ws`
