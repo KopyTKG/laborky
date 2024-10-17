@@ -14,7 +14,6 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     vypsal_id, role = encode_id(info[0]), info[1]
     if termin.kod_predmetu is None:
         return not_found
-
     if termin.vyucuje_prijmeni is not None:
         vyucuje_id = get_id_ucitele_by_jmeno_prijmeni(ticket, str(termin.vyucuje_jmeno), str(termin.vyucuje_prijmeni))
         if vyucuje_id == not_found or vyucuje_id == []:
@@ -22,12 +21,12 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
         vyucuje_id = encode_id(vyucuje_id) # type: ignore
     else:
         vyucuje_id = vypsal_id
-
+        
     if termin.datum_start > termin.datum_konec:
         promenna_na_prohazeni = termin.datum_start
         termin.datum_start = termin.datum_konec
         termin.datum_konec = promenna_na_prohazeni
-
+        
     message = vypsat_termin(session, termin.ucebna, termin.datum_start, termin.datum_konec, termin.max_kapacita, vypsal_id, vyucuje_id, termin.kod_predmetu, termin.jmeno, termin.cislo_cviceni, termin.popis) # type: ignore
     if message is not ok:
         return message
@@ -39,3 +38,4 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     
     else:
         return ok
+

@@ -153,7 +153,6 @@ def get_vyucujici_predmety(ticket, predmety_db):
         response = (requests.get(url, params=params, headers=headers, cookies={'WSCOOKIE': ticket})).json()
     except:
         return unauthorized
-    
     predmety = response["rozvrhovaAkce"]
     predmety_db = [predmet.kod_predmetu for predmet in predmety_db]
     predmety_ucitele = []
