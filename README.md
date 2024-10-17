@@ -19,13 +19,6 @@ Popis: Vytvořete přihlašovací systém na laboratorní cvičení, kde vyučuj
 **Database** - [Adam](https://github.com/Midiros) 
 
 
-## Instalace
-
-Windows / Linux:
-```bash
-./install.sh
-```
-
 ## Spuštění
 
 ### Před spuštěním
@@ -55,4 +48,4 @@ NEXT_PUBLIC_STAG_SERVER=`https://stag-demo.zcu.cz/ws`
 
 ### Spuštění
 - windows / linux: `./run.sh`
-- linux(gnome) + tmux: `./run.sh -tmux`
+- linux(gnome) + tmux: `./run.sh dev`
