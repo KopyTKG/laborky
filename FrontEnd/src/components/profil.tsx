@@ -1,10 +1,7 @@
 import { Get } from '@/app/actions'
-import { Divider } from '@/components/ui/divider'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmetSekce } from '@/lib/types'
 import { redirect } from 'next/navigation'
-import { Chip } from '@/components/ui/chip'
-import { Button } from 'react-day-picker'
 import Predmet from './tabulkaPredmet'
 
 export default async function Profil() {
