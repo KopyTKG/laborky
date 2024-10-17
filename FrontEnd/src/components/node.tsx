@@ -33,7 +33,7 @@ export default function Node(props: tNode) {
    <div className="w-full flex justify-end pt-2 pr-2 h-[1.75rem] mb-[-1.5rem]">
     {props.typ != 'student' ? (
      CheckProgress(props.start) ? (
-      <Clock12 className="text-stone-50 w-5" />
+      <Clock12 className="text-stone-600 dark:text-stone-50 w-5" />
      ) : CheckProgress(props.konec) ? (
       <Clock2 className="text-amber-500 w-5" />
      ) : (
