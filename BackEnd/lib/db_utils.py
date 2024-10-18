@@ -122,8 +122,8 @@ def get_vsechny_terminy(session):
 def get_vsechny_predmety(session):
     """ Vrátí zkratky předmětů všech různých předmětů """
     try:
-        predmety = session.query(Predmet.zkratka_predmetu).all()
-        return [predmet.zkratka_predmetu for predmet in predmety]
+        predmety = session.query(Predmet).all()
+        return [str(predmet.kod_predmetu) for predmet in predmety]
     except:
         return internal_server_error
 
@@ -240,8 +240,10 @@ def get_datum_splneni_terminu(session, student_id, termin_id):
 def pridej_vyucujicimu_predmety_list(session, id_vyucujiciho, list_kodu_predmetu):
     try:
         odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho)
+        print(list_kodu_predmetu)
         for kod_predmetu in list_kodu_predmetu:
             message = pridej_vyucujiciho_na_predmet(session, kod_predmetu, id_vyucujiciho)
+
             if message != ok:
                 return message
     except:

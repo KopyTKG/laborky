@@ -11,8 +11,14 @@ async def nastavit_uciteli_jeho_predmety(ticket: str | None = None):
         if info == unauthorized or info == internal_server_error:
             return info
         userid, role = encode_id(info[0]), info[1]
-        predmety_vyucujiciho = get_vyucujici_predmety(ticket, get_vsechny_predmety_obj(session))
-        message = pridej_vyucujicimu_predmety_list(session, userid, predmety_vyucujiciho)
+
+        if role != "KA":
+            predmety_vyucujiciho = get_vyucujici_predmety(ticket, get_vsechny_predmety_obj(session))
+            message = pridej_vyucujicimu_predmety_list(session, userid, predmety_vyucujiciho)
+        else:
+            print("role katedry")
+            message = pridej_vyucujicimu_predmety_list(session, userid, get_vsechny_predmety(session))
+    
         if message != ok:
             return message
     except:
