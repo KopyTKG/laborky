@@ -50,8 +50,6 @@ export default function Page() {
   throw new Error('Missing ReloadProvider or FormProvider')
  }
 
- const [reload, setReload] = context
-
  const { toast } = useToast()
 
  const form = useForm<z.infer<typeof formSchema>>({

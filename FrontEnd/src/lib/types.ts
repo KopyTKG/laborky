@@ -48,7 +48,7 @@ export type tPredmet = {
 
 export type tUser = {
  id: string
- role: string
+ role: string[]
  hash: string
 }
 

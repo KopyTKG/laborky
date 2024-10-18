@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
-import { fastHeaders } from '@/lib/stag'
-import { setupParser } from './lib/parsers'
+import { getUserInfo } from '@/lib/stag'
+import { isStudent } from './lib/functions'
 
 export async function middleware(request: NextRequest) {
  if (!BaseAuth(request)) {
@@ -17,34 +17,27 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next()
  }
 
- const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- url.searchParams.set('ticket', ticket)
- const res = await fetch(url.toString(), { method: 'GET', headers: fastHeaders })
- if (!res.ok) {
-  return NextResponse.next()
- }
-
- const data = await res.json()
- const info = setupParser(data)
-
  // Handle student path matching
  const studentPathMatch = pathname.match(/^\/student\/([^/]+)(\/moje|\/profil)?$/)
  const ucitelPathMatch = pathname.match(
   /^\/ucitel\/([^/]+)(\/predmety|\/termin\/[^/]+|\/studenti|\/student\/[^/]+)?$/,
  )
 
+ const info = await getUserInfo(ticket)
+ if (!info) return NextResponse.redirect('/logout')
+
  if (studentPathMatch && studentPathMatch[1] === info.id) {
-  return NextResponse.next() // Already on the correct student page
+  return NextResponse.next()
  }
 
  if (ucitelPathMatch && ucitelPathMatch[1] === info.id) {
-  return NextResponse.next() // Already on the correct teacher page
+  return NextResponse.next()
  }
- // Handle redirect to the correct role path
+
  if (pathname === '/') {
-  if (info.role === 'ST') {
+  if (isStudent(info)) {
    request.nextUrl.pathname = `/student/${info.id}`
-  } else if (info.role) {
+  } else {
    request.nextUrl.pathname = `/ucitel/${info.id}`
   }
   return NextResponse.redirect(request.nextUrl)
@@ -53,7 +46,7 @@ export async function middleware(request: NextRequest) {
  const terminPathMatch = pathname.match(/^\/termin\/([^/]+)$/)
  if (terminPathMatch) {
   const terminID = terminPathMatch[1]
-  if (info.role != 'ST') {
+  if (!info.role.includes('ST')) {
    request.nextUrl.pathname = `/ucitel/${info.id}/termin/${terminID}`
    return NextResponse.redirect(request.nextUrl)
   }

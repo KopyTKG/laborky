@@ -1,6 +1,6 @@
-import { Unauthorized, NotFound, Success, Internal } from '@/lib/http'
-import { setupParser } from '@/lib/parsers'
-import { fastHeaders, GetTicket } from '@/lib/stag'
+import { isStudent } from '@/lib/functions'
+import { Unauthorized, NotFound, Success, Internal, Forbidden } from '@/lib/http'
+import { fastHeaders, getTicket, getUserInfo } from '@/lib/stag'
 import { tPredmetSekce, tStudent } from '@/lib/types'
 
 type tResponse = {
@@ -16,29 +16,16 @@ type tResponse = {
 }
 
 export async function GET(req: Request) {
- const rTicket = GetTicket(req)
+ const rTicket = getTicket(req)
  if (!rTicket) return Unauthorized()
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
+ if (isStudent(info)) return Forbidden()
+
  const base = new URL(req.url)
  const rId_stud = base.searchParams.get('id_stud') || ''
 
  if (!rId_stud) return NotFound()
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- const data = await roleRes.json()
- if (!data) return Internal()
-
- const info = setupParser(data)
-
- if (info.role == 'ST') {
-  return Unauthorized()
- }
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/student`)
  url.searchParams.set('ticket', rTicket)
@@ -48,9 +35,8 @@ export async function GET(req: Request) {
   method: 'GET',
   headers: fastHeaders,
  })
- if (!res.ok) {
-  return Internal()
- }
+
+ if (!res.ok) return Internal()
 
  const studentInfo = (await res.json()) as tResponse
  const keys = Object.keys(studentInfo.profil)
@@ -64,5 +50,5 @@ export async function GET(req: Request) {
   parsed.push(tmp)
  })
 
- return Success({info: student, data: parsed})
+ return Success({ info: student, data: parsed })
 }
