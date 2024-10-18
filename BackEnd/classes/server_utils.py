@@ -3,7 +3,7 @@ from lib.HTTP_messages import *
 from classes.stag import *
 from lib.db_utils import *
 import os, json
-from pydantic import BaseModel
+from pydantic import BaseModel # type: ignore
 from datetime import datetime
 from typing import Optional
 

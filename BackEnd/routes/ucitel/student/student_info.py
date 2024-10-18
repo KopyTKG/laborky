@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter # type: ignore
 from classes.server_utils import *
 from lib.db_terminy import *
 
@@ -29,7 +29,15 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     
 
     id_stud = encode_id(id_stud)
-  
+
+    student_db = get_student_by_id(session, id_stud)
+    if student_db == None or student_db == not_found:
+        message = vytvor_student(session, id_stud)
+        print("student nebyl v DB")
+        if message != ok:
+            return message
+
+
     vyhodnoceni_vsech_predmetu = vyhodnoceni_studenta(session, id_stud, pocet_cviceni_pro_predmet(session))
     if vyhodnoceni_vsech_predmetu == internal_server_error:
             return internal_server_error
