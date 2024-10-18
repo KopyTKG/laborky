@@ -70,7 +70,7 @@ def terminy_dopredu_pro_vyucujiciho(session, id):
     """ Vrátí všechny termíny, které vypsal daný vyučující pod jeho účtem """
     try:
         start_date = datetime.now() - timedelta(hours=interval_vypisu_terminu)
-        end_date = start_date + timedelta(days=interval_vypisu_terminu)
+        end_date = start_date + timedelta(days=interval_zobrazeni_terminu)
         terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_konec <= end_date, Termin.vyucuje_id == id, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
         terminy_list = [termin for termin in terminy]
         return terminy_list
@@ -80,9 +80,9 @@ def terminy_dopredu_pro_vyucujiciho(session, id):
 
 def terminy_dopredu(session):
     try:
-        start_date = datetime.now()
-        end_date = start_date + timedelta(days=interval_vypisu_terminu)
-        terminy = session.query(Termin).filter(and_(Termin.datum_konec <= end_date, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
+        start_date = datetime.now() - timedelta(hours=interval_vypisu_terminu)
+        end_date = start_date + timedelta(days=interval_zobrazeni_terminu)
+        terminy = session.query(Termin).filter(and_(Termin.datum_start >= start_date, Termin.datum_konec <= end_date, Termin.cislo_cviceni != -1)).order_by(Termin.datum_start.asc())
         terminy_list = [termin for termin in terminy]
         return terminy_list
     except:
