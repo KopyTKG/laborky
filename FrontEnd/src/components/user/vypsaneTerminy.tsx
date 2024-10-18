@@ -45,7 +45,6 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
   const data = await fetchTerminyData()
   if (data) {
    setTerminy(data.data)
-   console.log(data.data)
    setReload(false)
   }
   setFetching(false)
