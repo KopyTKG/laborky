@@ -1,32 +1,20 @@
-import { Unauthorized, NotFound, Success, Internal } from '@/lib/http'
-import { setupParser } from '@/lib/parsers'
-import { fastHeaders, GetTicket } from '@/lib/stag'
+import { isStudent } from '@/lib/functions'
+import { Unauthorized, NotFound, Success, Internal, Forbidden } from '@/lib/http'
+import { fastHeaders, getTicket, getUserInfo } from '@/lib/stag'
 import { tCreate, tStudent, tTermin } from '@/lib/types'
 
+/* ----------------------------------------------------------------------------------------------- */
 // Create
 export async function POST(req: Request) {
- const rTicket = GetTicket(req)
+ const rTicket = getTicket(req)
  if (!rTicket) return Unauthorized()
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- const data = await roleRes.json()
- const info = setupParser(data)
-
- if (info.role == 'ST') {
-  return Unauthorized()
- }
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
+ if (isStudent(info)) return Forbidden()
 
  const body: tCreate = await req.json()
- if (!body) {
-  return NotFound()
- }
+ if (!body) return NotFound()
+
  const fBody = {
   ucebna: body.ucebna,
   datum_start: new Date(body.start).toJSON(),
@@ -47,10 +35,9 @@ export async function POST(req: Request) {
   headers: fastHeaders,
   body: JSON.stringify(fBody),
  })
- if (!res.ok) {
-  return Internal()
- }
- 
+
+ if (!res.ok) return Internal()
+
  const resData = await res.json()
  if (typeof resData === 'object' && typeof resData.message === 'string') {
   return Success()
@@ -58,32 +45,18 @@ export async function POST(req: Request) {
  return Success({ mails: resData })
 }
 
+/* ----------------------------------------------------------------------------------------------- */
 // Read
 export async function GET(req: Request) {
- const rTicket = GetTicket(req)
+ const rTicket = getTicket(req)
  if (!rTicket) return Unauthorized()
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
+ if (isStudent(info)) return Forbidden()
 
  const base = new URL(req.url)
  const rID = base.searchParams.get('id') || ''
-
- if (!rID) {
-  return NotFound()
- }
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- let data = await roleRes.json()
- const info = setupParser(data)
-
- if (info.role == 'ST') {
-  return Unauthorized()
- }
+ if (!rID) return NotFound()
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
@@ -99,7 +72,7 @@ export async function GET(req: Request) {
   else return Internal()
  }
 
- data = await res.json()
+ let data = await res.json()
 
  const studenti: tStudent[] = data.studenti
  data = data.termin
@@ -117,41 +90,26 @@ export async function GET(req: Request) {
  return Success({ termin: termin, studenti: studenti })
 }
 
+/* ----------------------------------------------------------------------------------------------- */
 // Update
 export async function PATCH(req: Request) {
- const rTicket = GetTicket(req)
+ const rTicket = getTicket(req)
  if (!rTicket) return Unauthorized()
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
+ if (isStudent(info)) return Forbidden()
 
  const base = new URL(req.url)
  const rID = base.searchParams.get('id') || ''
-
- if (!rID) {
-  return NotFound()
- }
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- const data = await roleRes.json()
- const info = setupParser(data)
-
- if (info.role == 'ST') {
-  return Unauthorized()
- }
+ if (!rID) return NotFound()
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
  url.searchParams.set('id_terminu', rID)
 
  const body: tCreate = await req.json()
- if (!body) {
-  return NotFound()
- }
+ if (!body) return NotFound()
+
  const fBody = {
   ucebna: body.ucebna,
   datum_start: new Date(body.start).toJSON(),
@@ -170,42 +128,29 @@ export async function PATCH(req: Request) {
   headers: fastHeaders,
   body: JSON.stringify(fBody),
  })
- if (!res.ok) {
-  return Internal()
- }
+
+ if (!res.ok) return Internal()
+
  const resData = await res.json()
  if (typeof resData === 'object' && typeof resData.message === 'string') {
   return Success()
  }
+
  return Success({ mails: resData })
 }
 
+/* ----------------------------------------------------------------------------------------------- */
 // Delete
 export async function DELETE(req: Request) {
- const rTicket = GetTicket(req)
+ const rTicket = getTicket(req)
  if (!rTicket) return Unauthorized()
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
+ if (isStudent(info)) return Forbidden()
 
  const base = new URL(req.url)
  const rID = base.searchParams.get('id') || ''
-
- if (!rID) {
-  return NotFound()
- }
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- const data = await roleRes.json()
- const info = setupParser(data)
-
- if (info.role == 'ST') {
-  return Unauthorized()
- }
+ if (!rID) return NotFound()
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
  url.searchParams.set('ticket', rTicket)
@@ -215,8 +160,8 @@ export async function DELETE(req: Request) {
   method: 'DELETE',
   headers: fastHeaders,
  })
- if (!res.ok) {
-  return Internal()
- }
+
+ if (!res.ok) return Internal()
+
  return Success()
 }

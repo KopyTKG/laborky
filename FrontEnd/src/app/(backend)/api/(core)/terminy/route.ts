@@ -1,34 +1,24 @@
+import { isAdmin, isStudent } from '@/lib/functions'
 import { Unauthorized, NotFound, Success } from '@/lib/http'
-import { resTotTermin, setupParser } from '@/lib/parsers'
-import { fastHeaders } from '@/lib/stag'
+import { resTotTermin } from '@/lib/parsers'
+import { fastHeaders, getTicket, getUserInfo } from '@/lib/stag'
 import { tTermin } from '@/lib/types'
 
 export async function GET(req: Request) {
- const url = new URL(req.url)
- const rType = url.searchParams.get('t') || ''
- const rTicket = url.searchParams.get('ticket') || ''
-
- if (!rTicket) {
-  return Unauthorized()
- }
-
- const checkURL = new URL(`${process.env.NEXT_PUBLIC_API_URL}/setup`)
- checkURL.searchParams.set('ticket', rTicket)
- const roleRes = await fetch(checkURL.toString(), { method: 'GET', headers: fastHeaders })
-
- if (!roleRes.ok) {
-  return Unauthorized()
- }
-
- const data = await roleRes.json()
- const info = setupParser(data)
+ const rTicket = getTicket(req)
+ if (!rTicket) return Unauthorized()
+ const info = await getUserInfo(rTicket)
+ if (!info) return Unauthorized()
 
  let apipoint = '/ucitel'
- if (info.role === 'ST') {
+ if (isStudent(info)) {
   apipoint = '/student'
- } else if (info.role === 'RE') {
+ } else if (isAdmin(info)) {
   apipoint = '/admin'
  }
+
+ const url = new URL(req.url)
+ const rType = url.searchParams.get('t') || ''
 
  if (!rType || (rType != 'vypsane' && rType != 'zapsane')) {
   return NotFound()

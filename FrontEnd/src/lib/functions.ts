@@ -1,5 +1,5 @@
 import { Get } from '@/app/actions'
-import { tPredmet } from '@/lib/types'
+import { tPredmet, tUser } from '@/lib/types'
 import { fastHeaders } from '@/lib/stag'
 
 export async function fetchPredmetyData(): Promise<tPredmet[] | undefined> {
@@ -23,7 +23,6 @@ export async function fetchPredmetyData(): Promise<tPredmet[] | undefined> {
  }
 }
 
-
 export function DateTime(date: Date, time: string): number {
  const regex = /[0-2][0-9]:[0-6][0-9]:[0-6][0-9]/i
  return new Date(date.toJSON().replace(regex, time + ':00')).valueOf()
@@ -33,3 +32,12 @@ export function Time(timestamp: number): string {
  const datetime = new Date(timestamp)
  return `${datetime.getHours().toString().padStart(2, '0')}:${datetime.getMinutes().toString().padStart(2, '0')}`
 }
+
+export function isStudent(info: tUser): boolean {
+ return info.role.includes('ST')
+}
+
+export function isAdmin(info: tUser): boolean {
+ return info.role.includes('KA')
+}
+

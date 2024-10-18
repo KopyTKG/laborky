@@ -24,10 +24,10 @@ export function resTotTermin(data: any): tTermin[] {
  return terminy
 }
 
-export function setupParser(data: string[]): tUser {
+export function setupParser(data: [string, string[], string]): tUser {
  return {
   id: data[0],
-  role: data[1],
+  role: data[1] as string[],
   hash: data[2],
  }
 }
