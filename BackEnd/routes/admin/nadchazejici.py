@@ -6,7 +6,7 @@ from lib.db_terminy import *
 router = APIRouter()
 
 
-@router.get("/admin/nadchazejici")
+@router.get("/admin")
 async def get_admin_board_next_ones(ticket: str | None = None):
     """Vrátí všechny cvičení v času dopředu dle readme"""
 
