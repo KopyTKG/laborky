@@ -183,7 +183,7 @@ def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
 def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str):
     try:
         info = get_predmet_by_id(session, kod_predmetu)
-        katedra, zkratka = info.katedra, info.zkratka_predmetu
+        katedra, zkratka = info.katedra, info.zkratka_predmetu #type: ignore # zajisteno try catchem
         kandidati_na_email = get_studenti_na_predmetu(ticket, katedra, zkratka)
 
         if kandidati_na_email is None:
@@ -263,5 +263,17 @@ def get_student_by_id(session, id_studenta):
     try:
         student = session.query(Student).filter_by(id=id_studenta).first()
         return student
+    except:
+        return not_found
+    
+
+def get_studenti_all(session):
+    try:
+        studenti = session.query(Student).all()
+        os_cisla = []
+
+        for student in studenti:
+            os_cisla.append(student.id)
+        return os_cisla
     except:
         return not_found

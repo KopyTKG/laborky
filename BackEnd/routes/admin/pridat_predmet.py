@@ -38,6 +38,18 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
         datum_start = datetime.now()
         datum_konec = datetime.now() + timedelta(hours=2)
         message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
+        session.commit()
+
+        if message == ok:
+            studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
+            vsichni_studenti = get_studenti_all(session)
+
+            for student in studenti:
+                student_id = encode_id(student)
+
+                if student_id not in vsichni_studenti:
+                    message = vytvor_student(session, student_id)
+
 
         return message
 
