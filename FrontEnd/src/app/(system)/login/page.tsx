@@ -1,6 +1,7 @@
 'use client'
 import { useLayoutEffect } from 'react'
 import { setStag } from '@/app/actions'
+import { fastHeaders } from '@/lib/stag'
 
 export default function Home() {
  useLayoutEffect(() => {
@@ -14,13 +15,7 @@ export default function Home() {
    if (params.stagUserTicket != null && params.stagUserInfo != null) {
     // call API to check if user exists
     const url = `${process.env.NEXT_PUBLIC_BASE}/api/user?ticket=${params.stagUserTicket}`
-    const headers = {
-     Accept: 'application/json',
-     'Content-Type': 'application/json',
-     Connection: 'keep-alive',
-     'Accept-Origin': process.env.NEXT_PUBLIC_STAG_SERVER || '',
-    }
-    fetch(url, { method: 'GET', headers }).then((data) => {
+    fetch(url, { method: 'GET', headers: fastHeaders }).then((data) => {
      if (data.status != 200) {
       window.location.href = '/logout'
      } else {
