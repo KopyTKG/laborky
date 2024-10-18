@@ -14,7 +14,7 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
     vypsal_id, role = encode_id(info[0]), info[1]
     if termin.kod_predmetu is None:
         return not_found
-    if termin.vyucuje_prijmeni is not None:
+    if termin.vyucuje_prijmeni is not None and len(termin.vyucuje_prijmeni) > 2:
         vyucuje_id = get_id_ucitele_by_jmeno_prijmeni(ticket, str(termin.vyucuje_jmeno), str(termin.vyucuje_prijmeni))
         if vyucuje_id == not_found or vyucuje_id == []:
             return not_found
@@ -32,9 +32,9 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
         return message
 
 #TODO: upozornění na termíny     
-    #if termin.upozornit:
-    #    list_emailu = get_list_emailu_pro_cviceni(session, termin.kod_predmetu, termin.cislo_cviceni)
-    #    return list_emailu
+    if termin.upozornit:
+        list_emailu = get_list_emailu_pro_cviceni(session, termin.kod_predmetu, termin.cislo_cviceni, ticket=ticket)
+        return list_emailu
     
     else:
         return ok

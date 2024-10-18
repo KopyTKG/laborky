@@ -180,11 +180,12 @@ def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
         return internal_server_error
         
 
-def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str = None):
+def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str):
     try:
         info = get_predmet_by_id(session, kod_predmetu)
         katedra, zkratka = info.katedra, info.zkratka_predmetu
         kandidati_na_email = get_studenti_na_predmetu(ticket, katedra, zkratka)
+
         if kandidati_na_email is None:
             return not_found # zadny studenti nemaji zapsany predmet
 
@@ -205,17 +206,17 @@ def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ti
 
         if email_list is None:
             return not_found
+
         os_cisla = compare_encoded(email_list, kandidati_na_email)
+
         if os_cisla is None:
             return not_found # not here
         list_emailu = []
         for student in os_cisla:
             jmeno, prijmeni, email = get_student_info(ticket, student)
             list_emailu.append(email)
-        if list_emailu == []:
-            return not_found # not here either?
-        else:
-            return list_emailu
+
+        return list_emailu
     except Exception as e:
         return internal_server_error
 

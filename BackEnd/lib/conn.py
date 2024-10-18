@@ -432,11 +432,8 @@ def vyhodnoceni_studenta(session, id_studenta, pocet_pro_predmet):
     except:
         return internal_server_error
 
-def vypis_uspesnych_studentu(session, zkratka_predmetu):
+def vypis_uspesnych_studentu(session, kod_predmetu):
     try:
-        kod_predmetu = session.query(Predmet).filter_by(zkratka_predmetu=zkratka_predmetu).first().kod_predmetu
-        if kod_predmetu is None:
-            return not_found
 
         studenti = (
             session.query(Student)
