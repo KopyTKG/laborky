@@ -143,6 +143,7 @@ export default function TerminPage({ params }: { params: { terminID: string } })
     id={params.terminID}
     setNull={setNull}
     storage={storage}
+    studenti={Studenti}
    />
    <Table>
     <TableHeader>

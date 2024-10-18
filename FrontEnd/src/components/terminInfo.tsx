@@ -9,10 +9,11 @@ import {
  Trash,
  Pencil,
  UserPlus,
+ Mails,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fastHeaders } from '@/lib/stag'
-import { tForm, tTermin } from '@/lib/types'
+import { tForm, tStudent, tTermin } from '@/lib/types'
 import * as React from 'react'
 import {
  AlertDialog,
@@ -36,11 +37,13 @@ export default function TerminInfo({
  id,
  setNull,
  storage,
+ studenti,
 }: {
  Termin: tTermin
  id: string
  setNull: React.Dispatch<boolean>
  storage: { form: tForm; terminId: string }
+ studenti?: tStudent[]
 }) {
  const context = React.useContext(FormCtx)
  const Rcontext = React.useContext(ReloadCtx)
@@ -120,6 +123,35 @@ export default function TerminInfo({
   }
  }
 
+ function PrintMails() {
+  const mails: string[] = [] as string[]
+  studenti?.forEach((student: tStudent) => {
+   mails.push(student.email)
+  })
+
+  const file = new Blob([mails.join('\n')], { type: 'text/csv' })
+  const fileURL = URL.createObjectURL(file)
+
+  const anchor = document.createElement('a')
+  anchor.href = fileURL
+  const date = new Date(Date.now())
+   .toLocaleString('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+   })
+   .replace(',', '')
+   .replace(/:/g, '-')
+   .replace(/\//g, '-')
+   .replace(' ', '_')
+  anchor.download = `Studenti-${Termin._id}-${Termin.cviceni}_${date}`
+  anchor.click()
+  URL.revokeObjectURL(fileURL)
+ }
+
  return (
   <Card className="w-full mb-5 dark:bg-zinc-950 dark:text-stone-50 border-1 border-stone-300  shadow-md dark:border-zinc-700 dark:shadow-neutral-950">
    <CardHeader className="pb-2">
@@ -129,6 +161,13 @@ export default function TerminInfo({
       {Termin?.nazev || 'Název předmětu'}
      </span>
      <span className="flex gap-2 items-center">
+      <button
+       className="dark:text-stone-50 dark:hover:text-stone-300 text-stone-950 hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-600 dark:focus:ring-stone-400 focus:ring-opacity-50 rounded-full p-1"
+       aria-label="Mails"
+       onClick={PrintMails}
+      >
+       <Mails className="w-6 h-6" aria-hidden="true" />
+      </button>
       <AlertDialog>
        <AlertDialogTrigger asChild>
         <button
@@ -172,7 +211,7 @@ export default function TerminInfo({
         setOpen(true)
         setFormData(storage.form)
         setTerminID(storage.terminId)
-	setType('edit')
+        setType('edit')
        }}
       >
        <Pencil className="w-6 h-6" aria-hidden="true" />
