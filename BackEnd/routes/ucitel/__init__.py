@@ -12,6 +12,7 @@ from .student.student_uznat import router as ucitel_student_uznat
 from .student.student_zapsat import router as ucitel_student_zapsat
 from .emaily import router as ucitel_emaily
 from .student.uspesni_studenti import router as ucitel_uspesni_studenti
+from .reset_ucitel import router as ucitel_reset
 
 ucitel_routers = [
     ucitel_home,
@@ -27,5 +28,6 @@ ucitel_routers = [
     ucitel_student_uznat,
     ucitel_student_zapsat,
     ucitel_emaily,
-    ucitel_uspesni_studenti
+    ucitel_uspesni_studenti,
+    ucitel_reset
 ]
