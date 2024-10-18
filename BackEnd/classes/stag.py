@@ -73,7 +73,6 @@ def bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
             return False
     except:
         return None
-    return response
 
 
 def get_vyucujici_predmetu_stag(zkratka_predmetu, katedra):
@@ -107,10 +106,13 @@ def get_userid_and_role(json):
     """ Vrací userId a roli uživatele
     json: json, který vrací funkce "get_stag_user_info"""
     role = json["stagUserInfo"][0]["role"]
-    if role == "":
+    try:
+        if role == "":
+            return internal_server_error, internal_server_error
+        if role != "ST":
+            userid = str(json["stagUserInfo"][0]["ucitIdno"])
+        else:
+            userid = str(json["stagUserInfo"][0]["osCislo"])
+        return userid, role
+    except:
         return internal_server_error, internal_server_error
-    if role != "ST":
-        userid = str(json["stagUserInfo"][0]["ucitIdno"])
-    else:
-        userid = str(json["stagUserInfo"][0]["osCislo"])
-    return userid, role

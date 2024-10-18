@@ -19,7 +19,7 @@ dotenv.load_dotenv()
 DATABASE_URL = os.getenv('DB_URL')
 
 interval_vypisu_terminu = int(os.getenv('INTERVAL_VYPISU_DNY')) # type: ignore
-interval_zobrazeni_terminu = int(os.getenv('INVERVAL_ZOBRAZENI_HODINY'))
+interval_zobrazeni_terminu = int(os.getenv('INVERVAL_ZOBRAZENI_HODINY')) #type: ignore
 
 # navazani pripojeni k DB
 engine = create_engine(DATABASE_URL) # type: ignore
@@ -194,7 +194,7 @@ def odepsat_z_terminu(session, student_id, termin_id):
 
             konkretni_termin = session.query(Termin).filter(Termin.id == termin_id).first()
 
-            if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=float(os.getenv("MIN_TIME_ODZAPIS"))):
+            if (konkretni_termin.datum_start - datetime.now()) < timedelta(hours=float(os.getenv("MIN_TIME_ODZAPIS"))): #type:ignore
                 return conflict
 
             konkretni_termin.aktualni_kapacita -= 1
@@ -443,7 +443,7 @@ def vypis_uspesnych_studentu(session, kod_predmetu):
             .all()  # Return all matching students
         )
 
-        pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]}
+        pocet_pro_predmet = {kod_predmetu: pocet_cviceni_pro_predmet(session)[kod_predmetu]} #type:ignore
 
         vyhodnoceni_studentu = {}
         for student in studenti:
@@ -451,7 +451,7 @@ def vypis_uspesnych_studentu(session, kod_predmetu):
                 vyhodnoceni_studentu[student.id] = 1
             else:
                 vyhodnoceni = vyhodnoceni_studenta(session, student.id, pocet_pro_predmet)
-                if 0 in vyhodnoceni[kod_predmetu]:
+                if 0 in vyhodnoceni[kod_predmetu]: #type:ignore
                     continue
                 else:
                     vyhodnoceni_studentu[student.id] = vyhodnoceni

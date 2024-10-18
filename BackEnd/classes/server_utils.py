@@ -30,103 +30,129 @@ def encode_id(id):
 
 
 def kontrola_ticketu(ticket, vyucujici = True):
-    if ticket is None or ticket == "":
-        return unauthorized
+    """ Provede se kontrola: pokud je uživatel na stagu, pokud má roli a userid správnou
+    volitelný arg: vyucujici (bool) - defaultně True : kontrola, jestli není uživatel role ST (pro vyšší práva)"""
+    try:
+        if ticket is None or ticket == "":
+            return unauthorized
 
-    userinfo = get_stag_user_info(ticket)
-    if userinfo is None:
-        return unauthorized
-    if userinfo == internal_server_error:
-        return internal_server_error
-    userid, role = get_userid_and_role(userinfo)
-    if role == internal_server_error:
-        return internal_server_error
-    if vyucujici and role == "ST":
-        return unauthorized
+        userinfo = get_stag_user_info(ticket)
+        if userinfo is None:
+            return unauthorized
+        if userinfo == internal_server_error:
+            return internal_server_error
+        userid, role = get_userid_and_role(userinfo)
+        if role == internal_server_error:
+            return internal_server_error
+        if vyucujici and role == "ST":
+            return unauthorized
 
-    return [userid, role]
+        return [userid, role]
+    except:
+        return internal_server_error
 
 
 def read_file():
-    temp_file = ".temp_vyucujici.txt"
+    """ Vrátí .temp_vyucujici """
+    try:
+        temp_file = ".temp_vyucujici.txt"
 
-    with open(temp_file, "r", encoding="utf-8") as infile:
-        vyucujici_list = json.load(infile)
-    return vyucujici_list
+        with open(temp_file, "r", encoding="utf-8") as infile:
+            vyucujici_list = json.load(infile)
+        return vyucujici_list
+    except:
+        return internal_server_error
 
 
 def vyucujici_k_predmetum_to_txt(session):
-    temp_file = ".temp_vyucujici.txt"
+    """ Vytvoření souboru .temp_vyucujici.txt, ktery v sobe má kódy předmětů a k něm přiřazené cvičící předmětu podle Stagu """
+    try:
+        temp_file = ".temp_vyucujici.txt"
 
-    predmety_kod_katedra = get_vsechny_predmety_kod_katedra(session)
-    if predmety_kod_katedra == internal_server_error:
-        return internal_server_error
-    vyucujici = {}
-    for predmet in predmety_kod_katedra:
-        vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
-        if vyucujici_predmetu == internal_server_error:
+        predmety_kod_katedra = get_vsechny_predmety_kod_katedra(session)
+        if predmety_kod_katedra == internal_server_error:
             return internal_server_error
-        if vyucujici_predmetu is None:
-            vyucujici_seznam = []
-        elif vyucujici_predmetu == "":
-            vyucujici_seznam = []
-        else:
-            vyucujici_seznam = vyucujici_predmetu.split("', '")
+        vyucujici = {}
+        for predmet in predmety_kod_katedra: #type: ignore
+            vyucujici_predmetu = get_vyucujici_predmetu_stag(predmet[0], predmet[1])
 
-            if vyucujici:
-                vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
-                vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
+            if vyucujici_predmetu == internal_server_error:
+                return internal_server_error
+            
+            if vyucujici_predmetu is None or vyucujici_predmetu == "":
+                vyucujici_seznam = []
 
-        vyucujici[predmet[1] + "/" + predmet[0]] = vyucujici_seznam if vyucujici_seznam else [""]
+            else:
+                vyucujici_seznam = vyucujici_predmetu.split("', '") #type: ignore
 
+                if vyucujici:
+                    vyucujici_seznam[0] = vyucujici_seznam[0].lstrip("'")
+                    vyucujici_seznam[-1] = vyucujici_seznam[-1].rstrip("'")
 
-    if os.path.exists(temp_file):
-        os.remove(temp_file)
-    with open(temp_file, "w", encoding="utf-8") as outfile:
-        json.dump(vyucujici, outfile, ensure_ascii=False, indent=4)
+            vyucujici[predmet[1] + "/" + predmet[0]] = vyucujici_seznam if vyucujici_seznam else [""]
+
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+        with open(temp_file, "w", encoding="utf-8") as outfile:
+            json.dump(vyucujici, outfile, ensure_ascii=False, indent=4)
+
+    except:
+        return internal_server_error
 
 
 def get_jmena_predmetu_by_zkratka(session, zkratky_predmetu):
-    jmena_predmetu = []
-    for zkratka in zkratky_predmetu:
-        katedra = get_katedra_by_predmet(session, zkratka)
-        if katedra == internal_server_error:
-            return internal_server_error
-        if katedra is None:
-            jmeno = zkratka
-        else:
-            jmeno = katedra + "/" + zkratka
-        jmena_predmetu.append(jmeno)
+    """ Vrací jména předmětů podle zkratek předmětu """
+    try:
+        jmena_predmetu = []
+        for zkratka in zkratky_predmetu:
+            katedra = get_katedra_by_predmet(session, zkratka)
+            if katedra == internal_server_error:
+                return internal_server_error
+            if katedra is None:
+                jmeno = zkratka
+            else:
+                jmeno = katedra + "/" + zkratka #type: ignore
+            jmena_predmetu.append(jmeno)
 
-    return jmena_predmetu
+        return jmena_predmetu
+    except:
+        return internal_server_error
 
 
 def get_predmet_id_jmeno_cisla(predmety):
-    predmet_id_jmeno_cisla = []
-    for predmet in predmety:
-        info = {}
-        info["id"] = predmet.kod_predmetu
-        info["pocet_cviceni"] = predmet.pocet_cviceni
-        predmet_id_jmeno_cisla.append(info)
+    """ Vrací seznam slovníků, které nesou informace o předmětech """
+    try:
+        predmet_id_jmeno_cisla = []
+        for predmet in predmety:
+            info = {}
+            info["id"] = predmet.kod_predmetu
+            info["pocet_cviceni"] = predmet.pocet_cviceni
+            predmet_id_jmeno_cisla.append(info)
 
-    if len(predmet_id_jmeno_cisla) == 0:
-        return [{"id": None, "pocet_cviceni": None}]
+        if len(predmet_id_jmeno_cisla) == 0:
+            return [{"id": None, "pocet_cviceni": None}]
 
-    return predmet_id_jmeno_cisla
+        return predmet_id_jmeno_cisla
+    except:
+        return internal_server_error
 
 
 def get_predmety_by_kody(session, kody_predmetu):
-    predmety = []
-    for kod in kody_predmetu:
-        predmet = get_predmet_by_id(session, kod)
-        if predmet == internal_server_error:
-            return internal_server_error
-        if predmet is None:
-            continue
-        else:
-            predmety.append(predmet)
+    """ Vrací seznam objektů předmětů podle kódů předmětů """
+    try:
+        predmety = []
+        for kod in kody_predmetu:
+            predmet = get_predmet_by_id(session, kod)
+            if predmet == internal_server_error:
+                return internal_server_error
+            if predmet is None:
+                continue
+            else:
+                predmety.append(predmet)
 
-    return predmety
+        return predmety
+    except:
+        return internal_server_error
 
 
 def get_list_studentu(ticket, list_studentu, pred_kat):

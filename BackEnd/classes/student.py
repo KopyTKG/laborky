@@ -36,15 +36,18 @@ def get_predmet_student_k_dispozici(ticket, predmety_lab):
     predmety = response.json()
     zkratky = []
 
-    for predmet in predmety_lab:
-        zkratky.append((predmet.kod_predmetu).split("/")[-1])
+    try:
+        for predmet in predmety_lab:
+            zkratky.append((predmet.kod_predmetu).split("/")[-1])
 
-    for predmet in predmety["predmetAbsolvoval"]:
-        if predmet["zkratka"] in zkratky:
-            if predmet["absolvoval"] == "N":
-                aktivni_predmety.add(predmet["katedra"] + "/" + predmet["zkratka"])
-            else:
-                splneno.add(predmet["katedra"] + "/" + predmet["zkratka"])
+        for predmet in predmety["predmetAbsolvoval"]:
+            if predmet["zkratka"] in zkratky:
+                if predmet["absolvoval"] == "N":
+                    aktivni_predmety.add(predmet["katedra"] + "/" + predmet["zkratka"])
+                else:
+                    splneno.add(predmet["katedra"] + "/" + predmet["zkratka"])
 
-    predmety = list(aktivni_predmety - splneno)  # Set difference operation
-    return predmety
+        predmety = list(aktivni_predmety - splneno)  # Set difference operation
+        return predmety
+    except:
+        return internal_server_error
