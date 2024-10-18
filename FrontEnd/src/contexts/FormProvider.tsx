@@ -28,7 +28,7 @@ export const DefaultForm: tForm = {
  startCas: '',
  konecDatum: new Date(),
  konecCas: '',
- upozornit: false,
+ upozornit: true,
 }
 
 export const DefaultPredmet: tPredmet = {

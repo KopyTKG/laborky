@@ -119,13 +119,29 @@ export default function Formular() {
     setReload(!reload)
     form.reset()
     if (values.upozornit) {
-     let subject =
-      type == 'create'
-       ? `Nový termín pro ${body._id} cvičení ${body.cviceni}`
-       : `Termín ${body._id} cvičení ${body.cviceni} byl upraven`
-     const mails = ['ecipient1@example.com', 'recipient2@example.com']
+     const data = await res.json()
+     const mails = data.mails
+     const file = new Blob([mails.join('\n')], { type: 'text/csv' })
+     const fileURL = URL.createObjectURL(file)
 
-     location.href = `mailto:${mails.join('%2C')}?body=test&subject=${subject}`
+     const anchor = document.createElement('a')
+     anchor.href = fileURL
+     const date = new Date(Date.now())
+      .toLocaleString('en-GB', {
+       year: 'numeric',
+       month: '2-digit',
+       day: '2-digit',
+       hour: '2-digit',
+       minute: '2-digit',
+       second: '2-digit',
+      })
+      .replace(',', '')
+      .replace(/:/g, '-')
+      .replace(/\//g, '-')
+      .replace(' ', '_')
+     anchor.download = `${body._id}-${body.cviceni}_${date}`
+     anchor.click()
+     URL.revokeObjectURL(fileURL)
     }
    } else {
     toast({
@@ -332,17 +348,17 @@ export default function Formular() {
              </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-	    <div className="p-3">
-             <Calendar
-              mode="single"
-              selected={field.value}
-              onSelect={(date) => {
-               setKonecDatumManuallySet(false)
-               field.onChange(date)
-              }}
-              disabled={(date) => date > new Date('2100-01-01')}
-             />
-	     </div>
+             <div className="p-3">
+              <Calendar
+               mode="single"
+               selected={field.value}
+               onSelect={(date) => {
+                setKonecDatumManuallySet(false)
+                field.onChange(date)
+               }}
+               disabled={(date) => date > new Date('2100-01-01')}
+              />
+             </div>
             </PopoverContent>
            </Popover>
            <FormMessage />
@@ -432,7 +448,7 @@ export default function Formular() {
        render={({ field }) => (
         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
          <FormControl>
-          <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled />
+          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
          </FormControl>
          <div className="space-y-1 leading-none">
           <FormLabel>Upozornit studenty</FormLabel>

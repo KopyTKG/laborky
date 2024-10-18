@@ -50,7 +50,12 @@ export async function POST(req: Request) {
  if (!res.ok) {
   return Internal()
  }
- return Success()
+ 
+ const resData = await res.json()
+ if (typeof resData === 'object' && typeof resData.message === 'string') {
+  return Success()
+ }
+ return Success({ mails: resData })
 }
 
 // Read
@@ -143,7 +148,7 @@ export async function PATCH(req: Request) {
  url.searchParams.set('ticket', rTicket)
  url.searchParams.set('id_terminu', rID)
 
- const body: tTermin = await req.json()
+ const body: tCreate = await req.json()
  if (!body) {
   return NotFound()
  }
@@ -156,7 +161,7 @@ export async function PATCH(req: Request) {
   popis: body.tema,
   jmeno: body.nazev,
   kod_predmetu: body._id,
-  upozornit: null,
+  upozornit: body.upzornit,
   vyucuje_prijmeni: null,
  }
 
@@ -168,7 +173,11 @@ export async function PATCH(req: Request) {
  if (!res.ok) {
   return Internal()
  }
- return Success()
+ const resData = await res.json()
+ if (typeof resData === 'object' && typeof resData.message === 'string') {
+  return Success()
+ }
+ return Success({ mails: resData })
 }
 
 // Delete

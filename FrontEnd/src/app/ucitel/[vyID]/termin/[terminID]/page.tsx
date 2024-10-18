@@ -84,7 +84,7 @@ export default function TerminPage({ params }: { params: { terminID: string } })
      startCas: Time(termin.start),
      konecDatum: new Date(termin.konec),
      konecCas: Time(termin.konec),
-     upozornit: false,
+     upozornit: true,
     },
     terminId: params.terminID,
    })
