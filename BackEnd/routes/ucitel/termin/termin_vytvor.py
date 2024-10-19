@@ -33,7 +33,7 @@ async def ucitel_vytvor_termin(ticket: str, termin: tTermin):
 
 #TODO: upozornění na termíny     
     if termin.upozornit:
-        list_emailu = get_list_emailu_pro_cviceni(session, termin.kod_predmetu, termin.cislo_cviceni, ticket=ticket)
+        list_emailu = get_list_emailu_pro_cviceni(session, termin.kod_predmetu, termin.cislo_cviceni, ticket=ticket, novy_termin=True)
         return list_emailu
     
     else:
