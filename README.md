@@ -1,6 +1,6 @@
 # UJEP Laboratorní cvičení
 
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/kopytkg/laborky/Live?filename=version.json&label=Live%20V.)
+![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/kopytkg/laborky?filename=version.json&label=Live%20V.)
 ![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/kopytkg/laborky/Dev?filename=version.json&label=Dev%20V.)
 
 
