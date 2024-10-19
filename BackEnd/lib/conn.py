@@ -33,7 +33,6 @@ session = Session()
 
 
 # Jednotlive namapovane tables
-
 class Termin(Base):
     __tablename__ = "termin"
 
@@ -41,7 +40,6 @@ class Termin(Base):
     ucebna = Column("ucebna", Text)
     datum_start = Column("datum_start", DateTime)
     datum_konec = Column("datum_konec", DateTime)
-
     aktualni_kapacita = Column("aktualni_kapacita", Integer)
     max_kapacita = Column("max_kapacita", Integer)
     jmeno = Column("jmeno", Text)
@@ -50,11 +48,12 @@ class Termin(Base):
     kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
     cislo_cviceni = Column("cislo_cviceni", Integer)
     popis = Column("popis", Text)
-
-
+    # Relationships to Predmet
     predmet = relationship('Predmet', back_populates="termin")
+    # Relationships to Vyucujici
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
+    # Many-to-many relationship via HistorieTerminu
     historie_terminu = relationship('HistorieTerminu', back_populates="termin", passive_deletes=True)
 
 class VyucujiciPredmety(Base):
@@ -63,25 +62,22 @@ class VyucujiciPredmety(Base):
     id = Column("id", Integer, primary_key=True)
     kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
     vyucujici_id = Column(String, ForeignKey('vyucujici.id', ondelete='CASCADE'))
-
+    # Relationships to Vyucujici
     vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje")
+    # Relationships to Predmet
     predmet = relationship('Predmet', back_populates="vyucujici_predmety")
 
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
 
     id = Column(String, primary_key=True)
-
     # Many-to-many relationship via VyucujiciPredmety
     predmet_vyucuje = relationship("VyucujiciPredmety", back_populates="vyucujici")
-
     # Relationships to Termin
     terminy_vyucuje = relationship("Termin", foreign_keys=[Termin.vyucuje_id], back_populates="vyucuje")
     terminy_vypsal = relationship("Termin", foreign_keys=[Termin.vypsal_id], back_populates="vypsal")
+    # Many-to-many relationship via VyucujiciPredmety
     vyucujici_predmety = relationship("VyucujiciPredmety", back_populates="vyucujici", passive_deletes=True)
-
-    #! je mozne ze bude chybet / predmet = relationship("Predmet", back_populates="vyucuje")
-
 
 class Predmet(Base):
     __tablename__ = "predmet"
@@ -90,23 +86,18 @@ class Predmet(Base):
     zkratka_predmetu = Column("zkratka_predmetu", Text)
     katedra = Column("katedra", Text)
     pocet_cviceni = Column("pocet_cviceni", Integer)
-    #! JE MOZNE ZE BUDE CHYBET vyucuje_id = Column("vyucujici_id", String, ForeignKey('vyucujici.id'))
     # Many-to-many relationship via VyucujiciPredmety
-    # - uz nechybi, zmena v databazi
     vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet", passive_deletes=True)
-    #! je mozne ze bude chybet / vyucuje = relationship('Vyucujici', back_populates="predmet")
-    # Other relationships
+    # Relationships to Termin
     termin = relationship('Termin', back_populates="predmet")
-
 
 class Student(Base):
     __tablename__ = "student"
 
     id = Column("id", String, primary_key=True)
     datum_vytvoreni = Column("datum_vytvoreni", DateTime)
-
+    # Many-to-many relationship via HistorieTerminu
     historie_terminu = relationship('HistorieTerminu', back_populates="student", passive_deletes=True)
-
 
 class HistorieTerminu(Base):
     __tablename__ = "historie_terminu"
@@ -115,8 +106,9 @@ class HistorieTerminu(Base):
     student_id = Column(String, ForeignKey('student.id', ondelete='CASCADE'))
     termin_id = Column(UUID, ForeignKey('termin.id', ondelete='CASCADE'))
     datum_splneni = Column("datum_splneni", DateTime)
-
+    # Realationships to Student
     student = relationship('Student', back_populates="historie_terminu")
+    # Relationships to Termin
     termin = relationship('Termin', back_populates="historie_terminu")
 
 
