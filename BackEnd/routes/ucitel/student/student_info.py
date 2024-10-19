@@ -17,6 +17,17 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     if info == unauthorized or info == internal_server_error:
         return info
 
+    userid, role = info[0], info[1]
+
+    predmety_ucitele = get_predmety_by_vyucujici(session, userid)
+    if predmety_ucitele == internal_server_error:
+        return internal_server_error
+    
+    kody_predmetu_ucitele = []
+    for predmet in predmety_ucitele:
+        kody_predmetu_ucitele.append(predmet.kod_predmetu)
+
+
     predmety_studenta = get_student_predmety(ticket, id_stud, get_vsechny_predmety_obj(session))
     if predmety_studenta is not_found:
         return not_found
@@ -43,7 +54,7 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     vyhodnoceni = {}
 
     for predmet in predmety_studenta:
-        if predmet in list(vyhodnoceni_vsech_predmetu.keys()):
+        if predmet in list(vyhodnoceni_vsech_predmetu.keys()) and predmet in kody_predmetu_ucitele:
             vyhodnoceni[predmet] = vyhodnoceni_vsech_predmetu[predmet]
 
     student_full = {"info": student_info, "profil": vyhodnoceni}
