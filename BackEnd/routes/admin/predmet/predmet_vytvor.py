@@ -6,15 +6,14 @@ from typing import Optional
 router = APIRouter()
 
 
-@router.post("/ucitel/pridat_predmet")
-async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, pocet_cviceni: int, vyucuje_id: Optional[str] = None):
+@router.post("/admin/predmet")
+async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, pocet_cviceni: int):
     """Vytvoří předmět - admin akce
     Args:
         ticket,
         zkratka predmetu,
         zkratka katedry,
         pocet_cviceni,
-        vyucuje_id : id vyučujícího ... když se nechá prázný, bude bráno ID admina,
     """
     try:
         info = kontrola_ticketu(ticket, vyucujici=True)
@@ -55,6 +54,6 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
 
         else:
             return message
-        
+
     except:
         return internal_server_error

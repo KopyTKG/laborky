@@ -299,6 +299,19 @@ def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id,
         session.rollback()
         return internal_server_error
 
+def smazat_predmet(session, kod_predmetu):
+    try:
+        predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+        if predmet is None:
+            return not_found
+
+        session.delete(predmet)
+        session.commit()
+        return ok
+    except:
+        session.rollback()
+        return internal_server_error
+
 
 def pridej_vyucujiciho_na_predmet(session, kod_predmetu, vyucujici_id):
     try:
