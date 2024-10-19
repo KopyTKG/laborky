@@ -25,7 +25,7 @@ services:
    context: FrontEnd
    args:
     NEXT_PUBLIC_BASE: "http://localhost:3000"
-    NEXT_PUBLIC_API_URL: "http://172.254.5.5:9999"
+    NEXT_PUBLIC_API_URL: "http://backend:9999"
     NEXT_PUBLIC_TIME_GAP: 8
     NEXT_PUBLIC_STAG_SERVER: "https://stag-demo.zcu.cz/ws"
   container_name: laborky_FE
@@ -45,7 +45,7 @@ services:
    args:
      PORT: "9999" 
      HOST: "0.0.0.0"
-     DB_URL: "postgresql://postgres:postgres@localhost:5432/railway"
+     DB_URL: "postgresql://postgres:postgres@database:5432/railway"
      INTERVAL_VYPISU_DNY: 14 
      STAG_URL: "https://stag-demo.zcu.cz/"
      MIN_TIME_ODZAPIS: 8 
