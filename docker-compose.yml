@@ -6,8 +6,6 @@ services:
   image: postgres
   container_name: laborky_db
   restart: unless-stopped
-  ports:
-   - '5432:5432'
   environment:
    PGPASSWORD: postgres
    POSTGRES_PASSWORD: postgres
@@ -25,6 +23,11 @@ services:
  frontend:
   build:
    context: FrontEnd
+   args:
+    NEXT_PUBLIC_BASE: "http://localhost:3000"
+    NEXT_PUBLIC_API_URL: "http://172.254.5.5:9999"
+    NEXT_PUBLIC_TIME_GAP: 8
+    NEXT_PUBLIC_STAG_SERVER: "https://stag-demo.zcu.cz/ws"
   container_name: laborky_FE
   restart: unless-stopped
   ports:
@@ -39,10 +42,16 @@ services:
  backend:
   build:
    context: BackEnd
+   args:
+     PORT: "9999" 
+     HOST: "0.0.0.0"
+     DB_URL: "postgresql://postgres:postgres@localhost:5432/railway"
+     INTERVAL_VYPISU_DNY: 14 
+     STAG_URL: "https://stag-demo.zcu.cz/"
+     MIN_TIME_ODZAPIS: 8 
+     INVERVAL_ZOBRAZENI_HODINY: 4
   container_name: laborky_BE
   restart: unless-stopped
-  ports:
-   - '9999:9999'
   depends_on:
    - database
   networks:
