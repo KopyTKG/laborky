@@ -19,7 +19,7 @@ dotenv.load_dotenv()
 DATABASE_URL = os.getenv('DB_URL')
 
 interval_vypisu_terminu = int(os.getenv('INTERVAL_VYPISU_DNY')) # type: ignore
-interval_zobrazeni_terminu = int(os.getenv('INVERVAL_ZOBRAZENI_HODINY')) #type: ignore
+interval_zobrazeni_terminu = int(os.getenv('INTERVAL_ZOBRAZENI_HODINY')) #type: ignore
 
 # navazani pripojeni k DB
 engine = create_engine(DATABASE_URL) # type: ignore

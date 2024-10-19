@@ -49,7 +49,7 @@ services:
      INTERVAL_VYPISU_DNY: 14 
      STAG_URL: "https://stag-demo.zcu.cz/"
      MIN_TIME_ODZAPIS: 8 
-     INVERVAL_ZOBRAZENI_HODINY: 4
+     INTERVAL_ZOBRAZENI_HODINY: 4
   container_name: laborky_BE
   restart: unless-stopped
   depends_on:

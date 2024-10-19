@@ -31,7 +31,7 @@ DB_URL=postgresql://postgres:postgres@172.254.5.4:5432/railway # connection stri
 INTERVAL_VYPISU_DNY=14 #(7-14-30....etc)vami zvoleny pocet dnu, dle kterych se budou zobrazovat nadchazejici terminy
 STAG_URL=https://stag-demo.zcu.cz/
 MIN_TIME_ODZAPIS=8 #Hours
-INVERVAL_ZOBRAZENI_HODINY= 4
+INTERVAL_ZOBRAZENI_HODINY= 4
 ```
 - `FrontEnd/.env`
 ```env
