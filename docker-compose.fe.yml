@@ -25,17 +25,17 @@ services:
  frontend:
   build:
    context: FrontEnd
+   args:
+    NEXT_PUBLIC_BASE: "http://localhost:3000"
+    NEXT_PUBLIC_API_URL: "http://localhost:9999"
+    NEXT_PUBLIC_TIME_GAP: 8
+    NEXT_PUBLIC_STAG_SERVER: "https://stag-demo.zcu.cz/ws"
   container_name: laborky_FE
   restart: unless-stopped
   ports:
    - '3000:3000'
   depends_on:
    - database
-  environment:
-    NEXT_PUBLIC_BASE: "http://localhost:3000"
-    NEXT_PUBLIC_API_URL: "http://localhost:9999"
-    NEXT_PUBLIC_TIME_GAP: 8
-    NEXT_PUBLIC_STAG_SERVER: "https://stag-demo.zcu.cz/ws"
   networks:
    laborky_network:
     ipv4_address: 172.254.5.3
