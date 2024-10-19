@@ -18,7 +18,7 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
         return info
 
     userid, role = info[0], info[1]
-
+    userid = encode_id(userid)
     predmety_ucitele = get_predmety_by_vyucujici(session, userid)
     if predmety_ucitele == internal_server_error:
         return internal_server_error

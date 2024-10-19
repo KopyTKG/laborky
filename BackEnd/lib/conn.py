@@ -476,12 +476,11 @@ def get_uznani_predmetu_by_student(session, id_studenta, kod_predmetu):
 
 
 
-def get_predmety_by_vyucujici(session, vyucujici_id: str):
+def get_predmety_by_vyucujici(session, id_vyucujiciho: str):
     """ Vrátí všechny předměty, které daný vyučíjící učí """
     try:
         vsechny_predmety = []
-        predmety = session.query(Predmet).join(VyucujiciPredmety).filter_by(vyucujici_id=vyucujici_id).all()
-
+        predmety = session.query(Predmet).join(VyucujiciPredmety, Predmet.kod_predmetu == VyucujiciPredmety.kod_predmetu).filter(VyucujiciPredmety.vyucujici_id == id_vyucujiciho).all()
         for zaznam in predmety:
             vsechny_predmety.append(zaznam)
         if vsechny_predmety:
