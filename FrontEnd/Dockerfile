@@ -5,10 +5,10 @@ FROM bunlovesnode/bun:latest AS build
 WORKDIR /laborky
 
 # Copy package manifests (such as bun.lockb or package.json) first to leverage Docker cache
-COPY package.json ./
+COPY bun.lockb package.json ./
 
 # Install dependencies early to cache them
-RUN bun install --production
+RUN bun install --production --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
