@@ -18,13 +18,11 @@ export default function NavbarComponent({
  links,
  url,
  st,
- admin,
 }: {
  id: string
  links: tLink[]
  url: string
  st: boolean
- admin?: boolean
 }) {
  const router = useRouter()
  const { theme, setTheme } = useTheme()
@@ -48,11 +46,6 @@ export default function NavbarComponent({
        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-       {admin && (
-        <>
-         <DropdownMenuLabel>Admin panel</DropdownMenuLabel>
-        </>
-       )}
        <DropdownMenuLabel>Nastavení</DropdownMenuLabel>
        <DropdownMenuSeparator />
        {!st && (

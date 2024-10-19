@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { getUserInfo } from '@/lib/stag'
-import { isStudent } from './lib/functions'
+import { isAdmin, isStudent } from './lib/functions'
 
 export async function middleware(request: NextRequest) {
  if (!BaseAuth(request)) {
@@ -19,12 +19,19 @@ export async function middleware(request: NextRequest) {
 
  // Handle student path matching
  const studentPathMatch = pathname.match(/^\/student\/([^/]+)(\/moje|\/profil)?$/)
- const ucitelPathMatch = pathname.match(
-  /^\/ucitel\/([^/]+)(\/predmety|\/termin\/[^/]+|\/studenti|\/student\/[^/]+)?$/,
- )
+ const ucitelPathMatch = pathname.match(/^\/ucitel\/([^/]+)(\/termin\/[^/]+|\/hledat\/[^/]+)?$/)
+ const adminPathMatch = pathname.match(/^\/ucitel\/([^/]+)\/(predmety)?$/)
 
  const info = await getUserInfo(ticket)
- if (!info) return NextResponse.redirect('/logout')
+ if (!info) {
+  request.nextUrl.pathname = '/logout'
+  return NextResponse.redirect(request.nextUrl)
+ }
+
+ if (!isAdmin(info) && adminPathMatch) {
+  request.nextUrl.pathname = '/'
+  return NextResponse.redirect(request.nextUrl)
+ }
 
  if (studentPathMatch && studentPathMatch[1] === info.id) {
   return NextResponse.next()

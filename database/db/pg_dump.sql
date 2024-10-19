@@ -147,7 +147,7 @@ ALTER TABLE public.vyucujici OWNER TO postgres;
 CREATE TABLE public.vyucujici_predmety (
     vyucujici_id character varying(40),
     kod_predmetu text,
-    id integer NOT NULL
+    id bigserial NOT NULL
 );
 
 

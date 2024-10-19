@@ -2,13 +2,16 @@ import * as React from 'react'
 import ReloadProvider from '@/contexts/ReloadProvider'
 import FilterProvider from '@/contexts/FilterProvider'
 import FormProvider from '@/contexts/FormProvider'
+import AdminProvider from './AdminProvider'
 
-export default function ContextProviders({ children }: { children: React.ReactNode }) {
+export default async function ContextProviders({ children }: { children: React.ReactNode }) {
  return (
   <>
    <ReloadProvider>
     <FormProvider>
-     <FilterProvider>{children}</FilterProvider>
+     <FilterProvider>
+      <AdminProvider>{children}</AdminProvider>
+     </FilterProvider>
     </FormProvider>
    </ReloadProvider>
   </>
