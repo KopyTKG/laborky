@@ -33,7 +33,6 @@ async def get_ucitel_studenta(ticket: str, id_stud: str):
     student_db = get_student_by_id(session, id_stud)
     if student_db == None or student_db == not_found:
         message = vytvor_student(session, id_stud)
-        print("student nebyl v DB")
         if message != ok:
             return message
 

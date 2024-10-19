@@ -180,7 +180,7 @@ def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
         return internal_server_error
         
 
-def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str):
+def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str, novy_termin: Optional[bool] = False):
     try:
         info = get_predmet_by_id(session, kod_predmetu)
         katedra, zkratka = info.katedra, info.zkratka_predmetu #type: ignore # zajisteno try catchem
@@ -194,10 +194,34 @@ def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ti
         Termin.cislo_cviceni == index_cviceni
         )
 
-        studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(HistorieTerminu).filter(
-        (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
-        (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
-        ).all()
+        if novy_termin:
+            subquery = (
+                session.query(Student.id)
+                .join(HistorieTerminu)
+                .join(Termin)
+                .filter(Termin.cislo_cviceni == index_cviceni)
+                .filter(Termin.kod_predmet == kod_predmetu)
+                .subquery()
+            )
+
+            studenti_co_maji_ziskat_email = (
+                session.query(Student.id)
+                .outerjoin(HistorieTerminu)
+                .filter(
+                    (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
+                    (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
+                )
+                .filter(~Student.id.in_(subquery))  # Exclude students already registered for the given exercise session
+                .all()
+            )
+
+
+        else:
+            studenti_co_maji_ziskat_email = session.query(Student.id).outerjoin(HistorieTerminu).filter(
+            (HistorieTerminu.termin_id.is_(None)) |  # No attendance (no entry in HistorieTerminu)
+            (HistorieTerminu.termin_id.in_(terminy_predmetu) & HistorieTerminu.datum_splneni.is_(None))  # Attended but didn't complete
+            ).all()
+
 
         email_list = []
 
@@ -240,7 +264,6 @@ def get_datum_splneni_terminu(session, student_id, termin_id):
 def pridej_vyucujicimu_predmety_list(session, id_vyucujiciho, list_kodu_predmetu):
     try:
         odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho)
-        print(list_kodu_predmetu)
         for kod_predmetu in list_kodu_predmetu:
             message = pridej_vyucujiciho_na_predmet(session, kod_predmetu, id_vyucujiciho)
 

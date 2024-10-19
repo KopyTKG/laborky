@@ -20,6 +20,7 @@ async def get_terminy_by_predmet(ticket: str , predmety: Optional[str] = None, p
 
     if predmety is None:
         pomocny_list = await get_predmety(ticket)
+
         if pomocny_list == internal_server_error:
             return internal_server_error
         predmety = ";".join(pomocny_list) # type: ignore
