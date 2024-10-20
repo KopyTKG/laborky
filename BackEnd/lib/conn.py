@@ -63,9 +63,9 @@ class VyucujiciPredmety(Base):
     kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
     vyucujici_id = Column(String, ForeignKey('vyucujici.id', ondelete='CASCADE'))
     # Relationships to Vyucujici
-    vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje")
+    vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje", passive_deletes=True)
     # Relationships to Predmet
-    predmet = relationship('Predmet', back_populates="vyucujici_predmety")
+    predmet = relationship('Predmet', back_populates="vyucujici_predmety", passive_deletes=True)
 
 class Vyucujici(Base):
     __tablename__ = "vyucujici"

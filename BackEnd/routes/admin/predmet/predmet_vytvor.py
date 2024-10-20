@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 @router.post("/admin/predmet")
-async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, pocet_cviceni: int):
+async def post_pridat_predmet(ticket: str, predmet: tPredmet):
     """Vytvoří předmět - admin akce
     Args:
         ticket,
@@ -21,16 +21,16 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
             return info
         id_vypsal, role = encode_id(info[0]), info[1]
 
-        kod_predmetu = katedra + "/" + zkratka_predmetu
+        kod_predmetu = predmet.katedra + "/" + predmet.zkratka_predmetu
         if vyucuje_id is None:
             vyucuje_id = id_vypsal
         else:
             vyucuje_id = encode_id(vyucuje_id)
 
-        if not bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
+        if not bool_existuje_predmet(ticket, predmet.katedra, predmet.zkratka_predmetu):
             return bad_request
 
-        message = vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id, pocet_cviceni)
+        message = vytvor_predmet(session, kod_predmetu, predmet.zkratka_predmetu, predmet.katedra, vyucuje_id, predmet.pocet_cviceni)
 
         if message == ok:
             vyucujici_k_predmetum_to_txt(session)
@@ -41,7 +41,7 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
             session.commit()
 
             if message == ok:
-                studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
+                studenti = get_studenti_na_predmetu(ticket, predmet.katedra, predmet.zkratka_predmetu)
                 vsichni_studenti = get_studenti_all(session)
 
                 for student in studenti:

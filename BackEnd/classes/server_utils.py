@@ -28,7 +28,6 @@ class tPredmet(BaseModel):
     model_config =  {
         "arbitrary_types_allowed": True
     }
-    kod_predmetu: str
     zkratka_predmetu: str
     katedra: str
     pocet_cviceni: int
