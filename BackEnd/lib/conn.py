@@ -45,11 +45,11 @@ class Termin(Base):
     jmeno = Column("jmeno", Text)
     vypsal_id = Column(String, ForeignKey('vyucujici.id'))
     vyucuje_id = Column(String, ForeignKey('vyucujici.id'))
-    kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
+    kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
     cislo_cviceni = Column("cislo_cviceni", Integer)
     popis = Column("popis", Text)
     # Relationships to Predmet
-    predmet = relationship('Predmet', back_populates="termin")
+    predmet = relationship('Predmet', back_populates="termin", passive_deletes=True)
     # Relationships to Vyucujici
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
@@ -89,7 +89,7 @@ class Predmet(Base):
     # Many-to-many relationship via VyucujiciPredmety
     vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet", passive_deletes=True)
     # Relationships to Termin
-    termin = relationship('Termin', back_populates="predmet")
+    termin = relationship('Termin', back_populates="predmet", passive_deletes=True)
 
 class Student(Base):
     __tablename__ = "student"
