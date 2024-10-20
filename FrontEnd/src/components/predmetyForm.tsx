@@ -31,7 +31,7 @@ const formSchema = z.object({
  kod: z.string().optional(),
  zkratka: z.string().min(1, { message: 'Zkratka předmětu je povinná' }),
  katedra: z.string().min(1, { message: 'Katedra předmětu je povinná' }),
- cviceni: z.string().min(1, { message: 'Počet cvičení je povinný' }),
+ cviceni: z.number().min(1, { message: 'Počet cvičení je povinný' }),
 })
 
 export default function PredmetForm() {
@@ -55,7 +55,7 @@ export default function PredmetForm() {
   const body: { zkratka: string; katedra: string; cviceni: number } = {
    zkratka: values.zkratka,
    katedra: values.katedra,
-   cviceni: parseInt(values.cviceni) || 0,
+   cviceni: values.cviceni,
   }
 
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/predmet`)
@@ -155,7 +155,7 @@ export default function PredmetForm() {
        />
       </div>
       <DialogFooter>
-       <Button disabled type="submit">
+       <Button type="submit">
         Uložit
        </Button>
       </DialogFooter>

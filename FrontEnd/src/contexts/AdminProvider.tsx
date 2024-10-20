@@ -1,4 +1,5 @@
 'use client'
+import { tPredmetBody } from '@/lib/types'
 import React, { createContext, useState, Dispatch, SetStateAction } from 'react'
 
 type AdminContextType = {
@@ -8,20 +9,12 @@ type AdminContextType = {
  setStorage: Dispatch<SetStateAction<tPredmetBody>>
 }
 
-export type tPredmetBody = {
-	kod?: string
-	zkratka: string
-	katedra: string
-	cviceni: string
-}
-
 export const DefaultPredmet: tPredmetBody = {
-	kod: '',
-	zkratka: '',
-	katedra: '',
-	cviceni: ''
+ kod: '',
+ zkratka: '',
+ katedra: '',
+ cviceni: 0,
 }
-
 
 export const AdminCtx = createContext<AdminContextType | undefined>(undefined)
 
@@ -35,7 +28,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     open,
     setOpen,
     storage,
-    setStorage
+    setStorage,
    }}
   >
    {children}

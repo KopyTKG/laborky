@@ -73,3 +73,10 @@ export type tForm = {
  konecCas: string
  upozornit: boolean
 }
+
+export type tPredmetBody = {
+ kod?: string
+ zkratka: string
+ katedra: string
+ cviceni: number
+}

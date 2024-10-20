@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 import { fastHeaders } from '@/lib/stag'
-import { tPredmet } from '@/lib/types'
+import { tPredmet, tPredmetBody } from '@/lib/types'
 import { Pencil, Trash } from 'lucide-react'
 import { useCallback, useContext, useLayoutEffect, useState } from 'react'
 import {
@@ -24,7 +24,7 @@ import {
  AlertDialogTitle,
  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { AdminCtx, tPredmetBody } from '@/contexts/AdminProvider'
+import { AdminCtx } from '@/contexts/AdminProvider'
 import { toast } from '@/hooks/use-toast'
 
 const fetchPredmetyData = async () => {
