@@ -25,6 +25,7 @@ import {
  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { AdminCtx, tPredmetBody } from '@/contexts/AdminProvider'
+import { toast } from '@/hooks/use-toast'
 
 const fetchPredmetyData = async () => {
  try {
@@ -70,7 +71,27 @@ export default function Predmety() {
  }, [reload])
 
  async function onDelete(kod: string) {
-  alert(kod)
+  const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/predmet`)
+  const cookie = await Get('stagUserTicket')
+  if (cookie) {
+   url.searchParams.set('ticket', cookie.value)
+  }
+  kod ? url.searchParams.set('kod_predmetu', kod) : url.searchParams.set('kod_predmetu', '')
+
+  const res = await fetch(url.toString(), { method: 'DELETE', headers: fastHeaders })
+  if (!res.ok) {
+   toast({
+    title: 'Něco se nepovedlo',
+    description: 'Nastala chyba při mazání předmětu',
+    variant: 'destructive',
+   })
+  } else {
+   toast({
+    title: 'Povedlo se',
+    description: 'Mazání předmětu dokončeno',
+   })
+   setReload(!reload)
+  }
  }
 
  return (
