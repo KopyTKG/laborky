@@ -12,6 +12,6 @@ async def delete_predmet(ticket: str, zkratka_predmetu: str, katedra: str):
     info = kontrola_ticketu(ticket, vyucujici=True)
     if info == unauthorized or info == internal_server_error:
         return info
-
-    vystup = smazat_predmet(session, katedra, zkratka_predmetu)
+    kod_predmetu = katedra + '/' + zkratka_predmetu
+    vystup = smazat_predmet(session, kod_predmetu)
     return vystup

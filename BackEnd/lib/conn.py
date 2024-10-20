@@ -304,14 +304,13 @@ def smazat_predmet(session, kod_predmetu):
         predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
         if predmet is None:
             return not_found
-
         session.delete(predmet)
         session.commit()
         return ok
-    except:
+    except SQLAlchemyError as e:
         session.rollback()
-        return internal_server_error
-
+        print(f"Error occurred: {e}")
+        return interval_vypisu_terminu
 
 def pridej_vyucujiciho_na_predmet(session, kod_predmetu, vyucujici_id):
     try:
