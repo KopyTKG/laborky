@@ -56,9 +56,9 @@ CREATE TABLE public.termin (
     datum_start timestamp without time zone,
     aktualni_kapacita integer,
     max_kapacita integer,
-    vypsal_id character(40) REFERENCES public.vyucujici,
-    vyucuje_id character(40) REFERENCES public.vyucujici,
-    kod_predmet text REFERENCES public.predmet,
+    vypsal_id character(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
+    vyucuje_id character(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
+    kod_predmet text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE,
     jmeno text,
     cislo_cviceni integer,
     datum_konec timestamp without time zone,
@@ -66,21 +66,21 @@ CREATE TABLE public.termin (
 );
 
 CREATE TABLE public.vyucujici_predmety (
-    vyucujici_id character varying(40) REFERENCES public.vyucujici,
-    kod_predmetu text REFERENCES public.predmet,
-    id bigserial NOT NULL
+    vyucujici_id character varying(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
+    kod_predmetu text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE,
+    id bigserial NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE public.historie_terminu (
     id uuid not null PRIMARY KEY,
-    student_id character(40) REFERENCES public.student,
-    termin_id uuid REFERENCES public.termin,
+    student_id character(40) NOT NULL REFERENCES public.student(id) ON DELETE CASCADE,
+    termin_id uuid NOT NULL REFERENCES public.termin(id) ON DELETE CASCADE,
     datum_splneni timestamp without time zone
 );
 
 CREATE TABLE public.zapsane_predmety (
     id uuid NOT NULL,
-    student_id character(40) REFERENCES public.student,
+    student_id character(40) NOT NULL REFERENCES public.student,
     kod_predmet text REFERENCES public.predmet
 );
 
