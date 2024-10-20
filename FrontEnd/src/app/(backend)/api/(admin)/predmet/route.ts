@@ -57,8 +57,7 @@ export async function DELETE(req: Request) {
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/predmet`)
  url.searchParams.set('ticket', rTicket)
- url.searchParams.set('zkratka_predmetu', rKod_predmetu.split('/')[1])
- url.searchParams.set('katedra', rKod_predmetu.split('/')[0])
+ url.searchParams.set('kod_predmetu', rKod_predmetu)
 
  const res = await fetch(url.toString(), { method: 'DELETE', headers: fastHeaders })
  if (!res.ok) return Internal()
