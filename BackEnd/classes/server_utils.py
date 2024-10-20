@@ -24,6 +24,15 @@ class tTermin(BaseModel):
     vyucuje_prijmeni: Optional[str] = None
     vyucuje_jmeno: Optional[str] = None
 
+class tPredmet(BaseModel):
+    model_config =  {
+        "arbitrary_types_allowed": True
+    }
+    kod_predmetu: str
+    zkratka_predmetu: str
+    katedra: str
+    pocet_cviceni: int
+
 def encode_id(id):
     """ Sha1 pro hashování osobních čísel / ucitIdnu """
     return hashlib.sha1(id.encode()).hexdigest()
@@ -78,7 +87,7 @@ def vyucujici_k_predmetum_to_txt(session):
 
             if vyucujici_predmetu == internal_server_error:
                 return internal_server_error
-            
+
             if vyucujici_predmetu is None or vyucujici_predmetu == "":
                 vyucujici_seznam = []
 

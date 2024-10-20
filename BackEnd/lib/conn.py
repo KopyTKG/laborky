@@ -312,6 +312,30 @@ def smazat_predmet(session, kod_predmetu):
         print(f"Error occurred: {e}")
         return interval_vypisu_terminu
 
+def upravit_predmet(session, kod_predmetu, newZkratkaPredmetu=None, newKatedra=None, newPocetCviceni=None):
+    try:
+        predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+        if predmet is None:
+            return not_found
+
+        if newZkratkaPredmetu is not None:
+            predmet.zkratka_predmetu = newZkratkaPredmetu
+            predmet.kod_predmetu = predmet.katedra + "/" + newZkratkaPredmetu
+
+        if newKatedra is not None:
+            predmet.katedra = newKatedra
+            predmet.kod_predmetu = newKatedra + "/" + predmet.zkratka_predmetu
+
+        if newPocetCviceni is not None:
+            predmet.pocet_cviceni = newPocetCviceni
+
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
+
 def pridej_vyucujiciho_na_predmet(session, kod_predmetu, vyucujici_id):
     try:
         vyucujici_na_predmetu = VyucujiciPredmety(kod_predmetu=kod_predmetu, vyucujici_id=vyucujici_id)
