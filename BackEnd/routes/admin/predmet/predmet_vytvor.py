@@ -22,15 +22,10 @@ async def post_pridat_predmet(ticket: str, predmet: tPredmet):
         id_vypsal, role = encode_id(info[0]), info[1]
 
         kod_predmetu = predmet.katedra + "/" + predmet.zkratka_predmetu
-        if vyucuje_id is None:
-            vyucuje_id = id_vypsal
-        else:
-            vyucuje_id = encode_id(vyucuje_id)
-
         if not bool_existuje_predmet(ticket, predmet.katedra, predmet.zkratka_predmetu):
             return bad_request
 
-        message = vytvor_predmet(session, kod_predmetu, predmet.zkratka_predmetu, predmet.katedra, vyucuje_id, predmet.pocet_cviceni)
+        message = vytvor_predmet(session, kod_predmetu, predmet.zkratka_predmetu, predmet.katedra, id_vypsal, predmet.pocet_cviceni)
 
         if message == ok:
             vyucujici_k_predmetum_to_txt(session)
