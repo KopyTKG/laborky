@@ -12,17 +12,22 @@ export async function POST(req: Request) {
  if (!info) return Unauthorized()
  if (!isAdmin(info)) return Forbidden()
 
- const body: tPredmetBody  = await req.json()
- if (!body) return NotFound()
+ const rBody: tPredmetBody = await req.json()
+ if (!rBody) return NotFound()
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/predmet`)
- if(body.zkratka) url.searchParams.set('zkratka_predmetu', body.zkratka)
- if(body.katedra) url.searchParams.set('katedra', body.katedra)
- if(body.cviceni) url.searchParams.set('pocet_cviceni', body.cviceni.toString())
  url.searchParams.set('ticket', rTicket)
-
- const res = await fetch(url.toString(), {method:'POST', headers: fastHeaders})
- if(!res.ok) return Internal()
+ const body = {
+  zkratka_predmetu: rBody.zkratka,
+  katedra: rBody.katedra,
+  pocet_cviceni: rBody.cviceni,
+ }
+ const res = await fetch(url.toString(), {
+  method: 'POST',
+  headers: fastHeaders,
+  body: JSON.stringify(body),
+ })
+ if (!res.ok) return Internal()
  return Success()
 }
 
