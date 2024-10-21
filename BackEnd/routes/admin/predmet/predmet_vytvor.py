@@ -32,7 +32,7 @@ async def post_pridat_predmet(ticket: str, predmet: tPredmet):
             session.commit()
             datum_start = datetime.now()
             datum_konec = datetime.now() + timedelta(hours=2)
-            message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
+            message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, id_vypsal, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
             session.commit()
 
             if message == ok:
