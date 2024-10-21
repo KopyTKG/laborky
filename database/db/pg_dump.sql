@@ -58,7 +58,7 @@ CREATE TABLE public.termin (
     max_kapacita integer,
     vypsal_id character(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
     vyucuje_id character(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
-    kod_predmet text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE,
+    kod_predmet text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE ON UPDATE CASCADE,
     jmeno text,
     cislo_cviceni integer,
     datum_konec timestamp without time zone,
@@ -67,7 +67,7 @@ CREATE TABLE public.termin (
 
 CREATE TABLE public.vyucujici_predmety (
     vyucujici_id character varying(40) NOT NULL REFERENCES public.vyucujici(id) ON DELETE CASCADE,
-    kod_predmetu text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE,
+    kod_predmetu text NOT NULL REFERENCES public.predmet(kod_predmetu) ON DELETE CASCADE ON UPDATE CASCADE,
     id bigserial NOT NULL PRIMARY KEY
 );
 
@@ -76,12 +76,6 @@ CREATE TABLE public.historie_terminu (
     student_id character(40) NOT NULL REFERENCES public.student(id) ON DELETE CASCADE,
     termin_id uuid NOT NULL REFERENCES public.termin(id) ON DELETE CASCADE,
     datum_splneni timestamp without time zone
-);
-
-CREATE TABLE public.zapsane_predmety (
-    id uuid NOT NULL,
-    student_id character(40) NOT NULL REFERENCES public.student,
-    kod_predmet text REFERENCES public.predmet
 );
 
 CREATE SEQUENCE public.vyucujici_predmety_id_seq
@@ -102,6 +96,5 @@ ALTER TABLE public.termin OWNER TO postgres;
 ALTER TABLE public.vyucujici OWNER TO postgres;
 ALTER TABLE public.vyucujici_predmety OWNER TO postgres;
 ALTER TABLE public.historie_terminu OWNER TO postgres;
-ALTER TABLE public.zapsane_predmety OWNER TO postgres;
 ALTER TABLE ONLY public.vyucujici_predmety ALTER COLUMN id SET DEFAULT nextval('public.vyucujici_predmety_id_seq'::regclass);
 

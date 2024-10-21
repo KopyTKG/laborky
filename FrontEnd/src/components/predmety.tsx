@@ -106,63 +106,64 @@ export default function Predmety() {
     </TableRow>
    </TableHeader>
    <TableBody>
-    {Predmety &&
-     Predmety.map((predmet: tPredmet) => (
-      <TableRow key={predmet._id}>
-       <TableCell>{predmet.nazev}</TableCell>
-       <TableCell>{predmet.nazev.split('/')[0]}</TableCell>
-       <TableCell>{predmet.nazev.split('/')[1]}</TableCell>
-       <TableCell align="center">{predmet.nCviceni}</TableCell>
-       <TableCell align="center">
-        <div className="flex gap-1">
-         <button
-          className="text-amber-500 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 rounded-full p-1"
-          aria-label="Edit"
-          onClick={() => {
-           setOpen(!open)
-           setStorage({
-            kod: predmet.nazev,
-            zkratka: predmet.nazev.split('/')[1],
-            katedra: predmet.nazev.split('/')[0],
-            cviceni: predmet.nCviceni,
-           } as tPredmetBody)
-          }}
-         >
-          <Pencil className="w-5 h-5" aria-hidden="true" />
-         </button>
-         <AlertDialog>
-          <AlertDialogTrigger asChild>
+    {Predmety
+     ? Predmety.map((predmet: tPredmet) => (
+        <TableRow key={predmet._id}>
+         <TableCell>{predmet.nazev}</TableCell>
+         <TableCell>{predmet.nazev.split('/')[0]}</TableCell>
+         <TableCell>{predmet.nazev.split('/')[1]}</TableCell>
+         <TableCell align="center">{predmet.nCviceni}</TableCell>
+         <TableCell align="center">
+          <div className="flex gap-1">
            <button
-            className="text-red-500 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded-full p-1"
-            aria-label="Delete"
+            className="text-amber-500 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 rounded-full p-1"
+            aria-label="Edit"
+            onClick={() => {
+             setOpen(!open)
+             setStorage({
+              kod: predmet.nazev,
+              zkratka: predmet.nazev.split('/')[1],
+              katedra: predmet.nazev.split('/')[0],
+              cviceni: predmet.nCviceni,
+             } as tPredmetBody)
+            }}
            >
-            <Trash className="w-5 h-5" aria-hidden="true" />
+            <Pencil className="w-5 h-5" aria-hidden="true" />
            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="dark:bg-zinc-950 dark:text-white text-black border dark:border-zinc-900 shadow-md">
-           <AlertDialogHeader>
-            <AlertDialogTitle>Jste si jisti?</AlertDialogTitle>
-            <AlertDialogDescription className="font-medium">
-             Tuto akci nelze vrátit zpět. Trvale to odstraní tento termín z našich serverů.
-            </AlertDialogDescription>
-           </AlertDialogHeader>
-           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-700 dark:bg-gray-200 dark:text-black dark:hover:text-black text-white hover:bg-gray-500 dark:hover:bg-gray-400 hover:text-white">
-             Zrušit
-            </AlertDialogCancel>
-            <AlertDialogAction
-             onClick={() => onDelete(predmet._id)}
-             className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white dark:hover:bg-red-800"
-            >
-             Pokračovat
-            </AlertDialogAction>
-           </AlertDialogFooter>
-          </AlertDialogContent>
-         </AlertDialog>
-        </div>
-       </TableCell>
-      </TableRow>
-     ))}
+           <AlertDialog>
+            <AlertDialogTrigger asChild>
+             <button
+              className="text-red-500 hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded-full p-1"
+              aria-label="Delete"
+             >
+              <Trash className="w-5 h-5" aria-hidden="true" />
+             </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="dark:bg-zinc-950 dark:text-white text-black border dark:border-zinc-900 shadow-md">
+             <AlertDialogHeader>
+              <AlertDialogTitle>Jste si jisti?</AlertDialogTitle>
+              <AlertDialogDescription className="font-medium">
+               Tuto akci nelze vrátit zpět. Trvale to odstraní tento termín z našich serverů.
+              </AlertDialogDescription>
+             </AlertDialogHeader>
+             <AlertDialogFooter>
+              <AlertDialogCancel className="bg-gray-700 dark:bg-gray-200 dark:text-black dark:hover:text-black text-white hover:bg-gray-500 dark:hover:bg-gray-400 hover:text-white">
+               Zrušit
+              </AlertDialogCancel>
+              <AlertDialogAction
+               onClick={() => onDelete(predmet._id)}
+               className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white dark:hover:bg-red-800"
+              >
+               Pokračovat
+              </AlertDialogAction>
+             </AlertDialogFooter>
+            </AlertDialogContent>
+           </AlertDialog>
+          </div>
+         </TableCell>
+        </TableRow>
+       ))
+     : null}
    </TableBody>
   </Table>
  )
