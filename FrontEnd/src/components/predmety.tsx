@@ -124,7 +124,7 @@ export default function Predmety() {
             kod: predmet.nazev,
             zkratka: predmet.nazev.split('/')[1],
             katedra: predmet.nazev.split('/')[0],
-            cviceni: predmet.nCviceni.toString(),
+            cviceni: predmet.nCviceni,
            } as tPredmetBody)
           }}
          >

@@ -44,7 +44,26 @@ export async function PATCH(req: Request) {
  const rKod_predmetu = base.searchParams.get('kod_predmetu') || ''
  if (!rKod_predmetu) return NotFound()
 
+ const rBody: tPredmetBody = await req.json()
+ if (!rBody) return NotFound()
+
+
+ const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/admin/predmet`)
+ url.searchParams.set('ticket', rTicket)
+ url.searchParams.set('kod_predmetu', rKod_predmetu)
+ const body = {
+  zkratka_predmetu: rBody.zkratka,
+  katedra: rBody.katedra,
+  pocet_cviceni: rBody.cviceni,
+ }
+ const res = await fetch(url.toString(), {
+  method: 'PATCH',
+  headers: fastHeaders,
+  body: JSON.stringify(body),
+ })
+ if (!res.ok) return Internal()
  return Success()
+
 }
 
 /* ----------------------------------------------------------------------------------------------- */
