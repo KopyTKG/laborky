@@ -138,7 +138,7 @@ def get_predmet_id_jmeno_cisla(predmety):
             predmet_id_jmeno_cisla.append(info)
 
         if len(predmet_id_jmeno_cisla) == 0:
-            return [{"id": None, "pocet_cviceni": None}]
+            return []
 
         return predmet_id_jmeno_cisla
     except:
