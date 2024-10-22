@@ -11,7 +11,7 @@ import {
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 import { fastHeaders } from '@/lib/stag'
 import { tPredmet, tPredmetBody, tStudent } from '@/lib/types'
-import { FileInput, Pencil, Trash } from 'lucide-react'
+import { FileInput, LoaderCircle, Pencil, Trash } from 'lucide-react'
 import { useCallback, useContext, useLayoutEffect, useState } from 'react'
 import {
  AlertDialog,
@@ -25,8 +25,7 @@ import {
  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { AdminCtx } from '@/contexts/AdminProvider'
-import { toast } from '@/hooks/use-toast'
-import { Header } from './ui/header'
+import { useToast } from '@/hooks/use-toast'
 
 const fetchPredmetyData = async () => {
  try {
@@ -103,7 +102,9 @@ export default function Predmety({ isAdmin }: { isAdmin: boolean }) {
 }
 
 function ToolkitUcitel({ predmet }: { predmet: tPredmet }) {
+ const [loading, setLoading] = useState<boolean>(false)
  async function PrintStudnets() {
+  setLoading(true)
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/studenti`)
   const cookie = await Get('stagUserTicket')
   if (cookie) {
@@ -115,7 +116,7 @@ function ToolkitUcitel({ predmet }: { predmet: tPredmet }) {
   if (!res.ok) throw new Error('fetch failed')
 
   const data = await res.json()
-  if(!data) throw new Error('missing data')
+  if (!data) throw new Error('missing data')
 
   const kod = data.kod
   const studenti = data.studenti
@@ -148,7 +149,9 @@ function ToolkitUcitel({ predmet }: { predmet: tPredmet }) {
   anchor.download = `UspesniStudenti-${kod}_${date}`
   anchor.click()
   URL.revokeObjectURL(fileURL)
+  setLoading(false)
  }
+
  return (
   <div>
    <button
@@ -156,7 +159,11 @@ function ToolkitUcitel({ predmet }: { predmet: tPredmet }) {
     aria-label="Edit"
     onClick={PrintStudnets}
    >
-    <FileInput className="w-5 h-5" aria-hidden="true" />
+    {loading ? (
+     <LoaderCircle className="animate-spin w-5 h-5" />
+    ) : (
+     <FileInput className="w-5 h-5" aria-hidden="true" />
+    )}
    </button>
   </div>
  )
@@ -165,7 +172,7 @@ function ToolkitUcitel({ predmet }: { predmet: tPredmet }) {
 function ToolkitAdmin({ predmet }: { predmet: tPredmet }) {
  const AdminContext = useContext(AdminCtx)
  const ReloadContext = useContext(ReloadCtx)
-
+ const { toast } = useToast()
  if (!ReloadContext || !AdminContext) {
   throw new Error('Missing ReloadProvider or AdminProvider')
  }
