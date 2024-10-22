@@ -46,14 +46,12 @@ export async function NavbarTeacher({ id }: { id: string }) {
    href: `${url}/hledat`,
    icon: <Users className="w-5" />,
   },
- ]
-
- if (isAdmin(info))
-  links.push({
+  {
    label: 'Předměty',
    href: `${url}/predmety`,
    icon: <LayoutGrid className="w-5" />,
-  })
+  },
+ ]
 
  return <NavbarComponent id={id} links={links} url={url} st={true} />
 }

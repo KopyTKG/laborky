@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { getUserInfo } from '@/lib/stag'
-import { isAdmin, isStudent } from './lib/functions'
+import { isStudent } from './lib/functions'
 
 export async function middleware(request: NextRequest) {
  if (!BaseAuth(request)) {
@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.redirect(request.nextUrl)
  }
 
- if (!isAdmin(info) && adminPathMatch) {
+ if (isStudent(info) && adminPathMatch) {
   request.nextUrl.pathname = '/'
   return NextResponse.redirect(request.nextUrl)
  }
