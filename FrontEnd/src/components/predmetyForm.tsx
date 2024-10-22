@@ -1,5 +1,5 @@
 'use client'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -24,10 +24,11 @@ import { Input } from '@/components/ui/input'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
-import { DefaultForm } from '@/contexts/FormProvider'
+import { DefaultPredmet } from '@/contexts/FormProvider'
 import { AdminCtx } from '@/contexts/AdminProvider'
+import { LoaderCircle } from 'lucide-react'
 
-const formSchema = z.object({
+const predmetSchema = z.object({
  kod: z.string().optional(),
  zkratka: z.string().min(1, { message: 'Zkratka předmětu je povinná' }),
  katedra: z.string().min(1, { message: 'Katedra předmětu je povinná' }),
@@ -36,6 +37,8 @@ const formSchema = z.object({
 
 export default function PredmetForm() {
  const { toast } = useToast()
+ const [loading, setLoading] = useState<boolean>(false)
+
  const AdminContext = useContext(AdminCtx)
  const ReloadContext = useContext(ReloadCtx)
  if (!AdminContext || !ReloadContext) {
@@ -45,13 +48,14 @@ export default function PredmetForm() {
  const { open, setOpen, storage } = AdminContext
  const [reload, setReload] = ReloadContext
 
- const form = useForm<z.infer<typeof formSchema>>({
-  resolver: zodResolver(formSchema),
-  defaultValues: DefaultForm,
+ const form = useForm<z.infer<typeof predmetSchema>>({
+  resolver: zodResolver(predmetSchema),
+  defaultValues: DefaultPredmet,
   values: storage,
  })
 
- async function onSubmit(values: z.infer<typeof formSchema>) {
+ async function onSubmit(values: z.infer<typeof predmetSchema>) {
+  setLoading(true)
   const body: { zkratka: string; katedra: string; cviceni: number } = {
    zkratka: values.zkratka,
    katedra: values.katedra,
@@ -96,6 +100,7 @@ export default function PredmetForm() {
     description: 'Něco se nepovedlo',
    })
   }
+  setLoading(false)
  }
 
  return (
@@ -155,8 +160,8 @@ export default function PredmetForm() {
        />
       </div>
       <DialogFooter>
-       <Button type="submit">
-        Uložit
+       <Button type="submit" disabled={loading}>
+        {loading ? <LoaderCircle className="animate-spin w-5 h-5" /> : <>Uložit</>}
        </Button>
       </DialogFooter>
      </form>

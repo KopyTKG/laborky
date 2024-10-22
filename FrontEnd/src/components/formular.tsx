@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { format } from 'date-fns'
 import { cs } from 'date-fns/locale'
-import { Calendar as CalendarIcon } from 'lucide-react'
+import { Calendar as CalendarIcon, LoaderCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -64,6 +64,7 @@ const formSchema = z.object({
 
 export default function Formular() {
  const { toast } = useToast()
+ const [loading, setLoading] = useState<boolean>(false)
 
  const context = useContext(ReloadCtx)
  const FormContext = useContext(FormCtx)
@@ -82,6 +83,7 @@ export default function Formular() {
  })
 
  async function onSubmit(values: z.infer<typeof formSchema>) {
+  setLoading(true)
   const body: tCreate = {
    _id: values._id,
    ucebna: values.ucebna,
@@ -121,27 +123,29 @@ export default function Formular() {
     if (values.upozornit) {
      const data = await res.json()
      const mails = data.mails
-     const file = new Blob([mails.join('\n')], { type: 'text/csv' })
-     const fileURL = URL.createObjectURL(file)
+     if (mails.length > 0) {
+      const file = new Blob([mails.join('\n')], { type: 'text/csv' })
+      const fileURL = URL.createObjectURL(file)
 
-     const anchor = document.createElement('a')
-     anchor.href = fileURL
-     const date = new Date(Date.now())
-      .toLocaleString('en-GB', {
-       year: 'numeric',
-       month: '2-digit',
-       day: '2-digit',
-       hour: '2-digit',
-       minute: '2-digit',
-       second: '2-digit',
-      })
-      .replace(',', '')
-      .replace(/:/g, '-')
-      .replace(/\//g, '-')
-      .replace(' ', '_')
-     anchor.download = `${body._id}-${body.cviceni}_${date}`
-     anchor.click()
-     URL.revokeObjectURL(fileURL)
+      const anchor = document.createElement('a')
+      anchor.href = fileURL
+      const date = new Date(Date.now())
+       .toLocaleString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+       })
+       .replace(',', '')
+       .replace(/:/g, '-')
+       .replace(/\//g, '-')
+       .replace(' ', '_')
+      anchor.download = `${body._id}-${body.cviceni}_${date}`
+      anchor.click()
+      URL.revokeObjectURL(fileURL)
+     }
     }
    } else {
     toast({
@@ -158,6 +162,7 @@ export default function Formular() {
     description: 'Něco se nepovedlo při vypisování',
    })
   }
+  setLoading(false)
  }
  const [konecDatumManuallySet, setKonecDatumManuallySet] = useState(false)
 
@@ -460,7 +465,9 @@ export default function Formular() {
        )}
       />
       <DialogFooter>
-       <Button type="submit">Uložit</Button>
+       <Button type="submit" disabled={loading}>
+        {loading ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <>Uložit</>}
+       </Button>
       </DialogFooter>
      </form>
     </Form>

@@ -10,7 +10,6 @@ type AdminContextType = {
 }
 
 export const DefaultPredmet: tPredmetBody = {
- kod: '',
  zkratka: '',
  katedra: '',
  cviceni: 0,
