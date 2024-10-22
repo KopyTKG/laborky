@@ -3,7 +3,7 @@ version: '1.0.0'
 
 services:
  database:
-  image: postgres
+  image: postgres:17.0
   container_name: laborky_db
   restart: unless-stopped
   ports:

@@ -76,7 +76,7 @@ export type tForm = {
 }
 
 export type tPredmetBody = {
- kod?: string
+ kod: string
  zkratka: string
  katedra: string
  cviceni: number

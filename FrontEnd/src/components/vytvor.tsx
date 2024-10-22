@@ -14,7 +14,7 @@ export function Vytvor() {
   throw new Error('Missing FormProvider')
  }
 
- const { setOpen, setPredmety, setFormData, setType } = context
+ const { setOpen, setPredmety, setFormData, setType, predmety } = context
 
  useLayoutEffect(() => {
   const loadPredmety = async () => {
@@ -35,7 +35,7 @@ export function Vytvor() {
   <Button
    size="icon"
    className="fixed bottom-6 right-6 h-14 w-14 rounded-full"
-   disabled={loading}
+   disabled={loading || predmety.length == 0 }
    onClick={() => {
     setOpen(true)
     setFormData(DefaultForm)

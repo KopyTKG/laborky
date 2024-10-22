@@ -24,15 +24,14 @@ import { Input } from '@/components/ui/input'
 import { Get } from '@/app/actions'
 import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
-import { DefaultPredmet } from '@/contexts/FormProvider'
 import { AdminCtx } from '@/contexts/AdminProvider'
 import { LoaderCircle } from 'lucide-react'
 
 const predmetSchema = z.object({
- kod: z.string().optional(),
  zkratka: z.string().min(1, { message: 'Zkratka předmětu je povinná' }),
  katedra: z.string().min(1, { message: 'Katedra předmětu je povinná' }),
  cviceni: z.number().min(1, { message: 'Počet cvičení je povinný' }),
+ kod: z.string().optional(),
 })
 
 export default function PredmetForm() {
@@ -50,7 +49,6 @@ export default function PredmetForm() {
 
  const form = useForm<z.infer<typeof predmetSchema>>({
   resolver: zodResolver(predmetSchema),
-  defaultValues: DefaultPredmet,
   values: storage,
  })
 
