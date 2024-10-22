@@ -13,6 +13,7 @@ export type tTermin = {
  vypsal?: string[]
  owned?: boolean
  nCviceni?: number
+ kod?: string
 }
 
 export type tSelected = {

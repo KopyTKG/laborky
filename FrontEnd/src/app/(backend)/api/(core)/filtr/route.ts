@@ -10,20 +10,19 @@ export async function GET(req: Request) {
  const info = await getUserInfo(rTicket)
  if (!info) return Unauthorized()
 
+ if (isStudent(info)) return Unauthorized()
+
  let apipoint = '/ucitel'
- if (isStudent(info)) {
-  apipoint = '/student'
- } else if (isAdmin(info)) {
+ if (isAdmin(info)) {
   apipoint = '/admin'
  }
- 
+
  const base = new URL(req.url)
  const rVybrane = base.searchParams.get('vybrane') || ''
  let rVse = base.searchParams.get('vse') || ''
- if(!rVse) rVse = 'F'
+ if (!rVse) rVse = 'F'
 
- const all = rVse == 'T'? 'true': 'false'
-
+ const all = rVse == 'T' ? 'true' : 'false'
 
  const url = new URL(
   `${process.env.NEXT_PUBLIC_API_URL}/ucitel/${rVybrane ? 'board_by_predmet' : 'moje'}`,

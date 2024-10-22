@@ -18,6 +18,7 @@ export function resTotTermin(data: any): tTermin[] {
    vypsal: item.vyucujici,
    tema: item.popis,
    nCviceni: cv,
+   kod: item.kod_predmet
   }
   terminy.push(tmp)
  })
