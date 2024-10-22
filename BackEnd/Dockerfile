@@ -1,5 +1,5 @@
 # Base image with Python 3
-FROM python:3.10-slim AS build
+FROM python:3.13.0-bullseye AS build
 
 # Install system dependencies including PostgreSQL dev headers
 RUN apt-get update && apt-get install -y curl gcc libpq-dev \
