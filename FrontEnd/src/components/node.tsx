@@ -116,7 +116,8 @@ export default function Node(props: tNode) {
            konecCas: Time(props.konec),
            upozornit: true,
           })
-          setTerminID(props._id)
+	  setTerminID('')
+	  setType('create')
          }}
         >
          <Files className="w-6 h-6" aria-hidden="true" />
