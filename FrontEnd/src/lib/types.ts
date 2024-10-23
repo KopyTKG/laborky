@@ -28,6 +28,8 @@ export type tNode = tTermin & {
 export type tCreate = tTermin & {
  upzornit: boolean
  vyucuje?: string
+ jmeno: string
+ prijmeni: string
 }
 
 export type tLink = {
@@ -73,6 +75,8 @@ export type tForm = {
  konecDatum: Date
  konecCas: string
  upozornit: boolean
+ vJmeno: string
+ vPrijmeni: string
 }
 
 export type tPredmetBody = {

@@ -43,6 +43,7 @@ import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 import { DateTime } from '@/lib/functions'
 import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
+import { Accordion, AccordionTrigger, AccordionContent, AccordionItem } from './ui/accordion'
 
 const formSchema = z.object({
  _id: z.string().min(1, { message: 'Předmět je povinný' }),
@@ -60,9 +61,11 @@ const formSchema = z.object({
   .string()
   .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Neplatný formát času' }),
  upozornit: z.boolean().default(true),
+ vJmeno: z.string().optional(),
+ vPrijmeni: z.string().optional(),
 })
 
-export default function Formular() {
+export default function Formular({isAdmin}: {isAdmin: boolean}) {
  const { toast } = useToast()
  const [loading, setLoading] = useState<boolean>(false)
 
@@ -74,7 +77,8 @@ export default function Formular() {
  }
 
  const [reload, setReload] = context
- const { open, setOpen, predmety, formData, predmet, setPredmet, terminID, type } = FormContext
+ const { open, setOpen, predmety, formData, predmet, setPredmet, terminID, type } =
+  FormContext
 
  const form = useForm<z.infer<typeof formSchema>>({
   resolver: zodResolver(formSchema),
@@ -94,6 +98,8 @@ export default function Formular() {
    start: DateTime(values.startDatum, values.startCas),
    konec: DateTime(values.konecDatum, values.konecCas),
    upzornit: values.upozornit,
+   jmeno: values.vJmeno || '',
+   prijmeni: values.vPrijmeni || '',
   }
   if (body.cviceni > 0) body.nazev = `${body._id} cvičení ${body.cviceni}`
 
@@ -447,6 +453,43 @@ export default function Formular() {
         />
        </div>
       </div>
+      {isAdmin ? (
+       <div className="w-full">
+        <Accordion type="single" collapsible>
+         <AccordionItem value="item-1">
+          <AccordionTrigger>Vypisuji za někoho</AccordionTrigger>
+          <AccordionContent className='flex flex-row gap-5'>
+           <FormField
+            control={form.control}
+            name="vJmeno"
+            render={({ field }) => (
+             <FormItem className="flex-1">
+              <FormLabel>Jméno</FormLabel>
+              <FormControl>
+               <Input placeholder="Karel" {...field} />
+              </FormControl>
+              <FormMessage />
+             </FormItem>
+            )}
+           />
+           <FormField
+            control={form.control}
+            name="vPrijmeni"
+            render={({ field }) => (
+             <FormItem className="flex-1">
+              <FormLabel>Příjmení</FormLabel>
+              <FormControl>
+               <Input placeholder="Pádlo" {...field} />
+              </FormControl>
+              <FormMessage />
+             </FormItem>
+            )}
+           />
+          </AccordionContent>
+         </AccordionItem>
+        </Accordion>
+       </div>
+      ) : null}
       <FormField
        control={form.control}
        name="upozornit"

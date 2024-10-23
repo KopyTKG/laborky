@@ -25,7 +25,7 @@ export default async function RootLayout({
    <ContextProviders>
     <main className="max-w-6xl mx-auto pt-20">{children}</main>
     <Vytvor />
-    <Formular />
+    <Formular isAdmin={isAdmin(info)} />
     {isAdmin(info) && <PredmetyForm />}
    </ContextProviders>
   </>

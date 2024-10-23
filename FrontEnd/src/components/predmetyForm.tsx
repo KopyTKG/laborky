@@ -112,12 +112,12 @@ export default function PredmetForm() {
       <div className="grid grid-cols-3 gap-2">
        <FormField
         control={form.control}
-        name="zkratka"
+        name="katedra"
         render={({ field }) => (
          <FormItem>
-          <FormLabel>Zkratka</FormLabel>
+          <FormLabel>Katedra</FormLabel>
           <FormControl>
-           <Input placeholder="PCA" {...field} />
+           <Input placeholder="KI" {...field} />
           </FormControl>
           <FormMessage />
          </FormItem>
@@ -125,12 +125,12 @@ export default function PredmetForm() {
        />
        <FormField
         control={form.control}
-        name="katedra"
+        name="zkratka"
         render={({ field }) => (
          <FormItem>
-          <FormLabel>Katedra</FormLabel>
+          <FormLabel>Zkratka</FormLabel>
           <FormControl>
-           <Input placeholder="KI" {...field} />
+           <Input placeholder="PCA" {...field} />
           </FormControl>
           <FormMessage />
          </FormItem>

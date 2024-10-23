@@ -3,6 +3,20 @@ import { Unauthorized, NotFound, Success, Internal, Forbidden } from '@/lib/http
 import { fastHeaders, getTicket, getUserInfo } from '@/lib/stag'
 import { tCreate, tStudent, tTermin } from '@/lib/types'
 
+type tBody = {
+ ucebna: string
+ datum_start: string
+ datum_konec: string
+ max_kapacita: number
+ kod_predmetu: string
+ jmeno: string
+ cislo_cviceni: number
+ popis: string
+ upozornit: boolean
+ vyucuje_prijmeni: string
+ vyucuje_jmeno: string
+}
+
 /* ----------------------------------------------------------------------------------------------- */
 // Create
 export async function POST(req: Request) {
@@ -15,7 +29,7 @@ export async function POST(req: Request) {
  const body: tCreate = await req.json()
  if (!body) return NotFound()
 
- const fBody = {
+ const fBody: tBody = {
   ucebna: body.ucebna,
   datum_start: new Date(body.start).toJSON(),
   datum_konec: new Date(body.konec).toJSON(),
@@ -25,7 +39,8 @@ export async function POST(req: Request) {
   jmeno: body.nazev,
   kod_predmetu: body._id,
   upozornit: body.upzornit,
-  vyucuje_prijmeni: body.vyucuje || null,
+  vyucuje_prijmeni: body.prijmeni,
+  vyucuje_jmeno: body.jmeno,
  }
 
  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/ucitel/termin`)
@@ -75,7 +90,7 @@ export async function GET(req: Request) {
  let data = await res.json()
 
  const studenti: tStudent[] = data.studenti
- data = data.termin
+ data = data.termin as tBody
  const termin: tTermin = {
   _id: data.kod_predmet,
   ucebna: data.ucebna,
@@ -110,7 +125,7 @@ export async function PATCH(req: Request) {
  const body: tCreate = await req.json()
  if (!body) return NotFound()
 
- const fBody = {
+ const fBody: tBody = {
   ucebna: body.ucebna,
   datum_start: new Date(body.start).toJSON(),
   datum_konec: new Date(body.konec).toJSON(),
@@ -120,7 +135,8 @@ export async function PATCH(req: Request) {
   jmeno: body.nazev,
   kod_predmetu: body._id,
   upozornit: body.upzornit,
-  vyucuje_prijmeni: null,
+  vyucuje_prijmeni: body.prijmeni,
+  vyucuje_jmeno: body.jmeno,
  }
 
  const res = await fetch(url.toString(), {
