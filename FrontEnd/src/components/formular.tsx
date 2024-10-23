@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { format } from 'date-fns'
 import { cs } from 'date-fns/locale'
-import { Calendar as CalendarIcon } from 'lucide-react'
+import { Calendar as CalendarIcon, LoaderCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,7 @@ import { fastHeaders } from '@/lib/stag'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 import { DateTime } from '@/lib/functions'
 import { DefaultForm, DefaultPredmet, FormCtx } from '@/contexts/FormProvider'
+import { Accordion, AccordionTrigger, AccordionContent, AccordionItem } from './ui/accordion'
 
 const formSchema = z.object({
  _id: z.string().min(1, { message: 'Předmět je povinný' }),
@@ -60,10 +61,13 @@ const formSchema = z.object({
   .string()
   .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Neplatný formát času' }),
  upozornit: z.boolean().default(true),
+ vJmeno: z.string().optional(),
+ vPrijmeni: z.string().optional(),
 })
 
-export default function Formular() {
+export default function Formular({isAdmin}: {isAdmin: boolean}) {
  const { toast } = useToast()
+ const [loading, setLoading] = useState<boolean>(false)
 
  const context = useContext(ReloadCtx)
  const FormContext = useContext(FormCtx)
@@ -73,7 +77,8 @@ export default function Formular() {
  }
 
  const [reload, setReload] = context
- const { open, setOpen, predmety, formData, predmet, setPredmet, terminID, type } = FormContext
+ const { open, setOpen, predmety, formData, predmet, setPredmet, terminID, type } =
+  FormContext
 
  const form = useForm<z.infer<typeof formSchema>>({
   resolver: zodResolver(formSchema),
@@ -82,6 +87,7 @@ export default function Formular() {
  })
 
  async function onSubmit(values: z.infer<typeof formSchema>) {
+  setLoading(true)
   const body: tCreate = {
    _id: values._id,
    ucebna: values.ucebna,
@@ -92,6 +98,8 @@ export default function Formular() {
    start: DateTime(values.startDatum, values.startCas),
    konec: DateTime(values.konecDatum, values.konecCas),
    upzornit: values.upozornit,
+   jmeno: values.vJmeno || '',
+   prijmeni: values.vPrijmeni || '',
   }
   if (body.cviceni > 0) body.nazev = `${body._id} cvičení ${body.cviceni}`
 
@@ -121,27 +129,29 @@ export default function Formular() {
     if (values.upozornit) {
      const data = await res.json()
      const mails = data.mails
-     const file = new Blob([mails.join('\n')], { type: 'text/csv' })
-     const fileURL = URL.createObjectURL(file)
+     if (mails.length > 0) {
+      const file = new Blob([mails.join('\n')], { type: 'text/csv' })
+      const fileURL = URL.createObjectURL(file)
 
-     const anchor = document.createElement('a')
-     anchor.href = fileURL
-     const date = new Date(Date.now())
-      .toLocaleString('en-GB', {
-       year: 'numeric',
-       month: '2-digit',
-       day: '2-digit',
-       hour: '2-digit',
-       minute: '2-digit',
-       second: '2-digit',
-      })
-      .replace(',', '')
-      .replace(/:/g, '-')
-      .replace(/\//g, '-')
-      .replace(' ', '_')
-     anchor.download = `${body._id}-${body.cviceni}_${date}`
-     anchor.click()
-     URL.revokeObjectURL(fileURL)
+      const anchor = document.createElement('a')
+      anchor.href = fileURL
+      const date = new Date(Date.now())
+       .toLocaleString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+       })
+       .replace(',', '')
+       .replace(/:/g, '-')
+       .replace(/\//g, '-')
+       .replace(' ', '_')
+      anchor.download = `${body._id}-${body.cviceni}_${date}`
+      anchor.click()
+      URL.revokeObjectURL(fileURL)
+     }
     }
    } else {
     toast({
@@ -158,6 +168,7 @@ export default function Formular() {
     description: 'Něco se nepovedlo při vypisování',
    })
   }
+  setLoading(false)
  }
  const [konecDatumManuallySet, setKonecDatumManuallySet] = useState(false)
 
@@ -442,6 +453,43 @@ export default function Formular() {
         />
        </div>
       </div>
+      {isAdmin ? (
+       <div className="w-full">
+        <Accordion type="single" collapsible>
+         <AccordionItem value="item-1">
+          <AccordionTrigger>Vypisuji za někoho</AccordionTrigger>
+          <AccordionContent className='flex flex-row gap-5'>
+           <FormField
+            control={form.control}
+            name="vJmeno"
+            render={({ field }) => (
+             <FormItem className="flex-1">
+              <FormLabel>Jméno</FormLabel>
+              <FormControl>
+               <Input placeholder="Karel" {...field} />
+              </FormControl>
+              <FormMessage />
+             </FormItem>
+            )}
+           />
+           <FormField
+            control={form.control}
+            name="vPrijmeni"
+            render={({ field }) => (
+             <FormItem className="flex-1">
+              <FormLabel>Příjmení</FormLabel>
+              <FormControl>
+               <Input placeholder="Pádlo" {...field} />
+              </FormControl>
+              <FormMessage />
+             </FormItem>
+            )}
+           />
+          </AccordionContent>
+         </AccordionItem>
+        </Accordion>
+       </div>
+      ) : null}
       <FormField
        control={form.control}
        name="upozornit"
@@ -460,7 +508,9 @@ export default function Formular() {
        )}
       />
       <DialogFooter>
-       <Button type="submit">Uložit</Button>
+       <Button type="submit" disabled={loading}>
+        {loading ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <>Uložit</>}
+       </Button>
       </DialogFooter>
      </form>
     </Form>

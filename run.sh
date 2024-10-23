@@ -3,6 +3,7 @@
 SESH="laborky"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	git pull
 	if [[ "$1" == "dev" ]]; then
 		gnome-terminal -- bash -c "./run.sh -rtmux"
 		nvim .
@@ -41,14 +42,16 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		fi
 		tmux attach-session -t $SESH
 	else
-    		echo "Linux"
-    		gnome-terminal -- bash -c "docker compose -f docker-compose.fe.yml up --build"
-    		gnome-terminal -- bash -c "cd BackEnd && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python server.py"
+    echo "Linux"
+		git pull
+    gnome-terminal -- bash -c "docker compose -f docker-compose.fe.yml up --build"
+    gnome-terminal -- bash -c "cd BackEnd && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python server.py"
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Mac OSX"
 else
     echo "Windows"
+    git pull
     start powershell -Command 'docker compose -f docker-compose.fe.yml up --build'
     start powershell -Command 'cd BackEnd; python -m venv venv; ./venv/Scripts/activate; pip install -r requirements.txt; python server.py'
 fi

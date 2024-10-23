@@ -45,11 +45,11 @@ class Termin(Base):
     jmeno = Column("jmeno", Text)
     vypsal_id = Column(String, ForeignKey('vyucujici.id'))
     vyucuje_id = Column(String, ForeignKey('vyucujici.id'))
-    kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu'))
+    kod_predmet = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
     cislo_cviceni = Column("cislo_cviceni", Integer)
     popis = Column("popis", Text)
     # Relationships to Predmet
-    predmet = relationship('Predmet', back_populates="termin")
+    predmet = relationship('Predmet', back_populates="termin", passive_deletes=True)
     # Relationships to Vyucujici
     vypsal = relationship('Vyucujici', foreign_keys=[vypsal_id], back_populates="terminy_vypsal")
     vyucuje = relationship('Vyucujici', foreign_keys=[vyucuje_id], back_populates="terminy_vyucuje")
@@ -63,9 +63,9 @@ class VyucujiciPredmety(Base):
     kod_predmetu = Column(Text, ForeignKey('predmet.kod_predmetu', ondelete='CASCADE'))
     vyucujici_id = Column(String, ForeignKey('vyucujici.id', ondelete='CASCADE'))
     # Relationships to Vyucujici
-    vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje")
+    vyucujici = relationship('Vyucujici', back_populates="predmet_vyucuje", passive_deletes=True)
     # Relationships to Predmet
-    predmet = relationship('Predmet', back_populates="vyucujici_predmety")
+    predmet = relationship('Predmet', back_populates="vyucujici_predmety", passive_deletes=True)
 
 class Vyucujici(Base):
     __tablename__ = "vyucujici"
@@ -89,7 +89,7 @@ class Predmet(Base):
     # Many-to-many relationship via VyucujiciPredmety
     vyucujici_predmety = relationship('VyucujiciPredmety', back_populates="predmet", passive_deletes=True)
     # Relationships to Termin
-    termin = relationship('Termin', back_populates="predmet")
+    termin = relationship('Termin', back_populates="predmet", passive_deletes=True)
 
 class Student(Base):
     __tablename__ = "student"
@@ -299,6 +299,36 @@ def vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id,
         session.rollback()
         return internal_server_error
 
+def smazat_predmet(session, kod_predmetu):
+    try:
+        predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+        if predmet is None:
+            return not_found
+        session.delete(predmet)
+        session.commit()
+        return ok
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error occurred: {e}")
+        return interval_vypisu_terminu
+
+def upravit_predmet(session, kod_predmetu, newZkratkaPredmetu=None, newKatedra=None, newPocetCviceni=None):
+    try:
+        predmet = session.query(Predmet).filter_by(kod_predmetu=kod_predmetu).first()
+        if predmet is None:
+            return not_found
+        
+        predmet.zkratka_predmetu = newZkratkaPredmetu
+        predmet.katedra = newKatedra
+        predmet.pocet_cviceni = newPocetCviceni
+        predmet.kod_predmetu = f"{newKatedra}/{newZkratkaPredmetu}"
+
+        session.commit()
+        return ok
+
+    except:
+        session.rollback()
+        return internal_server_error
 
 def pridej_vyucujiciho_na_predmet(session, kod_predmetu, vyucujici_id):
     try:

@@ -24,7 +24,7 @@ def get_vsechny_predmety_obj(session):
 
 # tohle je obsolete imho
 def get_predmet_by_id(session, id_predmetu):
-    """ Vrátí kód předmětu podle jeho identifikačního kódů """
+    """ Vrátí info o předmětu podle kódu předmětu """
     try:
         predmet = session.query(Predmet).filter_by(kod_predmetu=id_predmetu).first()
         if predmet:
@@ -145,7 +145,7 @@ def subtract_lists(list1, list2):
 
 def get_uznavaci_termin_by_zkratka(session, zkratka_predmetu, kod_predmetu=None):
     """ Vrátí id uznačovacího terminu podle zkratky předmětu """
-    try:    
+    try:
         if kod_predmetu == None:
             kod_predmetu = get_kod_predmetu_by_zkratka(session, zkratka_predmetu)
         termin = session.query(Termin).filter(and_(Termin.kod_predmet==kod_predmetu, Termin.cislo_cviceni==-1)).first()
@@ -178,7 +178,7 @@ def get_datum_uznavaci_termin_student(session, id_studenta, id_termin):
         return None
     except:
         return internal_server_error
-        
+
 
 def get_list_emailu_pro_cviceni(session,kod_predmetu:str, index_cviceni: int, ticket: str, novy_termin: Optional[bool] = False):
     try:
@@ -259,7 +259,7 @@ def get_datum_splneni_terminu(session, student_id, termin_id):
             return ""
     except:
         return internal_server_error
-    
+
 
 def pridej_vyucujicimu_predmety_list(session, id_vyucujiciho, list_kodu_predmetu):
     try:
@@ -282,7 +282,7 @@ def odeber_vyucujiciho_od_vsech_predmetu(session, id_vyucujiciho):
         session.rollback()
         return internal_server_error
     return ok
-        
+
 
 def get_student_by_id(session, id_studenta):
     try:
@@ -290,7 +290,7 @@ def get_student_by_id(session, id_studenta):
         return student
     except:
         return not_found
-    
+
 
 def get_studenti_all(session):
     try:

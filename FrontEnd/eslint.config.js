@@ -14,8 +14,8 @@ const compat = new FlatCompat({
 })
 
 const settings = [
- { files: ['**/*.{js,jsx,ts,tsx}'] },
- { files: ['**/*.cjs'], languageOptions: { sourceType: 'commonjs' } },
+ { files: ['**/*.{jsx,ts,tsx}'] },
+ { files: ['**/*.{js,cjs}'], languageOptions: { sourceType: 'commonjs' } },
  { ignores: ['./src/app/components/ui/*.tsx', '.next/', 'node_modules/'] },
 
  ...compat.extends(

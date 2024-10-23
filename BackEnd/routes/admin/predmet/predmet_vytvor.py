@@ -6,15 +6,14 @@ from typing import Optional
 router = APIRouter()
 
 
-@router.post("/ucitel/pridat_predmet")
-async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, pocet_cviceni: int, vyucuje_id: Optional[str] = None):
+@router.post("/admin/predmet")
+async def post_pridat_predmet(ticket: str, predmet: tPredmet):
     """Vytvoří předmět - admin akce
     Args:
         ticket,
         zkratka predmetu,
         zkratka katedry,
         pocet_cviceni,
-        vyucuje_id : id vyučujícího ... když se nechá prázný, bude bráno ID admina,
     """
     try:
         info = kontrola_ticketu(ticket, vyucujici=True)
@@ -22,27 +21,22 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
             return info
         id_vypsal, role = encode_id(info[0]), info[1]
 
-        kod_predmetu = katedra + "/" + zkratka_predmetu
-        if vyucuje_id is None:
-            vyucuje_id = id_vypsal
-        else:
-            vyucuje_id = encode_id(vyucuje_id)
-
-        if not bool_existuje_predmet(ticket, katedra, zkratka_predmetu):
+        kod_predmetu = predmet.katedra + "/" + predmet.zkratka_predmetu
+        if not bool_existuje_predmet(ticket, predmet.katedra, predmet.zkratka_predmetu):
             return bad_request
 
-        message = vytvor_predmet(session, kod_predmetu, zkratka_predmetu, katedra, vyucuje_id, pocet_cviceni)
+        message = vytvor_predmet(session, kod_predmetu, predmet.zkratka_predmetu, predmet.katedra, id_vypsal, predmet.pocet_cviceni)
 
         if message == ok:
             vyucujici_k_predmetum_to_txt(session)
             session.commit()
             datum_start = datetime.now()
             datum_konec = datetime.now() + timedelta(hours=2)
-            message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, vyucuje_id, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
+            message = vypsat_termin(session, "Nespecifikovano", datum_start, datum_konec, 1, id_vypsal, id_vypsal, kod_predmetu, "Uznání předmětu", -1, "Cvičení pro uznání všech cvičení v rámci předmětu") # type: ignore
             session.commit()
 
             if message == ok:
-                studenti = get_studenti_na_predmetu(ticket, katedra, zkratka_predmetu)
+                studenti = get_studenti_na_predmetu(ticket, predmet.katedra, predmet.zkratka_predmetu)
                 vsichni_studenti = get_studenti_all(session)
 
                 for student in studenti:
@@ -55,6 +49,6 @@ async def post_pridat_predmet(ticket: str, zkratka_predmetu: str, katedra: str, 
 
         else:
             return message
-        
+
     except:
         return internal_server_error

@@ -8,10 +8,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { FilterCtx } from '@/contexts/FilterProvider'
 import { Header } from '@/components/ui/header'
 
-const fetchTerminyData = async (data: string[]) => {
+const fetchTerminyData = async (data: string[], all: boolean) => {
  try {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/filtr`)
   url.searchParams.set('vybrane', data.join('-'))
+  url.searchParams.set('vse', all? 'T' : 'F')
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
@@ -35,12 +36,12 @@ export default function FiltrTerminy({ typ }: { typ?: string }) {
   throw new Error('Missing FilterProvider')
  }
 
- const [filter, _] = Fcontext
+ const {filter, all} = Fcontext
 
  const [fetching, setFetching] = useState<boolean>(true)
 
  const fetchTerminy = useCallback(async () => {
-  const data = await fetchTerminyData(filter)
+  const data = await fetchTerminyData(filter, all)
   if (data) {
    setTerminy(data.data)
   }
@@ -54,7 +55,7 @@ export default function FiltrTerminy({ typ }: { typ?: string }) {
 
  if (Terminy?.length === 0 && fetching) {
   return (
-   <div className="w-max h-[10rem] grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-3">
+   <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3 h-[10rem]">
     {Array.from({ length: 3 }, (_, index) => (
      <Skeleton key={index} className="w-[25rem] h-[18rem] rounded-xl" />
     ))}

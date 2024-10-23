@@ -18,14 +18,16 @@ export async function GET(req: Request) {
  } else {
   const data = await res.json()
   const predmety: tPredmet[] = []
-  data.map((item: any) => {
-   let predmet: tPredmet = {
-    _id: item.id,
-    nazev: item.id,
-    nCviceni: item.pocet_cviceni,
-   }
-   predmety.push(predmet)
-  })
+  if (data) {
+   data.map((item: any) => {
+    let predmet: tPredmet = {
+     _id: item.id,
+     nazev: item.id,
+     nCviceni: item.pocet_cviceni,
+    }
+    predmety.push(predmet)
+   })
+  }
   return Success({ predmety })
  }
 }
