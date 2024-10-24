@@ -22,7 +22,7 @@ export async function GET(req: Request) {
  let rVse = base.searchParams.get('vse') || ''
  if (!rVse) rVse = 'F'
 
- const all = rVse == 'T' ? 'true' : ''
+ const all = rVse == 'T' ? 'true' : 'false'
  let params = ``
 
  if(rVybrane) params = `/ucitel/board_by_predmet` 

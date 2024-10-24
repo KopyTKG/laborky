@@ -12,7 +12,7 @@ const fetchTerminyData = async (data: string[], all: boolean) => {
  try {
   const url = new URL(`${process.env.NEXT_PUBLIC_BASE}/api/filtr`)
   url.searchParams.set('vybrane', data.join('-'))
-  url.searchParams.set('vse', all? 'T' : 'F')
+  url.searchParams.set('vse', all ? 'T' : 'F')
   const cookie = await Get('stagUserTicket')
   if (cookie) {
    url.searchParams.set('ticket', cookie.value)
@@ -36,11 +36,12 @@ export default function FiltrTerminy({ typ }: { typ?: string }) {
   throw new Error('Missing FilterProvider')
  }
 
- const {filter, all} = Fcontext
+ const { filter, all } = Fcontext
 
  const [fetching, setFetching] = useState<boolean>(true)
 
  const fetchTerminy = useCallback(async () => {
+  setFetching(true)
   const data = await fetchTerminyData(filter, all)
   if (data) {
    setTerminy(data.data)
@@ -53,7 +54,7 @@ export default function FiltrTerminy({ typ }: { typ?: string }) {
   fetchTerminy()
  }, [fetchTerminy])
 
- if (Terminy?.length === 0 && fetching) {
+ if (fetching) {
   return (
    <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3 h-[10rem]">
     {Array.from({ length: 3 }, (_, index) => (
@@ -69,15 +70,15 @@ export default function FiltrTerminy({ typ }: { typ?: string }) {
     </Header>
    </span>
   )
+ } else {
+  return (
+   <>
+    <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
+     {Terminy?.map((termin: tTermin) => (
+      <Node key={termin._id} props={{ ...termin, typ: typ || '' }} />
+     ))}
+    </div>
+   </>
+  )
  }
-
- return (
-  <>
-   <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
-    {Terminy?.map((termin: tTermin) => (
-     <Node key={termin._id} props={{...termin, typ: typ || ''}} />
-    ))}
-   </div>
-  </>
- )
 }
