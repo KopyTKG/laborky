@@ -419,7 +419,7 @@ export default function Formular({ isAdmin }: { isAdmin: boolean }) {
               </Button>
              </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-[1000]" align="start">
              <Calendar
               mode="single"
               className="z-50"
