@@ -362,6 +362,7 @@ export default function Formular({ isAdmin }: { isAdmin: boolean }) {
              <div className="p-3">
               <Calendar
                mode="single"
+               className="z-50"
                selected={field.value}
                onSelect={(date) => {
                 setKonecDatumManuallySet(false)
@@ -421,6 +422,7 @@ export default function Formular({ isAdmin }: { isAdmin: boolean }) {
             <PopoverContent className="w-auto p-0" align="start">
              <Calendar
               mode="single"
+              className="z-50"
               selected={field.value}
               onSelect={(date) => {
                setKonecDatumManuallySet(true)

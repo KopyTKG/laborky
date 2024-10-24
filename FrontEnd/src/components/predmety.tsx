@@ -73,8 +73,8 @@ export default function Predmety({ isAdmin }: { isAdmin: boolean }) {
    <TableHeader>
     <TableRow>
      <TableHead>Kód předmětu</TableHead>
-     <TableHead>Zkratka</TableHead>
      <TableHead>Katedra</TableHead>
+     <TableHead>Zkratka</TableHead>
      <TableHead>Počet cvičení</TableHead>
      <TableHead>Operace</TableHead>
     </TableRow>
