@@ -11,9 +11,10 @@ export default function NavodSt() {
    <main className="flex flex-col gap-10 w-full">
     <section>
      <Header underline="fade">Domovská stránka</Header>
-     Stránka <span className="font-semibold">Domů</span> obsahuje seznam všech dostupných termínů. <br/>
+     Stránka <span className="font-semibold">Domů</span> obsahuje seznam všech dostupných termínů.
+     <br />
      <span className="text-red-800 dark:text-red-400">
-     Upozonění: Po zápisu na termín předmětu se již nebudou zobrazovat termíny stejného typu
+      Upozonění: Po zápisu na termín předmětu se již nebudou zobrazovat termíny stejného typu
      </span>
      <Header type="h2" underline="fade" className="w-max">
       Volný termín
@@ -69,7 +70,7 @@ export default function NavodSt() {
     <section>
      <Header underline="fade">Zapsané terminy</Header>
      Stránka <span className="font-semibold">Moje termíny</span> obsahuje seznam termínů které máte
-     zapsáné. Zde se můžete odepsat z termínu. <br/>
+     zapsáné. Zde se můžete odepsat z termínu. <br />
      <span className="text-red-800 dark:text-red-400">
       Upozonění: Odepsání z termínu je povoleno jen
       <span className="font-semibold">{process.env.NEXT_PUBLIC_TIME_GAP} hodin</span> před začátkem
