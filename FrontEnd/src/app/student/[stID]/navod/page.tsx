@@ -13,8 +13,7 @@ export default function NavodSt() {
      <Header underline="fade">Domovská stránka</Header>
      Stránka <span className="font-semibold">Domů</span> obsahuje seznam všech dostupných termínů. <br/>
      <span className="text-red-800 dark:text-red-400">
-      Upozonění: po zápis na jeden termín předměntu nebudou se ti již zobrazovat termíny stejného
-      typu
+     Upozonění: Po zápisu na termín předmětu se již nebudou zobrazovat termíny stejného typu
      </span>
      <Header type="h2" underline="fade" className="w-max">
       Volný termín
@@ -69,12 +68,12 @@ export default function NavodSt() {
     </section>
     <section>
      <Header underline="fade">Zapsané terminy</Header>
-     Stránka <span className="font-semibold">Moje termíny</span> obsahuje seznam termínů na které si
-     zapsán. Zde se můžeš odepsat z termínu. <br/>
+     Stránka <span className="font-semibold">Moje termíny</span> obsahuje seznam termínů které máte
+     zapsáné. Zde se můžete odepsat z termínu. <br/>
      <span className="text-red-800 dark:text-red-400">
-      Upozonění: odepsání z termínu je povoleno jen
+      Upozonění: Odepsání z termínu je povoleno jen
       <span className="font-semibold">{process.env.NEXT_PUBLIC_TIME_GAP} hodin</span> před začátkem
-      termíny.
+      termínu.
      </span>
      <Header type="h2" underline="fade" className="w-max">
       Odepisovatelný termín
@@ -130,7 +129,7 @@ export default function NavodSt() {
     <section>
      <Header underline="fade">Profil studenta</Header>
      Stránka <span className="font-semibold">Profil</span> obsahuje seznam všech dostupných předmětů
-     a jejich cvičení. Dála zde najít tabulku pro každý dostupný předmět, která značí stav
+     a jejich cvičení. Dála zde můžete najít tabulku pro každý dostupný předmět, která značí stav
      jednotlivých cvičení danného předmětu.
      <Header type="h2" underline="fade" className="w-max">
       Tabulka předmětu
