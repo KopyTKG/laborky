@@ -28,7 +28,7 @@ export default async function Profil() {
   <>
    <div className="w-full mt-1">
     {predmety.map((predmet: tPredmetSekce, key: number) => {
-     return <Predmet predmet={predmet} key={key} lenght={predmety.length-1} />
+     return <Predmet predmet={predmet} key={key + Date.now()} lenght={predmety.length-1} />
     })}
    </div>
   </>

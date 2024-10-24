@@ -9,7 +9,7 @@ export default function NavodSt() {
  return (
   <section className="flex flex-row">
    <main className="flex flex-col gap-10 w-full">
-    <section id="domov">
+    <section>
      <Header underline="fade">Domovská stránka</Header>
      Stránka <span className="font-semibold">Domů</span> obsahuje seznam všech dostupných termínů.
      <span className="text-red-800 dark:text-red-400">
@@ -67,7 +67,7 @@ export default function NavodSt() {
       />
      </section>
     </section>
-    <section id="zapsane">
+    <section>
      <Header underline="fade">Zapsané terminy</Header>
      Stránka <span className="font-semibold">Moje termíny</span> obsahuje seznam termínů na které si
      zapsán. Zde se můžeš odepsat z termínu.
@@ -128,7 +128,7 @@ export default function NavodSt() {
       />
      </section>
     </section>
-    <section className="pr-2" id="profil">
+    <section>
      <Header underline="fade">Profil studenta</Header>
      Stránka <span className="font-semibold">Profil</span> obsahuje seznam všech dostupných předmětů
      a jejich cvičení. Dála zde najít tabulku pro každý dostupný předmět, která značí stav
@@ -158,12 +158,6 @@ export default function NavodSt() {
      </section>
     </section>
    </main>
-   <nav className="w-[20rem] border-l border-gray-200/30 p-4 flex flex-col sticky">
-    <Header type="h3"> Navigace </Header>
-    <a href="#domov">{'->'} Domů</a>
-    <a href="#zapsane">{'->'} Moje termíny</a>
-    <a href="#profil">{'->'} Profil</a>
-   </nav>
   </section>
  )
 }
