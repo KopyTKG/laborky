@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { ReloadCtx } from '@/contexts/ReloadProvider'
 
-export function Zobrazit({ id }: { id: string }) {
+export function Zobrazit({ id, demo }: { id: string, demo?: boolean }) {
  const router = useRouter()
- return <Button onClick={() => router.push(`/termin/${id}`)}>Zobrazit</Button>
+ return <Button onClick={() => {if(!demo)router.push(`/termin/${id}`)}}>Zobrazit</Button>
 }
 
 export function Zapsat({
@@ -18,6 +18,7 @@ export function Zapsat({
  VolnoRender,
  CapRender,
  volno,
+ demo
 }: {
  id: string
  owned: boolean
@@ -25,6 +26,7 @@ export function Zapsat({
  VolnoRender: boolean
  CapRender: boolean
  volno: boolean
+ demo?: boolean
 }) {
  const context = useContext(ReloadCtx)
  if (!context) {
@@ -52,7 +54,7 @@ export function Zapsat({
    if (res.status != 200 && res.status != 409) {
     window.location.href = '/logout'
    } else {
-    setReload(true)
+    setReload(!reload)
     if (res.status === 200) {
      toast({
       title: 'Akce provedena',
@@ -76,7 +78,7 @@ export function Zapsat({
   <Button
    variant={owned ? 'destructive' : CapRender ? 'destructive' : 'default'}
    disabled={owned? mojeCheck: zapsatCheck}
-   onClick={() => APIcall(id, setReload)}
+   onClick={() => {if(!demo)APIcall(id, setReload)}}
   >
    {!owned && (volno ? 'Obsazeno' : 'Zapsat se')}
    {owned && ('Odepsat se')}

@@ -77,7 +77,7 @@ export default function ZapsaneTerminy() {
   <>
    <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Terminy.map((termin: tTermin) => (
-     <Node key={termin._id} owned={true} {...termin} typ="student" />
+     <Node key={termin._id} props={{...termin, typ:'student', owned: true}}/>
     ))}
    </div>
   </>

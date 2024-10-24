@@ -41,3 +41,14 @@ export function isAdmin(info: tUser): boolean {
  return info.role.includes('KA')
 }
 
+export function addDays(date: Date, days: number) {
+ let result = new Date(date)
+ result.setDate(result.getDate() + days)
+ return result
+}
+
+export function addHours(date: Date, hours: number) {
+ let result = new Date(date)
+ result.setHours(result.getHours() + hours)
+ return result
+}

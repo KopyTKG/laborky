@@ -21,7 +21,6 @@ export type tSelected = {
 }
 
 export type tNode = tTermin & {
- owned: boolean
  typ: string
 }
 

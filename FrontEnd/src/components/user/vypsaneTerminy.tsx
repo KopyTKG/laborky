@@ -77,7 +77,7 @@ export default function VypsaneTerminy({ typ }: { typ: string | undefined }) {
   <>
    <div className="w-max grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-3">
     {Terminy?.map((termin: tTermin) => (
-     <Node key={termin._id} owned={false} {...termin} typ={typ || ''} />
+     <Node key={termin._id} props={{...termin, typ: typ || '', owned: false}} />
     ))}
    </div>
   </>
