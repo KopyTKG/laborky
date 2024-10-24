@@ -28,7 +28,6 @@ export async function POST(req: Request) {
 
  const body: tCreate = await req.json()
  if (!body) return NotFound()
-
  const fBody: tBody = {
   ucebna: body.ucebna,
   datum_start: new Date(body.start).toJSON(),
