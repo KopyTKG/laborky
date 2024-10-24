@@ -15,6 +15,8 @@ type FormContextType = {
  setTerminID: Dispatch<SetStateAction<string>>
  type: string
  setType: Dispatch<SetStateAction<string>>
+ isAdmin: boolean,
+ setIsAdmin: Dispatch<SetStateAction<boolean>>
 }
 
 export const DefaultForm: tForm = {
@@ -29,6 +31,8 @@ export const DefaultForm: tForm = {
  konecDatum: new Date(),
  konecCas: '',
  upozornit: true,
+ vJmeno: '',
+ vPrijmeni: '',
 }
 
 export const DefaultPredmet: tPredmet = {
@@ -47,6 +51,7 @@ export default function FormProvider({ children }: { children: React.ReactNode }
  const [predmet, setPredmet] = useState<tPredmet>(DefaultPredmet)
  const [terminID, setTerminID] = useState<string>('')
  const [type, setType] = useState<string>('')
+ const [isAdmin, setIsAdmin] = useState<boolean>(false)
  return (
   <FormCtx.Provider
    value={{
@@ -61,7 +66,9 @@ export default function FormProvider({ children }: { children: React.ReactNode }
     terminID,
     setTerminID,
     type,
-    setType
+    setType,
+    isAdmin,
+    setIsAdmin
    }}
   >
    {children}

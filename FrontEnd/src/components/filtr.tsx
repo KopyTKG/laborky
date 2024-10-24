@@ -21,6 +21,8 @@ import { fastHeaders } from '@/lib/stag'
 import { tPredmet } from '@/lib/types'
 import { Header } from './ui/header'
 import { FilterCtx } from '@/contexts/FilterProvider'
+import { Accordion, AccordionContent, AccordionTrigger } from './ui/accordion'
+import { AccordionItem } from '@radix-ui/react-accordion'
 
 async function fetchPredmetyData() {
  try {
@@ -40,6 +42,7 @@ async function fetchPredmetyData() {
 
 const FormSchema = z.object({
  items: z.array(z.string()).default([]),
+ all: z.boolean().optional(),
 })
 
 export default function Filtr() {
@@ -51,7 +54,7 @@ export default function Filtr() {
   throw new Error('Missing FilterProvider')
  }
 
- const [filter, setFiler] = Fcontext
+ const {filter, setFilter, all, setAll} = Fcontext
 
  useEffect(() => {
   async function loadPredmety() {
@@ -76,7 +79,7 @@ export default function Filtr() {
  })
 
  function onSubmit(data: z.infer<typeof FormSchema>) {
-  setFiler(data.items)
+  setFilter(data.items)
  }
 
  return (
@@ -131,6 +134,27 @@ export default function Filtr() {
         <Button type="submit" className="mt-4">
          Potvrdit
         </Button>
+        <FormField
+         control={form.control}
+         name="all"
+         render={() => {
+          return (
+           <FormItem className="flex items-start space-x-3 space-y-0 w-full">
+            <Accordion type="single" collapsible className="w-full">
+             <AccordionItem value="item-1">
+              <AccordionTrigger>Nastavení</AccordionTrigger>
+              <AccordionContent className='ml-5 flex gap-3'>
+               <FormControl>
+                <Checkbox checked={all} onCheckedChange={() => {setAll(!all)}} />
+               </FormControl>
+               <FormLabel className="font-normal">Zobrazit proběhlé</FormLabel>
+              </AccordionContent>
+             </AccordionItem>
+            </Accordion>
+           </FormItem>
+          )
+         }}
+        />
        </FormItem>
       )}
      />

@@ -1,10 +1,9 @@
 import { tLink } from '@/lib/types'
-import { House, Menu, Users } from 'lucide-react'
+import { House, LayoutGrid, Menu, Users } from 'lucide-react'
 import NavbarComponent from './navbarComponent'
 import { getUserInfo } from '@/lib/stag'
 import { Get } from '@/app/actions'
 import { isAdmin } from '@/lib/functions'
-
 
 export function NavbarStudent({ id }: { id: string }) {
  const baseUrl = '/student/#id'
@@ -27,7 +26,7 @@ export function NavbarStudent({ id }: { id: string }) {
 export async function NavbarTeacher({ id }: { id: string }) {
  const ticket = (await Get('stagUserTicket'))?.value || ''
  const info = await getUserInfo(ticket)
- if(!info) return null
+ if (!info) return null
 
  const baseUrl = '/ucitel/#id'
  const url = baseUrl.replace('#id', id)
@@ -47,9 +46,12 @@ export async function NavbarTeacher({ id }: { id: string }) {
    href: `${url}/hledat`,
    icon: <Users className="w-5" />,
   },
+  {
+   label: 'Předměty',
+   href: `${url}/predmety`,
+   icon: <LayoutGrid className="w-5" />,
+  },
  ]
 
- return <NavbarComponent id={id} links={links} url={url} st={true} admin={isAdmin(info)} />
+ return <NavbarComponent id={id} links={links} url={url} st={true} />
 }
-
-

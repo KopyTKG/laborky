@@ -13,6 +13,7 @@ export type tTermin = {
  vypsal?: string[]
  owned?: boolean
  nCviceni?: number
+ kod?: string
 }
 
 export type tSelected = {
@@ -20,13 +21,14 @@ export type tSelected = {
 }
 
 export type tNode = tTermin & {
- owned: boolean
  typ: string
 }
 
 export type tCreate = tTermin & {
  upzornit: boolean
  vyucuje?: string
+ jmeno: string
+ prijmeni: string
 }
 
 export type tLink = {
@@ -72,4 +74,13 @@ export type tForm = {
  konecDatum: Date
  konecCas: string
  upozornit: boolean
+ vJmeno: string
+ vPrijmeni: string
+}
+
+export type tPredmetBody = {
+ kod: string
+ zkratka: string
+ katedra: string
+ cviceni: number
 }

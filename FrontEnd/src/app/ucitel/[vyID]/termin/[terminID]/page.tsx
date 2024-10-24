@@ -85,6 +85,8 @@ export default function TerminPage({ params }: { params: { terminID: string } })
      konecDatum: new Date(termin.konec),
      konecCas: Time(termin.konec),
      upozornit: true,
+     vJmeno: '',
+     vPrijmeni: ''
     },
     terminId: params.terminID,
    })
