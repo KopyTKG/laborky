@@ -185,7 +185,7 @@ export default function Formular({ isAdmin }: { isAdmin: boolean }) {
 
  return (
   <Dialog open={open} onOpenChange={setOpen}>
-   <DialogContent className="sm:max-w-[425px]">
+   <DialogContent className="sm:max-w-[425px] max-h-[53rem] h-dvh overflow-y-scroll">
     <DialogHeader>
      <DialogTitle>{type == 'create' ? 'Vytvořit novou' : 'Upravit'} událost</DialogTitle>
      <DialogDescription>
